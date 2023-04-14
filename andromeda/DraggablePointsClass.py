@@ -47,8 +47,8 @@ class DraggablePoints(object):
         if (self.current_artist is not None) and (event.xdata is not None) and (event.ydata is not None):
             # Drag the point and its text label
             dx, dy = self.offset
-            x0, y0 = event.xdata + dx, event.ydata + dy
-            self.current_artist.center = x0, y0 #= event.xdata + dx, event.ydata + dy
+            #x0, y0 = event.xdata + dx, event.ydata + dy
+            self.current_artist.center = x0, y0 = event.xdata + dx, event.ydata + dy
             self.current_artist.text.set_position((x0 + self.current_artist.radius, 
                                                    y0 ))
             if self.current_artist.ab:
@@ -58,6 +58,6 @@ class DraggablePoints(object):
         ''' 
         Function to stop dragging the point when the mouse is released
         '''
-        self.ax.figure.canvas.draw()
+        #self.ax.figure.canvas.draw()
         self.current_artist = None
         
