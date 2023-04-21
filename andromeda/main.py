@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
+import numpy as np
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -56,7 +57,8 @@ def upload_dataset():
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
     dataset = dataset_store.create_dataset(user_file)
-
+    # we could send the data the the front end here
+    # data = dataset.read_dataframe().replace({np.nan: None}).to_dict("records")
     return jsonify(
         {
             "id": dataset.id
