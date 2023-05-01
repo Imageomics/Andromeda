@@ -1,4 +1,3 @@
-// https://observablehq.com/@hanliuxxx/andromeda_js/2@1998
 import define1 from "./a33468b95d0b15b0@808.js";
 import define2 from "./b2bbebd2f186ed03@1786.js";
 
@@ -164,10 +163,6 @@ Inputs.button([
 ], {value: 0})
 )}
 
-function _10(copy2sliders){return(
-copy2sliders
-)}
-
 function _inversed_chart(BarChart,labeled_weights,d3,width){return(
 BarChart(labeled_weights, {
   x: d => d.Weight,
@@ -178,10 +173,6 @@ BarChart(labeled_weights, {
   width,
   color: "steelblue"
 })
-)}
-
-function _12(labeled_weights){return(
-labeled_weights
 )}
 
 function _BarChart(d3){return(
@@ -295,26 +286,6 @@ function BarChart(data, {
 }
 )}
 
-function _14(weights){return(
-weights
-)}
-
-function _15(copy2sliders){return(
-copy2sliders
-)}
-
-function _16(selected_nodes){return(
-selected_nodes
-)}
-
-function _17(updated_weights){return(
-updated_weights
-)}
-
-function _18(weights){return(
-weights
-)}
-
 function _counter(){return(
 0
 )}
@@ -338,7 +309,7 @@ function _copy_to_sliders(copy2sliders,selected_nodes,counter,attrs,updated_weig
 }
 
 
-function _21(md){return(
+function _14(md){return(
 md `## Data Preprocessing for Relevance Data`
 )}
 
@@ -350,6 +321,7 @@ function _weight_list(attrs,w)
 {
   var lst = [];
   for(var i = 0; i < attrs.length;i++) {
+    //console.log(attrs[i], w[attrs[i]])
     lst.push(w[attrs[i]]/attrs.length);
   }
   return lst;
@@ -430,11 +402,11 @@ function _relevance_inPercent(relv_value)
 }
 
 
-function _31(md){return(
+function _24(md){return(
 md `## Color-Coded Scatter Plot Initialization`
 )}
 
-function _32(md){return(
+function _25(md){return(
 md`1. Build Color Scale for the dots
 2. Create the simulation for the forced-directed graph
 3. Initialize data to be a suitable format
@@ -446,7 +418,7 @@ function _cScale(d3){return(
 d3.scaleSqrt([0, 50, 100], ["yellow", "red", "darkred"])
 )}
 
-function _34(data,w,graph,Distance,simulation,scale)
+function _27(data,w,graph,Distance,simulation,scale)
 {
   data.weights = w;
   graph.edges.forEach( (e, i) => {
@@ -464,7 +436,7 @@ d3.forceSimulation(graph.vertices)
     		.strength(e => 10.0 / e.distance) 
     		.strength(0.5) 
             )
-      //.force("charge", d3.forceManyBody())
+      .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2))
 )}
 
@@ -517,7 +489,7 @@ simulation => {
   function dragged(event) {
     event.subject.fx = event.x;
     event.subject.fy = event.y;
-    console.log(Date.now())
+    //console.log(Date.now())
   }
   /*function dragended(event) {
     if (!event.active) simulation.alphaTarget(0);
@@ -535,10 +507,6 @@ function _height(){return(
 700
 )}
 
-function _41(width){return(
-width
-)}
-
 function _scale_x(d3,width){return(
 d3.scaleLinear()
   .domain([0, width]) // unit: km
@@ -551,11 +519,11 @@ d3.scaleLinear()
   .range([30, -30])
 )}
 
-function _44(md){return(
+function _36(md){return(
 md`# Inverse MDS`
 )}
 
-function _45(md){return(
+function _37(md){return(
 md `## Retrieve Selected Data`
 )}
 
@@ -566,7 +534,7 @@ function _selected_nodes(reset_button)
 }
 
 
-function _47(selected_data){return(
+function _39(selected_data){return(
 selected_data
 )}
 
@@ -596,7 +564,7 @@ function _selected_labels(selected_data)
 }
 
 
-function _50(FileAttachment){return(
+function _42(FileAttachment){return(
 FileAttachment("Animal_Data_Andromeda@1.csv").csv()
 )}
 
@@ -615,7 +583,7 @@ function _selected_cords(selected_nodes,scale_x,scale_y)
 }
 
 
-function _52(md){return(
+function _44(md){return(
 md `## Distance Functions`
 )}
 
@@ -680,7 +648,7 @@ function pairwise_distance(dataset, distance_function) {
 }
 )}
 
-function _60(md){return(
+function _49(md){return(
 md`## Data Preparation`
 )}
 
@@ -701,7 +669,7 @@ function _data2Dnew(selected_cords)
 }
 
 
-function _63(md){return(
+function _52(md){return(
 md `### Proposal`
 )}
 
@@ -719,7 +687,7 @@ function new_proposal(current, step, direction) {
 }
 )}
 
-function _65(md){return(
+function _54(md){return(
 md `### Stress`
 )}
 
@@ -739,7 +707,7 @@ function stress(distHD, dist2D) {
 }
 )}
 
-function _70(md){return(
+function _59(md){return(
 md `### Inverse MDS`
 )}
 
@@ -851,7 +819,7 @@ function _labeled_weights(attrs,updated_weights)
 }
 
 
-function _78(md){return(
+function _67(md){return(
 md`## Import`
 )}
 
@@ -859,7 +827,7 @@ function _d3(require){return(
 require("d3@6")
 )}
 
-function _82(html){return(
+function _71(html){return(
 html`
 <style type="text/css">			
 			.nodes {
@@ -891,7 +859,7 @@ html`
 </style>`
 )}
 
-function _83(md){return(
+function _72(md){return(
 md` 
 ## Reference
 1. https://observablehq.com/d/72afa1ae13806e66
@@ -900,7 +868,7 @@ md`
 `
 )}
 
-function _84(FileAttachment){return(
+function _73(FileAttachment){return(
 FileAttachment("Animal_Data_Andromeda@1.csv").csv()
 )}
 
@@ -925,20 +893,13 @@ export default function define(runtime, observer) {
   main.variable(observer("reset_button")).define("reset_button", ["Generators", "viewof reset_button"], (G, _) => G.input(_));
   main.variable(observer("viewof copy2sliders")).define("viewof copy2sliders", ["Inputs"], _copy2sliders);
   main.variable(observer("copy2sliders")).define("copy2sliders", ["Generators", "viewof copy2sliders"], (G, _) => G.input(_));
-  main.variable(observer()).define(["copy2sliders"], _10);
   main.variable(observer("inversed_chart")).define("inversed_chart", ["BarChart","labeled_weights","d3","width"], _inversed_chart);
-  main.variable(observer()).define(["labeled_weights"], _12);
   main.variable(observer("BarChart")).define("BarChart", ["d3"], _BarChart);
-  main.variable(observer()).define(["weights"], _14);
-  main.variable(observer()).define(["copy2sliders"], _15);
-  main.variable(observer()).define(["selected_nodes"], _16);
-  main.variable(observer()).define(["updated_weights"], _17);
-  main.variable(observer()).define(["weights"], _18);
   main.define("initial counter", _counter);
   main.variable(observer("mutable counter")).define("mutable counter", ["Mutable", "initial counter"], (M, _) => new M(_));
   main.variable(observer("counter")).define("counter", ["mutable counter"], _ => _.generator);
   main.variable(observer("copy_to_sliders")).define("copy_to_sliders", ["copy2sliders","selected_nodes","counter","attrs","updated_weights","mutable counter","mutable weights"], _copy_to_sliders);
-  main.variable(observer()).define(["md"], _21);
+  main.variable(observer()).define(["md"], _14);
   main.define("initial weights", ["data"], _weights);
   main.variable(observer("mutable weights")).define("mutable weights", ["Mutable", "initial weights"], (M, _) => new M(_));
   main.variable(observer("weights")).define("weights", ["mutable weights"], _ => _.generator);
@@ -950,55 +911,54 @@ export default function define(runtime, observer) {
   main.variable(observer("applied_weight_data")).define("applied_weight_data", ["normalized_data","attrs","weight_list"], _applied_weight_data);
   main.variable(observer("relv_value")).define("relv_value", ["applied_weight_data","attrs"], _relv_value);
   main.variable(observer("relevance_inPercent")).define("relevance_inPercent", ["relv_value"], _relevance_inPercent);
-  main.variable(observer()).define(["md"], _31);
-  main.variable(observer()).define(["md"], _32);
+  main.variable(observer()).define(["md"], _24);
+  main.variable(observer()).define(["md"], _25);
   main.variable(observer("cScale")).define("cScale", ["d3"], _cScale);
-  main.variable(observer()).define(["data","w","graph","Distance","simulation","scale"], _34);
+  main.variable(observer()).define(["data","w","graph","Distance","simulation","scale"], _27);
   main.variable(observer("simulation")).define("simulation", ["d3","graph","width","height"], _simulation);
   main.variable(observer("data")).define("data", ["reset_button","d3","FileAttachment"], _data);
   main.variable(observer("Distance")).define("Distance", ["d3","data"], _Distance);
   main.variable(observer("graph")).define("graph", ["reset_button","copy2sliders","data","Distance"], _graph);
   main.variable(observer("drag")).define("drag", ["d3"], _drag);
   main.variable(observer("height")).define("height", _height);
-  main.variable(observer()).define(["width"], _41);
   main.variable(observer("scale_x")).define("scale_x", ["d3","width"], _scale_x);
   main.variable(observer("scale_y")).define("scale_y", ["d3","height"], _scale_y);
-  main.variable(observer()).define(["md"], _44);
-  main.variable(observer()).define(["md"], _45);
+  main.variable(observer()).define(["md"], _36);
+  main.variable(observer()).define(["md"], _37);
   main.define("initial selected_nodes", ["reset_button"], _selected_nodes);
   main.variable(observer("mutable selected_nodes")).define("mutable selected_nodes", ["Mutable", "initial selected_nodes"], (M, _) => new M(_));
   main.variable(observer("selected_nodes")).define("selected_nodes", ["mutable selected_nodes"], _ => _.generator);
-  main.variable(observer()).define(["selected_data"], _47);
+  main.variable(observer()).define(["selected_data"], _39);
   main.variable(observer("selected_data")).define("selected_data", ["selected_nodes","data"], _selected_data);
   main.variable(observer("selected_labels")).define("selected_labels", ["selected_data"], _selected_labels);
-  main.variable(observer()).define(["FileAttachment"], _50);
+  main.variable(observer()).define(["FileAttachment"], _42);
   main.variable(observer("selected_cords")).define("selected_cords", ["selected_nodes","scale_x","scale_y"], _selected_cords);
-  main.variable(observer()).define(["md"], _52);
+  main.variable(observer()).define(["md"], _44);
   main.variable(observer("euclidean_distance")).define("euclidean_distance", _euclidean_distance);
   main.variable(observer("manhattan_distance")).define("manhattan_distance", _manhattan_distance);
   main.variable(observer("pairwise_distance")).define("pairwise_distance", ["selected_cords","euclidean_distance","manhattan_distance"], _pairwise_distance);
-  main.variable(observer()).define(["md"], _60);
+  main.variable(observer()).define(["md"], _49);
   main.variable(observer("dataHDpart")).define("dataHDpart", ["selected_data"], _dataHDpart);
   main.variable(observer("data2Dnew")).define("data2Dnew", ["selected_cords"], _data2Dnew);
-  main.variable(observer()).define(["md"], _63);
+  main.variable(observer()).define(["md"], _52);
   main.variable(observer("new_proposal")).define("new_proposal", _new_proposal);
-  main.variable(observer()).define(["md"], _65);
+  main.variable(observer()).define(["md"], _54);
   main.variable(observer("stress")).define("stress", _stress);
-  main.variable(observer()).define(["md"], _70);
+  main.variable(observer()).define(["md"], _59);
   main.variable(observer("dist2D")).define("dist2D", ["pairwise_distance","data2Dnew"], _dist2D);
   main.variable(observer("apply_weights")).define("apply_weights", _apply_weights);
   main.variable(observer("inversMDS")).define("inversMDS", ["apply_weights","pairwise_distance","stress","dist2D","new_proposal"], _inversMDS);
   main.variable(observer("updated_weights")).define("updated_weights", ["selected_cords","inversMDS","dataHDpart","data2Dnew"], _updated_weights);
   main.variable(observer("labeled_weights")).define("labeled_weights", ["attrs","updated_weights"], _labeled_weights);
-  main.variable(observer()).define(["md"], _78);
+  main.variable(observer()).define(["md"], _67);
   const child1 = runtime.module(define1);
   main.import("legend", child1);
   const child2 = runtime.module(define2);
   main.import("rangeSlider", child2);
   main.import("themes", child2);
   main.variable(observer("d3")).define("d3", ["require"], _d3);
-  main.variable(observer()).define(["html"], _82);
-  main.variable(observer()).define(["md"], _83);
-  main.variable(observer()).define(["FileAttachment"], _84);
+  main.variable(observer()).define(["html"], _71);
+  main.variable(observer()).define(["md"], _72);
+  main.variable(observer()).define(["FileAttachment"], _73);
   return main;
 }
