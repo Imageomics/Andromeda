@@ -1,27 +1,11 @@
 import getConfig from "next/config";
-import {
-  csvParse,
-  autoType,
-  deviation,
-  sum,
-  forceManyBody,
-  forceCenter,
-  forceSimulation,
-  forceLink,
-  scaleLinear,
-} from "d3";
-const { publicRuntimeConfig } = getConfig();
-import { enhance_data, normalized_data } from "./andromeda";
-
-function apiURL(suffix: string) {
-  return publicRuntimeConfig.apiURL + suffix;
-}
+import * as d3 from "d3";
 
 const globalDatasets: any = {};
 let dataset_next_id = 1;
 export async function uploadDataset(file: File) {
   const text = await file.text();
-  var data = csvParse(text, autoType);
+  var data = d3.csvParse(text, d3.autoType);
   globalDatasets[dataset_next_id] = data;
   return { id: dataset_next_id };
 }
@@ -55,19 +39,19 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
   data.label = "Image_Label"; // data.columns[0]; // the column to use for the dot labels
   data.stdevs = {}; // zscore normalization factors for each attribute, for Distance()
   data.attrs.forEach(
-    (a: any) => (data.stdevs[a] = deviation(data, (r: any) => r[a]))
+    (a: any) => (data.stdevs[a] = d3.deviation(data, (r: any) => r[a]))
   );
   data.weights = {};
   data.attrs.forEach((a: any) => (data.weights[a] = lookupWeight(weights, a)));
 
   // JPB ADDITION: normalize the weights
-  const sum_weights = sum(Object.values(data.weights));
+  const sum_weights = d3.sum(Object.values(data.weights));
   Object.keys(data.weights).forEach(
     (k) => (data.weights[k] = data.weights[k] / sum_weights)
   );
 
   function Distance(r1, r2) {
-    return sum(
+    return d3.sum(
       data.attrs.map(
         (attr) =>
           (Math.abs(r1[attr] - r2[attr]) / data.stdevs[attr]) *
@@ -94,16 +78,18 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
   var size = 700;
   var distanceMultiplier = 600; // spreads out x,y more
 
-  var simulation = forceSimulation(graph.vertices)
+  var simulation = d3
+    .forceSimulation(graph.vertices)
     .force(
       "link",
-      forceLink(graph.edges)
+      d3
+        .forceLink(graph.edges)
         .distance((e) => e.mydistance * distanceMultiplier)
         .strength((e) => 10.0 / e.distance)
         .strength(0.5)
     )
-    .force("charge", forceManyBody())
-    .force("center", forceCenter(size / 2, size / 2));
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(size / 2, size / 2));
   simulation.tick();
 
   const new_images = graph.vertices.map((vert: any) => {
@@ -155,7 +141,6 @@ function pairwise_distance(
   selected_cords: any,
   distance_function: string
 ) {
-  console.log("dataset", dataset);
   if (selected_cords.length >= 2) {
     let row_index = selected_cords.length;
     let col_index = selected_cords[0].length;
@@ -313,40 +298,35 @@ export async function reverseDimensionalReduction(
   dataset_id: string,
   movedPositions: any[]
 ) {
-  console.log(movedPositions);
-  console.log(dataset_id);
-  console.log(globalDatasets);
   const data = globalDatasets[dataset_id];
-  console.log(data);
-
   const selected_data = makeSelectedData(data, movedPositions);
-  console.log("selected_data");
-  console.log(selected_data);
   const dataHDPart = makeDataHDpart(selected_data);
-  console.log("dataHDPart");
-  console.log(dataHDPart);
   const width = 1152;
   const height = 700;
-  const scale_x = scaleLinear()
+  const scale_x = d3
+    .scaleLinear()
     .domain([0, width]) // unit: km
     .range([-30, 30]); // unit: pixels
 
-  const scale_y = scaleLinear()
+  const scale_y = d3
+    .scaleLinear()
     .domain([0, height]) // unit: km
     .range([30, -30]); // unit: pixels
   const selected_cords = movedPositions.map((pos: any) => {
-    return { x: scale_x(pos.x), y: scale_y(pos.y) };
+    return [scale_x(pos.x), scale_y(pos.y)];
   });
-
   const dist2D = pairwise_distance(selected_cords, selected_cords, "euclidean");
-  console.log("dist2D");
-  console.log(dist2D);
-  /*
-  const result = inversMDS(dataHDPart, selected_cords, dist2D, selected_cords);
-  console.log("result");
-  console.log(result);
-*/
+  const weightValues = inversMDS(
+    dataHDPart,
+    selected_cords,
+    dist2D,
+    selected_cords
+  );
+  const weights = Object.fromEntries(
+    Object.keys(data.weights).map((k, i) => [k, weightValues[i]])
+  );
+
   return {
-    weights: [],
+    weights: weights,
   };
 }

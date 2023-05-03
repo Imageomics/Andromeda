@@ -45,7 +45,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
 
-    const gridSize = 500;
+    const gridSize = 600;
     let imageControls = null;
     function onImageMoved(imageSettings: any) {
         if (images) {
@@ -135,84 +135,87 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
 
         <div>
             <div className="flex">
-                <Stage width={gridSize} height={gridSize} className="mr-4">
-                    <Layer >
-                        <Rect width={gridSize} height={gridSize} stroke="black"></Rect>
-                        {imageControls}
-                    </Layer>
-                </Stage>
+                <div>
+                    <Stage width={gridSize} height={gridSize} className="mr-4">
+                        <Layer >
+                            <Rect width={gridSize} height={gridSize} stroke="black"></Rect>
+                            {imageControls}
+                        </Layer>
+                    </Stage>
+                    <div>
+                        <button
+                            onClick={applyMovedObservations}
+                            disabled={working}
+                            className="m-2 px-6 py-2 rounded bg-green-400 hover:bg-green-500 disabled:opacity-50 text-slate-100 inline-block"
+                            type="button">Apply Moved Observations</button>
+                        <button
+                            onClick={applySliderWeights}
+                            disabled={working}
+                            className="m-2 px-6 py-2 rounded bg-orange-400 hover:bg-orange-500 disabled:opacity-50 text-slate-100 inline-block"
+                            type="button">Apply Slider Weights</button>
+                        <button
+                            onClick={resetPlot}
+                            disabled={working}
+                            className="m-2 px-6 py-2 rounded bg-red-400 hover:bg-red-500 disabled:opacity-50 text-slate-100 inline-block"
+                            type="button">Reset Plot</button>
+                    </div>
+                    <div>
+                        <label htmlFor="imageSize">Adjust image size:&nbsp;</label>
+                        <input
+                            id="imageSize"
+                            name="imageSize"
+                            type="range"
+                            min="10"
+                            max="100"
+                            step="0.05"
+                            value={imageSize}
+                            onChange={(evt) => setImageSize(parseInt(evt.target.value))}
+                        ></input>
+                        <div>
+                            <div >
+                                Show:
+                                <div className="inline-block m-2">
+                                    <input
+                                        type="radio"
+                                        id="showImage"
+                                        name="show"
+                                        value="image"
+                                        checked={showImage && !showLabel}
+                                        onChange={onChangeShow}
+                                    />
+                                    <label className="ml-1" htmlFor="showImage">Image</label>
+                                </div>
+                                <div className="inline-block m-2">
+                                    <input
+                                        type="radio"
+                                        id="showLabel"
+                                        name="show"
+                                        value="label"
+                                        checked={showLabel && !showImage}
+                                        onChange={onChangeShow}
+                                    />
+                                    <label className="ml-1" htmlFor="showLabel">Label</label>
+                                </div>
+                                <div className="inline-block m-2">
+                                    <input
+                                        type="radio"
+                                        id="showBoth"
+                                        name="show"
+                                        value="both"
+                                        checked={showImage && showLabel}
+                                        onChange={onChangeShow}
+                                    />
+                                    <label className="ml-1" htmlFor="showBoth">Image and Label</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     {weightControls}
                 </div>
             </div>
-            <div>
-                <button
-                    onClick={applyMovedObservations}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-green-400 hover:bg-green-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Apply Moved Observations</button>
-                <button
-                    onClick={applySliderWeights}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-orange-400 hover:bg-orange-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Apply Slider Weights</button>
-                <button
-                    onClick={resetPlot}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-red-400 hover:bg-red-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Reset Plot</button>
-            </div>
-            <div>
-                <label htmlFor="imageSize">Adjust image size:&nbsp;</label>
-                <input
-                    id="imageSize"
-                    name="imageSize"
-                    type="range"
-                    min="10"
-                    max="100"
-                    step="0.05"
-                    value={imageSize}
-                    onChange={(evt) => setImageSize(parseInt(evt.target.value))}
-                ></input>
-                <div>
-                    <div >
-                        Show:
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showImage"
-                                name="show"
-                                value="image"
-                                checked={showImage && !showLabel}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showImage">Image</label>
-                        </div>
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showLabel"
-                                name="show"
-                                value="label"
-                                checked={showLabel && !showImage}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showLabel">Label</label>
-                        </div>
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showBoth"
-                                name="show"
-                                value="both"
-                                checked={showImage && showLabel}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showBoth">Image and Label</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
         </div >
     )

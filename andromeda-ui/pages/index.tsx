@@ -30,8 +30,7 @@ export default function Home() {
   }
 
   async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
-    const result = await reverseDimensionalReduction(id, movedPositions)
-    //setImageData(result.images);
+    const result = await reverseDimensionalReduction(id, movedPositions);
     setWeightData(result.weights);
     return result;
   }
@@ -66,7 +65,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col px-12 py-2">
-      <h2 className="text-3xl font-medium leading-tight">Andromeda</h2>
+      <h2 className="text-3xl font-medium leading-tight">Andromeda js</h2>
       <div>
         <label
           className="text-md font-medium"
