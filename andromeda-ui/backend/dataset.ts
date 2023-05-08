@@ -1,13 +1,11 @@
 import getConfig from "next/config";
 import * as d3 from "d3";
 
-const globalDatasets: any = {};
 let dataset_next_id = 1;
 export async function uploadDataset(file: File) {
   const text = await file.text();
   var data = d3.csvParse(text, d3.autoType);
-  globalDatasets[dataset_next_id] = data;
-  return { id: dataset_next_id };
+  return { id: dataset_next_id, data: data };
 }
 
 function scaleCoordinate(x: number, size: number) {
@@ -31,10 +29,9 @@ function lookupWeight(weights, name) {
   return weights.all;
 }
 
-export async function dimensionalReduction(dataset_id: string, weights: any) {
-  console.log("dr dataset_id", dataset_id);
+export async function dimensionalReduction(data: any, weights: any) {
+  console.log("dr data", data);
   console.log("dr weights", weights);
-  const data = globalDatasets[dataset_id];
   data.attrs = getNumericProperyNames(data[0]); // the quantitative attributes in the data table
   data.label = "Image_Label"; // data.columns[0]; // the column to use for the dot labels
   data.stdevs = {}; // zscore normalization factors for each attribute, for Distance()
@@ -44,6 +41,7 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
   data.weights = {};
   data.attrs.forEach((a: any) => (data.weights[a] = lookupWeight(weights, a)));
 
+  console.log(data);
   // JPB ADDITION: normalize the weights
   const sum_weights = d3.sum(Object.values(data.weights));
   Object.keys(data.weights).forEach(
@@ -73,8 +71,6 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
     })
   );
   var graph = { vertices: vertices, edges: edges };
-
-  console.log(graph);
   var size = 700;
   var distanceMultiplier = 600; // spreads out x,y more
 
@@ -90,7 +86,9 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
     )
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(size / 2, size / 2));
-  simulation.tick();
+  simulation.tick(20);
+  // forceManyBody look at - makes points attract or repel each other
+  // we might not need this because of distances?
 
   const new_images = graph.vertices.map((vert: any) => {
     return {
@@ -295,10 +293,9 @@ function makeDataHDpart(selected_data: any) {
 }
 
 export async function reverseDimensionalReduction(
-  dataset_id: string,
+  data: any,
   movedPositions: any[]
 ) {
-  const data = globalDatasets[dataset_id];
   const selected_data = makeSelectedData(data, movedPositions);
   const dataHDPart = makeDataHDpart(selected_data);
   const width = 1152;

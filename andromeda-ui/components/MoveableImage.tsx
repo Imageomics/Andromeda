@@ -47,7 +47,9 @@ export default function MoveableImage(props: MoveableImageProps) {
             labelX = imageSize;
             labelY = imageSize / 3;
         }
-        labelControl = <Text text={label} x={labelX} y={labelY} />
+        labelControl = <Text
+            text={label} x={labelX} y={labelY}
+            shadowColor="white" shadowOffset={{ x: 1, y: 1 }} />
     }
     let circleControl = null;
     if (showSelected || isDragging) {

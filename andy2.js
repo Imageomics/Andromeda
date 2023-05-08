@@ -1,0 +1,1335 @@
+function normalize_data(attrs, new_data, d3) {
+  var stdMean = [];
+  for (var i = 0; i < attrs.length; i++) {
+    var obj = {};
+    var arr = new_data.map((r) => r[attrs[i]]);
+    obj["std_dev"] = d3.deviation(arr);
+    obj["mean"] = d3.mean(arr);
+    stdMean.push(obj);
+  }
+
+  return new_data.map((r) => {
+    var norm = Object.assign({}, r);
+    for (var i = 0; i < attrs.length; i++) {
+      norm[attrs[i]] =
+        (norm[attrs[i]] - stdMean[i]["mean"]) / stdMean[i]["std_dev"];
+    }
+    return norm;
+  });
+}
+
+//akd distance_matrix_2D
+
+function manhattan_distance(a, b) {
+  if (a != null && b != null) {
+    if (a.length == b.length) {
+      let result = 0;
+      for (let i = 0; i < a.length; i++) {
+        let diff = a[i] - b[i];
+        let absolute = Math.abs(diff);
+        result += absolute;
+      }
+      return result;
+    }
+  }
+}
+
+function euclidean_distance(a, b) {
+  if (a != null && b != null) {
+    if (a.length == b.length) {
+      let result = 0;
+      for (let i = 0; i < a.length; i++) {
+        let diff = a[i] - b[i];
+        let square = diff ** 2;
+        result += square;
+      }
+      return Math.sqrt(result);
+    }
+  }
+}
+
+function stress(distHD, dist2D) {
+  let diff_sum = 0;
+  let total_sum = 0;
+  for (let i = 0; i < distHD.length; i++) {
+    for (let j = 0; j < distHD[0].length; j++) {
+      let x = distHD[i][j];
+      let y = dist2D[i][j];
+      diff_sum += (x - y) ** 2;
+      total_sum += x ** 2;
+    }
+  }
+  return diff_sum / total_sum;
+}
+
+///----------------
+/// old code below
+///----------------
+
+function _1(md) {
+  return md`
+# Andromeda_JS
+  `;
+}
+
+function _relevance(rangeSlider, themes) {
+  return rangeSlider({
+    min: 0,
+    max: 1,
+    // Note that values must be specified as array of length 2.
+    value: this ? this.value : [0, 1],
+    // Custom slider CSS, replaces all styles.
+    theme: themes["Flat"],
+    // Overrides the range color. Support for range colors is up to the theme.
+    color: "#3b99fc",
+    format: ".0%",
+    description: "0%: less relevant; 100%: most relevant;",
+  });
+}
+
+function _3(legend, cScale) {
+  return legend({
+    color: cScale,
+    title: "Relevance",
+  });
+}
+
+function _4(md) {
+  return md`
+Rescale the visualization
+  `;
+}
+
+function _w(html, data, weights, d3) {
+  var form = html`<form>
+    ${data.attrs.map(
+      (attr) =>
+        html`<div>
+          <input
+            type="range"
+            name="${attr}"
+            id="${attr}"
+            min="0"
+            max="2.0"
+            step="0.01"
+            value="0.8"
+          />${attr}
+        </div>`
+    )}
+  </form>`;
+  // nonlinear slider to weight mappings:
+  function weightOfSlider(s) {
+    return s < 1 ? s : (s - 1) * (data.attrs.length - 1) + 1;
+  }
+  function sliderOfWeight(w) {
+    return w < 1 ? w : (w - 1) / (data.attrs.length - 1) + 1;
+  }
+  // initialize weights to 1.0:
+  //console.log("weights>>>", weights)
+  //mutable weights = Object.fromEntries(data.attrs.map(a => [a, 1.0]));
+  form.value = weights;
+  // if (weights.length === 0) {
+  //   mutable weights = Object.fromEntries(data.attrs.map(a => [a, 1.0]));
+  // }
+  // else{
+  //   mutable weights = labeled_weights
+  // }
+
+  // slider interaction:
+  data.attrs.forEach(
+    (attr) =>
+      (form[attr].oninput = () => {
+        weights[attr] = weightOfSlider(form[attr].valueAsNumber);
+        const remaining = data.attrs.length - weights[attr];
+        const prev = d3.sum(data.attrs.map((a) => weights[a])) - weights[attr];
+        if (prev == 0)
+          data.attrs.forEach((a) => {
+            if (a != attr)
+              form[a].value = sliderOfWeight(
+                (weights[a] = remaining / (data.attrs.length - 1))
+              );
+          });
+        else
+          data.attrs.forEach((a) => {
+            if (a != attr)
+              form[a].value = sliderOfWeight(
+                (weights[a] = (weights[a] * remaining) / prev)
+              );
+          });
+        form.value = weights;
+      })
+  );
+  return form;
+}
+
+function _scale(html) {
+  var form = html`<form>
+    <input type="range" name="scale" min="0" max="15" value="10" step="1" /><i
+      >Scale</i
+    >
+  </form>`;
+  form.oninput = () => (form.value = form.scale.valueAsNumber);
+  form.value = 10;
+  return form;
+}
+
+function _scatter_chart(
+  d3,
+  width,
+  height,
+  graph,
+  relevance_inPercent,
+  relevance,
+  simulation,
+  drag,
+  $0,
+  cScale,
+  invalidation
+) {
+  const start = Date.now();
+  const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
+
+  const labels = svg
+    .append("g")
+    .attr("class", "labels")
+    .selectAll("text")
+    .data(graph.vertices)
+    .join("text")
+    .text((d) => d.id)
+    .attr("dx", 8)
+    .attr("dy", ".35em")
+    .attr("id", (d, i) => {
+      return "text_" + i;
+    })
+    .style("display", (d, i) => {
+      if (
+        relevance_inPercent[i] < relevance[0] * 100 ||
+        relevance_inPercent[i] > relevance[1] * 100
+      ) {
+        simulation.restart();
+        return "none";
+      } else {
+        simulation.restart();
+        return "";
+      }
+    })
+    .call(drag(simulation));
+  var select = [];
+  const nodes = svg
+    .append("g")
+    .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.vertices)
+    .join("circle")
+    .attr("r", 7)
+    .attr("id", (d, i) => {
+      return "circle_" + i;
+    })
+    .attr("class", "circle")
+    .style("display", (d, i) => {
+      if (
+        relevance_inPercent[i] < relevance[0] * 100 ||
+        relevance_inPercent[i] > relevance[1] * 100
+      ) {
+        simulation.restart();
+        return "none";
+      } else {
+        simulation.restart();
+        return "";
+      }
+    })
+    .on("click", (event, d) => {
+      var selectedID = d3.select(event.target).attr("id").split("_")[1];
+      var lineID = "#line_" + selectedID;
+
+      select.push(labels._groups[0][Number(selectedID)]);
+      $0.value = select;
+      if (d3.select(event.target).style("fill") == "blue") {
+        d3.select(event.target).style("fill", (d, i) =>
+          cScale(relevance_inPercent[d.index])
+        );
+        d3.select(lineID).style("stroke", (d, i) =>
+          cScale(relevance_inPercent[d.index])
+        );
+        d3.select(lineID).attr("stroke-width", 1.5);
+      } else {
+        d3.select(lineID).style("stroke", "blue");
+        d3.select(lineID).attr("stroke-width", 5);
+        d3.select(event.target).style("fill", "blue");
+      }
+    })
+    .style("fill", (d, i) => cScale(relevance_inPercent[i]))
+    .call(drag(simulation));
+
+  // nodes.append("title")
+  //     .text((d, i) => {return "Relevance score: " + relevance_inPercent[i].toFixed(2);});
+  let num_sim = 0;
+  simulation.on("tick", () => {
+    nodes.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    labels.attr("x", (d) => d.x).attr("y", (d) => d.y);
+    console.log("simulation time: ", Date.now());
+    num_sim += 1;
+  });
+
+  invalidation.then(() => simulation.stop());
+
+  const end = Date.now();
+  console.log("graph render time diff: ", end, start, end - start);
+
+  return svg.node();
+}
+
+function _reset_button(Inputs) {
+  return Inputs.button("Reset Plot");
+}
+
+function _copy2sliders(Inputs) {
+  return Inputs.button([["copy to Sliders", (value) => (value += 1)]], {
+    value: 0,
+  });
+}
+
+function _10(copy2sliders) {
+  return copy2sliders;
+}
+
+function _inversed_chart(BarChart, labeled_weights, d3, width) {
+  return BarChart(labeled_weights, {
+    x: (d) => d.Weight,
+    y: (d) => d.Name,
+    yDomain: d3.groupSort(
+      labeled_weights,
+      ([d]) => -d.Weight,
+      (d) => d.Name
+    ), // sort by descending frequency
+    xFormat: "%",
+    xLabel: "Frequency →",
+    width,
+    color: "steelblue",
+  });
+}
+
+function _12(labeled_weights) {
+  return labeled_weights;
+}
+
+function _BarChart(d3) {
+  return function BarChart(
+    data,
+    {
+      x = (d) => d, // given d in data, returns the (quantitative) x-value
+      y = (d, i) => i, // given d in data, returns the (ordinal) y-value
+      title, // given d in data, returns the title text
+      marginTop = 30, // the top margin, in pixels
+      marginRight = 0, // the right margin, in pixels
+      marginBottom = 10, // the bottom margin, in pixels
+      marginLeft = 80, // the left margin, in pixels
+      width = 640, // the outer width of the chart, in pixels
+      height, // outer height, in pixels
+      xType = d3.scaleLinear, // type of x-scale
+      xDomain, // [xmin, xmax]
+      xRange = [marginLeft, width - marginRight], // [left, right]
+      xFormat, // a format specifier string for the x-axis
+      xLabel, // a label for the x-axis
+      yPadding = 0.1, // amount of y-range to reserve to separate bars
+      yDomain, // an array of (ordinal) y-values
+      yRange, // [top, bottom]
+      color = "currentColor", // bar fill color
+      titleColor = "white", // title fill color when atop bar
+      titleAltColor = "currentColor", // title fill color when atop background
+    } = {}
+  ) {
+    // Compute values.
+    const X = d3.map(data, x);
+    const Y = d3.map(data, y);
+
+    // Compute default domains, and unique the y-domain.
+    if (xDomain === undefined) xDomain = [0, d3.max(X)];
+    if (yDomain === undefined) yDomain = Y;
+    yDomain = new d3.InternSet(yDomain);
+
+    // Omit any data not present in the y-domain.
+    const I = d3.range(X.length).filter((i) => yDomain.has(Y[i]));
+
+    // Compute the default height.
+    if (height === undefined)
+      height =
+        Math.ceil((yDomain.size + yPadding) * 25) + marginTop + marginBottom;
+    if (yRange === undefined) yRange = [marginTop, height - marginBottom];
+
+    // Construct scales and axes.
+    const xScale = xType(xDomain, xRange);
+    const yScale = d3.scaleBand(yDomain, yRange).padding(yPadding);
+    const xAxis = d3.axisTop(xScale).ticks(width / 80, xFormat);
+    const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
+
+    // Compute titles.
+    if (title === undefined) {
+      const formatValue = xScale.tickFormat(100, xFormat);
+      title = (i) => `${formatValue(X[i])}`;
+    } else {
+      const O = d3.map(data, (d) => d);
+      const T = title;
+      title = (i) => T(O[i], i, data);
+    }
+
+    const svg = d3
+      .create("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [0, 0, width, height])
+      .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${marginTop})`)
+      .call(xAxis)
+      .call((g) => g.select(".domain").remove())
+      .call((g) =>
+        g
+          .selectAll(".tick line")
+          .clone()
+          .attr("y2", height - marginTop - marginBottom)
+          .attr("stroke-opacity", 0.1)
+      )
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", width - marginRight)
+          .attr("y", -22)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "end")
+          .text(xLabel)
+      );
+
+    svg
+      .append("g")
+      .attr("fill", color)
+      .selectAll("rect")
+      .data(I)
+      .join("rect")
+      .attr("x", xScale(0))
+      .attr("y", (i) => yScale(Y[i]))
+      .attr("width", (i) => xScale(X[i]) - xScale(0))
+      .attr("height", yScale.bandwidth());
+
+    svg
+      .append("g")
+      .attr("fill", titleColor)
+      .attr("text-anchor", "end")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .selectAll("text")
+      .data(I)
+      .join("text")
+      .attr("x", (i) => xScale(X[i]))
+      .attr("y", (i) => yScale(Y[i]) + yScale.bandwidth() / 2)
+      .attr("dy", "0.35em")
+      .attr("dx", -4)
+      .text(title)
+      .call((text) =>
+        text
+          .filter((i) => xScale(X[i]) - xScale(0) < 20) // short bars
+          .attr("dx", +4)
+          .attr("fill", titleAltColor)
+          .attr("text-anchor", "start")
+      );
+
+    svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(yAxis);
+
+    return svg.node();
+  };
+}
+
+function _14(weights) {
+  return weights;
+}
+
+function _15(copy2sliders) {
+  return copy2sliders;
+}
+
+function _16(selected_nodes) {
+  return selected_nodes;
+}
+
+function _17(updated_weights) {
+  return updated_weights;
+}
+
+function _18(weights) {
+  return weights;
+}
+
+function _counter() {
+  return 0;
+}
+
+function _copy_to_sliders(
+  copy2sliders,
+  selected_nodes,
+  counter,
+  attrs,
+  updated_weights,
+  $0,
+  $1
+) {
+  copy2sliders;
+  var result = {};
+
+  //console.log(selected_nodes.length, copy2sliders)
+  if (selected_nodes.length >= 2 && copy2sliders !== counter) {
+    for (let i = 0; i < attrs.length; i++) {
+      result[attrs[i]] = updated_weights[i];
+    }
+    console.log("result>>", result);
+
+    $0.value = copy2sliders;
+    $1.value = result;
+  }
+  return result;
+}
+
+function _21(md) {
+  return md`
+## Data Preprocessing for Relevance Data
+  `;
+}
+
+function _weights(data) {
+  return Object.fromEntries(data.attrs.map((a) => [a, 1.0]));
+}
+
+function _weight_list(attrs, w) {
+  var lst = [];
+  for (var i = 0; i < attrs.length; i++) {
+    lst.push(w[attrs[i]] / attrs.length);
+  }
+  return lst;
+}
+
+function _attrs(new_data) {
+  return Object.keys(new_data[0]);
+}
+
+function _names(data) {
+  return data.map((r) => r.Name);
+}
+
+function _new_data(data) {
+  return data.map((r) => {
+    var obj = Object.assign({}, r);
+    delete obj.Name;
+    return obj;
+  });
+}
+
+function _applied_weight_data(normalized_data, attrs, weight_list) {
+  return normalized_data.map((r) => {
+    for (var i = 0; i < attrs.length; i++) {
+      r[attrs[i]] *= weight_list[i];
+    }
+    return r;
+  });
+}
+
+function _relv_value(applied_weight_data, attrs) {
+  var relv_list = [];
+  applied_weight_data.map((r) => {
+    var maxx = 0;
+    for (var i = 0; i < attrs.length; i++) {
+      maxx += r[attrs[i]];
+    }
+    relv_list.push(maxx);
+  });
+  return relv_list;
+}
+
+function _relevance_inPercent(relv_value) {
+  var rele_percentage = [];
+  var minValue = Math.min(...relv_value);
+  var maxValue = Math.max(...relv_value);
+  for (var i = 0; i < relv_value.length; i++) {
+    rele_percentage.push(
+      ((relv_value[i] - minValue) / (maxValue - minValue)) * 100
+    );
+  }
+  return rele_percentage;
+}
+
+function _31(md) {
+  return md`
+## Color-Coded Scatter Plot Initialization
+  `;
+}
+
+function _32(md) {
+  return md`
+1. Build Color Scale for the dots
+2. Create the simulation for the forced-directed graph
+3. Initialize data to be a suitable format
+4. Build the forced-directed graph based on L1 distance
+5. Enable the drag functionality
+  `;
+}
+
+function _cScale(d3) {
+  return d3.scaleSqrt([0, 50, 100], ["yellow", "red", "darkred"]);
+}
+
+function _34(data, w, graph, Distance, simulation, scale) {
+  data.weights = w;
+  graph.edges.forEach((e, i) => {
+    e.mydistance = Distance(e.source.row, e.target.row);
+  });
+  simulation.force("link").distance((e) => e.mydistance * scale * 0.8);
+  simulation.alpha(1).restart();
+}
+
+function _simulation(d3, graph, width, height) {
+  return (
+    d3
+      .forceSimulation(graph.vertices)
+      .force(
+        "link",
+        d3
+          .forceLink(graph.edges)
+          .distance((e) => e.mydistance * 20)
+          .strength((e) => 10.0 / e.distance)
+          .strength(0.5)
+      )
+      //.force("charge", d3.forceManyBody())
+      .force("center", d3.forceCenter(width / 2, height / 2))
+  );
+}
+
+async function _data(reset_button, d3, FileAttachment) {
+  reset_button;
+  var data = d3.csvParse(
+    await FileAttachment("Animal_Data_Andromeda@1.csv").text(),
+    d3.autoType
+  );
+  data.attrs = data.columns.slice(1); // the quantitative attributes in the data table
+  data.label = data.columns[0]; // the column to use for the dot labels
+  data.stdevs = {}; // zscore normalization factors for each attribute, for Distance()
+  data.attrs.forEach((a) => (data.stdevs[a] = d3.deviation(data, (r) => r[a])));
+  data.weights = {};
+  data.attrs.forEach((a) => (data.weights[a] = 1.0));
+  return data;
+}
+
+function _Distance(d3, data) {
+  return function Distance(r1, r2) {
+    return d3.sum(
+      data.attrs.map(
+        (attr) =>
+          (Math.abs(r1[attr] - r2[attr]) / data.stdevs[attr]) *
+          data.weights[attr]
+      )
+    ); // weighted L1
+    //return d3.sum(data.attrs.map(attr =>
+    //		Math.abs(r1[attr] - r2[attr]) / data.stdevs[attr] ));  // L1
+    //return Math.sqrt(d3.sum(data.attrs.map(attr =>
+    //		Math.pow((r1[attr] - r2[attr])/data.stdevs[attr], 2)))); // L2
+  };
+}
+
+function _graph(reset_button, copy2sliders, data, Distance) {
+  reset_button;
+  copy2sliders;
+  var vertices = data.map((r, i) => ({ id: r[data.label], index: i, row: r }));
+  var edges = []; // completely connected graph
+  vertices.forEach((src, isrc) =>
+    vertices.forEach((dst, idst) => {
+      if (isrc < idst)
+        edges.push({
+          source: src,
+          target: dst,
+          mydistance: Distance(src.row, dst.row),
+        });
+    })
+  );
+  return { vertices: vertices, edges: edges };
+}
+
+function _drag(d3) {
+  return (simulation) => {
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+      console.log(Date.now());
+    }
+    /*function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+  }*/
+    return d3.drag().on("start", dragstarted).on("drag", dragged);
+    // .on("end", dragended);
+  };
+}
+
+function _height() {
+  return 700;
+}
+
+function _41(width) {
+  return width;
+}
+
+function _scale_x(d3, width) {
+  return d3
+    .scaleLinear()
+    .domain([0, width]) // unit: km
+    .range([-30, 30]);
+}
+
+function _scale_y(d3, height) {
+  return d3
+    .scaleLinear()
+    .domain([0, height]) // unit: km
+    .range([30, -30]);
+}
+
+function _44(md) {
+  return md`
+# Inverse MDS
+  `;
+}
+
+function _45(md) {
+  return md`
+## Retrieve Selected Data
+  `;
+}
+
+function _selected_nodes(reset_button) {
+  reset_button;
+  return [];
+}
+
+function _47(selected_data) {
+  return selected_data;
+}
+
+function _selected_data(selected_nodes, data) {
+  let result = [];
+
+  for (let i = 0; i < selected_nodes.length; ++i) {
+    let svg = selected_nodes[i]["__data__"];
+    let index = svg["index"];
+    //result.push(index)
+    result.push(data[index]);
+  }
+  return result;
+}
+
+function _selected_labels(selected_data) {
+  let result = [];
+
+  for (let i = 0; i < selected_data.length; ++i) {
+    let x = selected_data[i]["Name"];
+    result.push(x);
+  }
+  return result;
+}
+
+function _50(FileAttachment) {
+  return FileAttachment("Animal_Data_Andromeda@1.csv").csv();
+}
+
+function _selected_cords(selected_nodes, scale_x, scale_y) {
+  let result = [];
+
+  for (let i = 0; i < selected_nodes.length; ++i) {
+    let x = Object.values(selected_nodes[i])[0]["x"];
+    x = scale_x(x);
+    let y = Object.values(selected_nodes[i])[0]["y"];
+    y = scale_y(y);
+    result.push([x, y]);
+  }
+  return result;
+}
+
+function _52(md) {
+  return md`
+## Distance Functions
+  `;
+}
+
+function _euclidean_distance() {
+  return function euclidean_distance(a, b) {
+    if (a != null && b != null) {
+      if (a.length == b.length) {
+        let result = 0;
+        for (let i = 0; i < a.length; i++) {
+          let diff = a[i] - b[i];
+          let square = diff ** 2;
+          result += square;
+        }
+        return Math.sqrt(result);
+      }
+    }
+  };
+}
+
+function _manhattan_distance() {
+  return function manhattan_distance(a, b) {
+    if (a != null && b != null) {
+      if (a.length == b.length) {
+        let result = 0;
+        for (let i = 0; i < a.length; i++) {
+          let diff = a[i] - b[i];
+          let absolute = Math.abs(diff);
+          result += absolute;
+        }
+        return result;
+      }
+    }
+  };
+}
+
+function _pairwise_distance(
+  selected_cords,
+  euclidean_distance,
+  manhattan_distance
+) {
+  return function pairwise_distance(dataset, distance_function) {
+    if (selected_cords.length >= 2) {
+      let row_index = selected_cords.length;
+      let col_index = selected_cords[0].length;
+      let result = [];
+      for (let i = 0; i < row_index; ++i) {
+        let row = [];
+        for (let j = 0; j < row_index; ++j) {
+          let distance = 0;
+          if (distance_function == "euclidean") {
+            distance = euclidean_distance(dataset[i], dataset[j]);
+          } else if (distance_function == "manhattan") {
+            distance = manhattan_distance(dataset[i], dataset[j]);
+          }
+          row.push(distance);
+        }
+        result.push(row);
+      }
+      return result;
+    } else {
+      return [];
+    }
+  };
+}
+
+function _60(md) {
+  return md`
+## Data Preparation
+  `;
+}
+
+function _dataHDpart(selected_data) {
+  let result = [];
+  for (let i = 0; i < selected_data.length; i++) {
+    let row = Object.values(selected_data[i]).slice(1);
+    result.push(row);
+  }
+  return result;
+}
+
+function _data2Dnew(selected_cords) {
+  return selected_cords;
+}
+
+function _63(md) {
+  return md`
+### Proposal
+  `;
+}
+
+function _new_proposal() {
+  return function new_proposal(current, step, direction) {
+    //console.log(current, step, direction)
+    let move = current + direction * step * Math.random();
+    if (move > 0.9999) {
+      move = 0.9999;
+    } else if (move < 0.00001) {
+      move = 0.00001;
+    }
+    return move;
+  };
+}
+
+function _65(md) {
+  return md`
+### Stress
+  `;
+}
+
+function _stress() {
+  return function stress(distHD, dist2D) {
+    let diff_sum = 0;
+    let total_sum = 0;
+    for (let i = 0; i < distHD.length; i++) {
+      for (let j = 0; j < distHD[0].length; j++) {
+        let x = distHD[i][j];
+        let y = dist2D[i][j];
+        diff_sum += (x - y) ** 2;
+        total_sum += x ** 2;
+      }
+    }
+    return diff_sum / total_sum;
+  };
+}
+
+function _70(md) {
+  return md`
+### Inverse MDS
+  `;
+}
+
+function _dist2D(pairwise_distance, data2Dnew) {
+  return pairwise_distance(data2Dnew, "euclidean");
+}
+
+function _apply_weights() {
+  return function apply_weights(data, weights) {
+    let result = [];
+    for (let i = 0; i < data.length; i++) {
+      let row = [];
+      for (let j = 0; j < weights.length; j++) {
+        row.push(data[i][j] * weights[j]);
+      }
+      result.push(row);
+    }
+    return result;
+  };
+}
+
+function _inversMDS(
+  apply_weights,
+  pairwise_distance,
+  stress,
+  dist2D,
+  new_proposal
+) {
+  return function inversMDS(dataHDpart, data2Dnew) {
+    const start = Date.now();
+    //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    let MAX = 500;
+    let col = dataHDpart[0].length;
+    let row = dataHDpart.length;
+
+    let curWeights = Array(col).fill(1 / col);
+    let newWeights = Array(col).fill(1 / col);
+
+    let flag = Array(col).fill(0);
+    let direction = Array(col).fill(1);
+    let step = Array(col).fill(1 / col);
+
+    let dataHDw = apply_weights(dataHDpart, curWeights);
+    let distHD = pairwise_distance(dataHDw, "manhattan");
+    let curStress = stress(distHD, dist2D);
+    //console.log("cur_stress: " + curStress)
+    for (let i = 0; i < MAX; ++i) {
+      for (let dim = 0; dim < col; dim++) {
+        let nw = new_proposal(curWeights[dim], step[dim], direction[dim]);
+        //console.log(nw)
+        let s = 1 + nw - curWeights[dim];
+        for (let index = 0; index < curWeights.length; index++) {
+          let temp = curWeights[index] / s;
+          newWeights[index] = curWeights[index] / s;
+        }
+        newWeights[dim] = nw / s;
+
+        dataHDw = apply_weights(dataHDpart, newWeights);
+        distHD = pairwise_distance(dataHDw, "manhattan");
+
+        let newStress = stress(distHD, dist2D);
+        //console.log('newstress: '+ newStress + " curstress: "+curStress)
+        if (newStress < curStress) {
+          let temp = curWeights;
+          curWeights = newWeights;
+          newWeights = temp;
+          curStress = newStress;
+          flag[dim] = flag[dim] + 1;
+        } else {
+          flag[dim] = flag[dim] - 1;
+          direction[dim] = -direction[dim];
+        }
+        if (flag[dim] >= 5) {
+          step[dim] = step[dim] * 2;
+          flag[dim] = 0;
+        } else if (flag[dim] <= -5) {
+          step[dim] = step[dim] / 2;
+          flag[dim] = 0;
+        }
+      }
+    }
+    const end = Date.now();
+    console.log("inverse mds speed: ", end - start);
+    console.log("final stress: " + curStress);
+    return curWeights;
+  };
+}
+
+function _updated_weights(selected_cords, inversMDS, dataHDpart, data2Dnew) {
+  var result = [];
+
+  if (selected_cords.length >= 2) {
+    result = inversMDS(dataHDpart, data2Dnew);
+  }
+  var sum = result.reduce((a, b) => a + b, 0);
+  for (var i = 0; i < result.length; i++) {
+    result[i] = (result[i] * 36) / sum;
+  }
+  return result;
+}
+
+function _labeled_weights(attrs, updated_weights) {
+  var result = [];
+
+  for (let i = 0; i < attrs.length; i++) {
+    result[i] = { Name: attrs[i], Weight: updated_weights[i] };
+  }
+  return result;
+}
+
+function _78(md) {
+  return md`
+## Import
+  `;
+}
+
+function _d3(require) {
+  return require("d3@6");
+}
+
+function _82(html) {
+  return html` <style type="text/css">
+    .nodes {
+      fill: steelblue;
+      stroke: none;
+      cursor: pointer;
+    }
+    .nodes.selected {
+      stroke: yellow;
+      stroke-width: 3;
+      border-style: solid;
+      border-width: thin;
+      border-color: grey;
+    }
+    .labels {
+      font-family: "Arial";
+      font-size: 12px;
+      fill: grey;
+      cursor: pointer;
+    }
+    .labels.selected {
+      stroke: yellow;
+      stroke-width: 1;
+    }
+    .link {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+  </style>`;
+}
+
+function _83(md) {
+  return md`
+## Reference
+
+1. https://observablehq.com/d/72afa1ae13806e66
+2. https://observablehq.com/@d3/parallel-coordinates
+3. https://observablehq.com/@mootari/range-slider
+  `;
+}
+
+function _84(FileAttachment) {
+  return FileAttachment("Animal_Data_Andromeda@1.csv").csv();
+}
+
+export default function define(runtime, observer) {
+  const main = runtime.module();
+  function toString() {
+    return this.url;
+  }
+  const fileAttachments = new Map([
+    [
+      "Animal_Data_Andromeda@1.csv",
+      {
+        url: new URL(
+          "./files/45a9ebcc28d86912f7044e2a2632374ff4d9df471c2d885f3abb4edcda7e3fc654a3367ec78ac8bcd7ebb6d523476e4b11d077cbaeaa93af45159a4bbe85b7af.csv",
+          import.meta.url
+        ),
+        mimeType: "text/csv",
+        toString,
+      },
+    ],
+  ]);
+  main.builtin(
+    "FileAttachment",
+    runtime.fileAttachments((name) => fileAttachments.get(name))
+  );
+  main.variable(observer()).define(["md"], _1);
+  main
+    .variable(observer("viewof relevance"))
+    .define("viewof relevance", ["rangeSlider", "themes"], _relevance);
+  main
+    .variable(observer("relevance"))
+    .define("relevance", ["Generators", "viewof relevance"], (G, _) =>
+      G.input(_)
+    );
+  main.variable(observer()).define(["legend", "cScale"], _3);
+  main.variable(observer()).define(["md"], _4);
+  main
+    .variable(observer("viewof w"))
+    .define("viewof w", ["html", "data", "weights", "d3"], _w);
+  main
+    .variable(observer("w"))
+    .define("w", ["Generators", "viewof w"], (G, _) => G.input(_));
+  main
+    .variable(observer("viewof scale"))
+    .define("viewof scale", ["html"], _scale);
+  main
+    .variable(observer("scale"))
+    .define("scale", ["Generators", "viewof scale"], (G, _) => G.input(_));
+  main
+    .variable(observer("scatter_chart"))
+    .define(
+      "scatter_chart",
+      [
+        "d3",
+        "width",
+        "height",
+        "graph",
+        "relevance_inPercent",
+        "relevance",
+        "simulation",
+        "drag",
+        "mutable selected_nodes",
+        "cScale",
+        "invalidation",
+      ],
+      _scatter_chart
+    );
+  main
+    .variable(observer("viewof reset_button"))
+    .define("viewof reset_button", ["Inputs"], _reset_button);
+  main
+    .variable(observer("reset_button"))
+    .define("reset_button", ["Generators", "viewof reset_button"], (G, _) =>
+      G.input(_)
+    );
+  main
+    .variable(observer("viewof copy2sliders"))
+    .define("viewof copy2sliders", ["Inputs"], _copy2sliders);
+  main
+    .variable(observer("copy2sliders"))
+    .define("copy2sliders", ["Generators", "viewof copy2sliders"], (G, _) =>
+      G.input(_)
+    );
+  main.variable(observer()).define(["copy2sliders"], _10);
+  main
+    .variable(observer("inversed_chart"))
+    .define(
+      "inversed_chart",
+      ["BarChart", "labeled_weights", "d3", "width"],
+      _inversed_chart
+    );
+  main.variable(observer()).define(["labeled_weights"], _12);
+  main.variable(observer("BarChart")).define("BarChart", ["d3"], _BarChart);
+  main.variable(observer()).define(["weights"], _14);
+  main.variable(observer()).define(["copy2sliders"], _15);
+  main.variable(observer()).define(["selected_nodes"], _16);
+  main.variable(observer()).define(["updated_weights"], _17);
+  main.variable(observer()).define(["weights"], _18);
+  main.define("initial counter", _counter);
+  main
+    .variable(observer("mutable counter"))
+    .define(
+      "mutable counter",
+      ["Mutable", "initial counter"],
+      (M, _) => new M(_)
+    );
+  main
+    .variable(observer("counter"))
+    .define("counter", ["mutable counter"], (_) => _.generator);
+  main
+    .variable(observer("copy_to_sliders"))
+    .define(
+      "copy_to_sliders",
+      [
+        "copy2sliders",
+        "selected_nodes",
+        "counter",
+        "attrs",
+        "updated_weights",
+        "mutable counter",
+        "mutable weights",
+      ],
+      _copy_to_sliders
+    );
+  main.variable(observer()).define(["md"], _21);
+  main.define("initial weights", ["data"], _weights);
+  main
+    .variable(observer("mutable weights"))
+    .define(
+      "mutable weights",
+      ["Mutable", "initial weights"],
+      (M, _) => new M(_)
+    );
+  main
+    .variable(observer("weights"))
+    .define("weights", ["mutable weights"], (_) => _.generator);
+  main
+    .variable(observer("weight_list"))
+    .define("weight_list", ["attrs", "w"], _weight_list);
+  main.variable(observer("attrs")).define("attrs", ["new_data"], _attrs);
+  main.variable(observer("names")).define("names", ["data"], _names);
+  main.variable(observer("new_data")).define("new_data", ["data"], _new_data);
+  main
+    .variable(observer("normalized_data"))
+    .define("normalized_data", ["attrs", "new_data", "d3"], _normalized_data);
+  main
+    .variable(observer("applied_weight_data"))
+    .define(
+      "applied_weight_data",
+      ["normalized_data", "attrs", "weight_list"],
+      _applied_weight_data
+    );
+  main
+    .variable(observer("relv_value"))
+    .define("relv_value", ["applied_weight_data", "attrs"], _relv_value);
+  main
+    .variable(observer("relevance_inPercent"))
+    .define("relevance_inPercent", ["relv_value"], _relevance_inPercent);
+  main.variable(observer()).define(["md"], _31);
+  main.variable(observer()).define(["md"], _32);
+  main.variable(observer("cScale")).define("cScale", ["d3"], _cScale);
+  main
+    .variable(observer())
+    .define(["data", "w", "graph", "Distance", "simulation", "scale"], _34);
+  main
+    .variable(observer("simulation"))
+    .define("simulation", ["d3", "graph", "width", "height"], _simulation);
+  main
+    .variable(observer("data"))
+    .define("data", ["reset_button", "d3", "FileAttachment"], _data);
+  main
+    .variable(observer("Distance"))
+    .define("Distance", ["d3", "data"], _Distance);
+  main
+    .variable(observer("graph"))
+    .define(
+      "graph",
+      ["reset_button", "copy2sliders", "data", "Distance"],
+      _graph
+    );
+  main.variable(observer("drag")).define("drag", ["d3"], _drag);
+  main.variable(observer("height")).define("height", _height);
+  main.variable(observer()).define(["width"], _41);
+  main
+    .variable(observer("scale_x"))
+    .define("scale_x", ["d3", "width"], _scale_x);
+  main
+    .variable(observer("scale_y"))
+    .define("scale_y", ["d3", "height"], _scale_y);
+  main.variable(observer()).define(["md"], _44);
+  main.variable(observer()).define(["md"], _45);
+  main.define("initial selected_nodes", ["reset_button"], _selected_nodes);
+  main
+    .variable(observer("mutable selected_nodes"))
+    .define(
+      "mutable selected_nodes",
+      ["Mutable", "initial selected_nodes"],
+      (M, _) => new M(_)
+    );
+  main
+    .variable(observer("selected_nodes"))
+    .define("selected_nodes", ["mutable selected_nodes"], (_) => _.generator);
+  main.variable(observer()).define(["selected_data"], _47);
+  main
+    .variable(observer("selected_data"))
+    .define("selected_data", ["selected_nodes", "data"], _selected_data);
+  main
+    .variable(observer("selected_labels"))
+    .define("selected_labels", ["selected_data"], _selected_labels);
+  main.variable(observer()).define(["FileAttachment"], _50);
+  main
+    .variable(observer("selected_cords"))
+    .define(
+      "selected_cords",
+      ["selected_nodes", "scale_x", "scale_y"],
+      _selected_cords
+    );
+  main.variable(observer()).define(["md"], _52);
+  main
+    .variable(observer("euclidean_distance"))
+    .define("euclidean_distance", _euclidean_distance);
+  main
+    .variable(observer("manhattan_distance"))
+    .define("manhattan_distance", _manhattan_distance);
+  main
+    .variable(observer("pairwise_distance"))
+    .define(
+      "pairwise_distance",
+      ["selected_cords", "euclidean_distance", "manhattan_distance"],
+      _pairwise_distance
+    );
+  main.variable(observer()).define(["md"], _60);
+  main
+    .variable(observer("dataHDpart"))
+    .define("dataHDpart", ["selected_data"], _dataHDpart);
+  main
+    .variable(observer("data2Dnew"))
+    .define("data2Dnew", ["selected_cords"], _data2Dnew);
+  main.variable(observer()).define(["md"], _63);
+  main.variable(observer("new_proposal")).define("new_proposal", _new_proposal);
+  main.variable(observer()).define(["md"], _65);
+  main.variable(observer("stress")).define("stress", _stress);
+  main.variable(observer()).define(["md"], _70);
+  main
+    .variable(observer("dist2D"))
+    .define("dist2D", ["pairwise_distance", "data2Dnew"], _dist2D);
+  main
+    .variable(observer("apply_weights"))
+    .define("apply_weights", _apply_weights);
+  main
+    .variable(observer("inversMDS"))
+    .define(
+      "inversMDS",
+      [
+        "apply_weights",
+        "pairwise_distance",
+        "stress",
+        "dist2D",
+        "new_proposal",
+      ],
+      _inversMDS
+    );
+  main
+    .variable(observer("updated_weights"))
+    .define(
+      "updated_weights",
+      ["selected_cords", "inversMDS", "dataHDpart", "data2Dnew"],
+      _updated_weights
+    );
+  main
+    .variable(observer("labeled_weights"))
+    .define("labeled_weights", ["attrs", "updated_weights"], _labeled_weights);
+  main.variable(observer()).define(["md"], _78);
+  const child1 = runtime.module(define1);
+  main.import("legend", child1);
+  const child2 = runtime.module(define2);
+  main.import("rangeSlider", child2);
+  main.import("themes", child2);
+  main.variable(observer("d3")).define("d3", ["require"], _d3);
+  main.variable(observer()).define(["html"], _82);
+  main.variable(observer()).define(["md"], _83);
+  main.variable(observer()).define(["FileAttachment"], _84);
+  return main;
+}

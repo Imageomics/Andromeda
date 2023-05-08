@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File>();
   const [datasetID, setDatasetID] = useState<string>();
+  const [dataset, setDataset] = useState<string>();
   const [imageData, setImageData] = useState<any[]>();
   const [weightData, setWeightData] = useState<any[]>();
 
@@ -21,16 +22,15 @@ export default function Home() {
     setSelectedFile(selectedFiles?.[0]);
   }
 
-  async function performDimensionalReduction(id: string, weights: any) {
-    const result = await dimensionalReduction(id, weights)
-    setDatasetID(id);
+  async function performDimensionalReduction(weights: any) {
+    const result = await dimensionalReduction(dataset, weights)
     setImageData(result.images);
     setWeightData(result.weights);
     return result;
   }
 
-  async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
-    const result = await reverseDimensionalReduction(id, movedPositions);
+  async function performReverseDimensionalReduction(movedPositions: any[]) {
+    const result = await reverseDimensionalReduction(dataset, movedPositions);
     setWeightData(result.weights);
     return result;
   }
@@ -39,7 +39,10 @@ export default function Home() {
     if (selectedFile) {
       const initialWeights = { all: 0.5 };
       const result = await uploadDataset(selectedFile);
-      await performDimensionalReduction(result.id, initialWeights);
+      setDataset(result.data)
+      const drResult = await dimensionalReduction(result.data, initialWeights)
+      setImageData(drResult.images);
+      setWeightData(drResult.weights);
     } else {
       console.log("File must be selected first.");
     }

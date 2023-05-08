@@ -1,0 +1,14 @@
+{
+  "name": "@hanliuxxx/andromeda_js/2",
+  "main": "4b38a438adb50b4f@2198.js",
+  "version": "2198.0.0",
+  "homepage": "https://observablehq.com/@hanliuxxx/andromeda_js/2",
+  "author": {
+    "name": "Han Liu",
+    "url": "https://observablehq.com/@hanliuxxx"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}

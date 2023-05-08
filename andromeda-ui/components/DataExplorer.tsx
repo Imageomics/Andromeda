@@ -80,7 +80,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
 
     async function applySliderWeights() {
         setWorking(true);
-        const results = await drFunc(datasetID, sliderWeights);
+        const results = await drFunc(sliderWeights);
         setSliderWeights(results.weights);
         setWorking(false);
     }
@@ -92,7 +92,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
                 alert("You must move at least 2 images first.");
             } else {
                 setWorking(true);
-                const results = await rdrFunc(datasetID, movedPositions);
+                const results = await rdrFunc(movedPositions);
                 setSliderWeights(results.weights);
                 //clear selected images
                 const newImages = images.map((x) => {
@@ -111,7 +111,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
             newWeights[key] = 0.5;
         }
         setSliderWeights(newWeights);
-        const results = await drFunc(datasetID, newWeights);
+        const results = await drFunc(newWeights);
         setSliderWeights(results.weights);
         setImageData(results.images);
         setWorking(false);
