@@ -1,0 +1,18 @@
+﻿Image_Label,Image_Link,Wgt (F_KG),Dimorphism,Diet,Mating,Habitat,Color,M_Horns
+blackRhino,https://www.apps.stat.vt.edu/house/quest/questAnimalData/blackRhino.jpeg,1000,0,3,3,2.5,1,3
+bushbuck,https://www.apps.stat.vt.edu/house/quest/questAnimalData/bushbuck.jpeg,50,3,3,1,3,4,2
+capeBuffalo,https://www.apps.stat.vt.edu/house/quest/questAnimalData/capeBuffalo.jpeg,700,2,1,3,1.5,1,3
+cattle,https://www.apps.stat.vt.edu/house/quest/questAnimalData/cattle.jpeg,400,0,1,3,1,1,4
+donkey,https://www.apps.stat.vt.edu/house/quest/questAnimalData/donkey.jpeg,275,0,1.5,3,1.5,2,0
+eland,https://www.apps.stat.vt.edu/house/quest/questAnimalData/eland.jpeg,450,2,2.5,3,2,4,3
+elephant,https://www.apps.stat.vt.edu/house/quest/questAnimalData/elephant.jpeg,3000,0,2,3,2,2,0
+giraffe,https://www.apps.stat.vt.edu/house/quest/questAnimalData/giraffe.jpeg,850,0,3,3,2,5,2
+grantsGazelle,https://www.apps.stat.vt.edu/house/quest/questAnimalData/grantsGazelle.jpeg,70,2,1,3,1,4.5,2
+grevysZebra,https://www.apps.stat.vt.edu/house/quest/questAnimalData/grevysZebra.jpeg,375,0,1.5,3,1.5,3,0
+hippo,https://www.apps.stat.vt.edu/house/quest/questAnimalData/hippo.jpeg,2000,0.5,1,3,1,1,0
+impala,https://www.apps.stat.vt.edu/house/quest/questAnimalData/impala.jpeg,50,1.5,1.5,3,2,4,3
+kudu,https://www.apps.stat.vt.edu/house/quest/questAnimalData/kudu.jpeg,175,1.5,2.5,3,2.5,5,3
+oryx,https://www.apps.stat.vt.edu/house/quest/questAnimalData/oryx.jpeg,180,0,1,3,1,2,4
+plainsZebra,https://www.apps.stat.vt.edu/house/quest/questAnimalData/plainsZebra.jpeg,225,0,1,2,1,3,0
+warthog,https://www.apps.stat.vt.edu/house/quest/questAnimalData/warthog.jpeg,60,0.5,1,3,1,2,0
+waterbuck,https://www.apps.stat.vt.edu/house/quest/questAnimalData/waterbuck.jpeg,185,1.5,1.5,3,2,4,3
