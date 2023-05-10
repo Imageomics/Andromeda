@@ -3,6 +3,7 @@ import MoveableImage from "../components/MoveableImage";
 import { useState, createRef, Children } from 'react';
 import { Stage, Layer, Rect, Circle } from 'react-konva';
 
+const DEFAULT_IMAGE_SIZE = 40;
 
 interface DataExplorerProps {
     images: any[] | undefined;
@@ -39,13 +40,14 @@ function transformImageCoordinates(x: number, y: number, gridSize: number) {
 }
 
 export default function DataExplorer({ images, setImageData, weights, datasetID, drFunc, rdrFunc }: DataExplorerProps) {
-    const [imageSize, setImageSize] = useState<number>(40);
+    const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
     const [showLabel, setShowLabel] = useState<boolean>(true);
     const [showImage, setShowImage] = useState<boolean>(true);
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
 
-    const gridSize = 500;
+    const gridSize = 600;
+    const expandedGridSize = gridSize + DEFAULT_IMAGE_SIZE;
     let imageControls = null;
     function onImageMoved(imageSettings: any) {
         if (images) {
@@ -135,7 +137,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
 
         <div>
             <div className="flex">
-                <Stage width={gridSize} height={gridSize} className="mr-4">
+                <Stage width={expandedGridSize} height={expandedGridSize} className="mr-4">
                     <Layer >
                         <Rect width={gridSize} height={gridSize} stroke="black"></Rect>
                         {imageControls}

@@ -147,7 +147,9 @@ def inverse_DR(dataHD, data2D, curWeights = None):
         data2D[pd.df or np.array]: projected 2D data
     @return[pd.Series]: new weights  
     """
+    print("data2D.1", data2D);
     dist2D = distance_matrix_2D(data2D)  # compute 2D distances only once
+    print("dist2D.2", dist2D);
     col_names = dataHD.columns
     dataHD = dataHD.to_numpy()  # use numpy for efficiency 
     row, col = dataHD.shape
@@ -164,9 +166,10 @@ def inverse_DR(dataHD, data2D, curWeights = None):
     flag = [0]*col         # degree of success of a weight change
     direction = [1]*col  # direction to move a weight, pos or neg
     step = [1.0/col]*col   # how much to change each weight
-    
+    print("cw", curWeights);
     dataHDw = dataHD * curWeights   # weighted space, re-use this array                              
     distHD = distance_matrix_HD(dataHDw)
+    print("distHD", distHD);
     curStress = stress(distHD, dist2D)
     print('Starting stress =', curStress, 'Processing...')   
 

@@ -23,6 +23,8 @@ export default function Home() {
 
   async function performDimensionalReduction(id: string, weights: any) {
     const result = await dimensionalReduction(id, weights)
+    console.log("Images");
+    console.log(result.images);
     setDatasetID(id);
     setImageData(result.images);
     setWeightData(result.weights);
@@ -31,6 +33,8 @@ export default function Home() {
 
   async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
     const result = await reverseDimensionalReduction(id, movedPositions)
+    console.log("Weights");
+    console.log(result.weights);
     //setImageData(result.images);
     setWeightData(result.weights);
     return result;

@@ -29,6 +29,7 @@ export default function MoveableImage(props: MoveableImageProps) {
     const [image] = useImage(url);
     const imageX = (x + 1.0) / 2.0 * gridSize;
     let imageY = (y + 1.0) / 2.0 * gridSize;
+    console.log(label, " x,y:", x, ",", y, "imageX,imageY", imageX, ",", imageY);
     let imageControl = null;
     if (showImage) {
         imageControl = <Image
