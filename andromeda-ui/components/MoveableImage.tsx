@@ -27,8 +27,6 @@ export default function MoveableImage(props: MoveableImageProps) {
     const { label, url, x, y, gridSize, imageSize, showLabel, showImage, showSelected, onImageMoved } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [image] = useImage(url);
-    const imageX = (x + 1.0) / 2.0 * gridSize;
-    let imageY = (y + 1.0) / 2.0 * gridSize;
     let imageControl = null;
     if (showImage) {
         imageControl = <Image
@@ -60,19 +58,22 @@ export default function MoveableImage(props: MoveableImageProps) {
 
     function onDragEnd(evt: any) {
         setIsDragging(false);
-        const imageSettings: any = transformImageCoordinates(evt.target.x(), evt.target.y(), gridSize);
+        const imageSettings: any = {
+            "label": label,
+            x: evt.target.x(),
+            y: evt.target.y(),
+        }
         imageSettings.label = label;
         onImageMoved(imageSettings)
     }
 
-    //x and y are in the range +/- 1
     return <Group
         data-label={label}
         draggable
         onDragStart={() => setIsDragging(true)}
         onDragEnd={onDragEnd}
-        x={imageX}
-        y={imageY}>
+        x={x}
+        y={y}>
         {circleControl}
         {imageControl}
         {labelControl}

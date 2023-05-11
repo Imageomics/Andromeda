@@ -11,6 +11,7 @@ interface DataExplorerProps {
     datasetID: string | undefined;
     drFunc: any;
     rdrFunc: any;
+    imagePanelSize: number;
 }
 
 function createImage(item: any, gridSize: number, imageSize: number,
@@ -30,22 +31,13 @@ function createImage(item: any, gridSize: number, imageSize: number,
     />
 }
 
-function transformImageCoordinates(x: number, y: number, gridSize: number) {
-    //transformed x and y are in the range +/- 1
-    return {
-        "x": x / gridSize * 2.0 - 1.0,
-        "y": y / gridSize * 2.0 - 1.0,
-    }
-}
-
-export default function DataExplorer({ images, setImageData, weights, datasetID, drFunc, rdrFunc }: DataExplorerProps) {
+export default function DataExplorer({ images, setImageData, weights, datasetID, drFunc, rdrFunc, imagePanelSize }: DataExplorerProps) {
     const [imageSize, setImageSize] = useState<number>(40);
     const [showLabel, setShowLabel] = useState<boolean>(true);
     const [showImage, setShowImage] = useState<boolean>(true);
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
-
-    const gridSize = 600;
+    const [gridScale, setGridScale] = useState<number>(1.0);
     let imageControls = null;
     function onImageMoved(imageSettings: any) {
         if (images) {
@@ -59,7 +51,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
     }
     if (images) {
         imageControls = images.map(item => createImage(
-            item, gridSize, imageSize,
+            item, imagePanelSize, imageSize,
             showLabel, showImage, onImageMoved
         ))
     }
@@ -83,6 +75,10 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
         const results = await drFunc(sliderWeights);
         setSliderWeights(results.weights);
         setWorking(false);
+    }
+
+    async function updateGridWithScale(newGridScale: number) {
+        setGridScale(newGridScale);
     }
 
     async function applyMovedObservations() {
@@ -136,9 +132,9 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
         <div>
             <div className="flex">
                 <div>
-                    <Stage width={gridSize} height={gridSize} className="mr-4">
+                    <Stage width={imagePanelSize} height={imagePanelSize} className="mr-4">
                         <Layer >
-                            <Rect width={gridSize} height={gridSize} stroke="black"></Rect>
+                            <Rect width={imagePanelSize} height={imagePanelSize} stroke="black"></Rect>
                             {imageControls}
                         </Layer>
                     </Stage>
@@ -160,17 +156,19 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
                             type="button">Reset Plot</button>
                     </div>
                     <div>
-                        <label htmlFor="imageSize">Adjust image size:&nbsp;</label>
-                        <input
-                            id="imageSize"
-                            name="imageSize"
-                            type="range"
-                            min="10"
-                            max="100"
-                            step="0.05"
-                            value={imageSize}
-                            onChange={(evt) => setImageSize(parseInt(evt.target.value))}
-                        ></input>
+                        <div>
+                            <label htmlFor="imageSize">Adjust image size:&nbsp;</label>
+                            <input
+                                id="imageSize"
+                                name="imageSize"
+                                type="range"
+                                min="10"
+                                max="100"
+                                step="0.05"
+                                value={imageSize}
+                                onChange={(evt) => setImageSize(parseInt(evt.target.value))}
+                            ></input>
+                        </div>
                         <div>
                             <div >
                                 Show:
@@ -215,8 +213,6 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
                     {weightControls}
                 </div>
             </div>
-
-
         </div >
     )
 }

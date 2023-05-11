@@ -8,6 +8,7 @@ const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
 });
 
 const inter = Inter({ subsets: ['latin'] })
+const IMAGE_PANEL_SIZE = 600;
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File>();
@@ -30,7 +31,8 @@ export default function Home() {
   }
 
   async function performReverseDimensionalReduction(movedPositions: any[]) {
-    const result = await reverseDimensionalReduction(dataset, movedPositions);
+    console.log(movedPositions);
+    const result = await reverseDimensionalReduction(dataset, movedPositions, IMAGE_PANEL_SIZE);
     setWeightData(result.weights);
     return result;
   }
@@ -61,6 +63,7 @@ export default function Home() {
           setImageData={setImageData}
           drFunc={performDimensionalReduction}
           rdrFunc={performReverseDimensionalReduction}
+          imagePanelSize={IMAGE_PANEL_SIZE}
         />
       </>
 
