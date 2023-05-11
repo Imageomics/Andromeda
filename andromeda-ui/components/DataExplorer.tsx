@@ -1,6 +1,6 @@
 import WeightSlider from "../components/WeightSlider";
 import MoveableImage from "../components/MoveableImage";
-import { useState, createRef, Children } from 'react';
+import { useState, useRef, Children } from 'react';
 import { Stage, Layer, Rect, Circle } from 'react-konva';
 
 
@@ -38,6 +38,8 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
     const [gridScale, setGridScale] = useState<number>(1.0);
+    const stageRef = useRef(null);
+
     let imageControls = null;
     function onImageMoved(imageSettings: any) {
         if (images) {
@@ -127,13 +129,47 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
         }
     }
 
+    var scaleBy = 1.05;
+    function onWheel(e: any) {
+        e.evt.preventDefault();
+        console.log()
+        const stage: any = stageRef.current;
+        var oldScale = stage.scaleX();
+        var pointer = stage.getPointerPosition();
+
+        var mousePointTo = {
+            x: (pointer.x - stage.x()) / oldScale,
+            y: (pointer.y - stage.y()) / oldScale,
+        };
+
+        // how to scale? Zoom in? Or zoom out?
+        let direction = e.evt.deltaY > 0 ? 1 : -1;
+
+        // when we zoom on trackpad, e.evt.ctrlKey is true
+        // in that case lets revert direction
+        if (e.evt.ctrlKey) {
+            direction = -direction;
+        }
+
+        var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+        stage.scale({ x: newScale, y: newScale });
+
+        var newPos = {
+            x: pointer.x - mousePointTo.x * newScale,
+            y: pointer.y - mousePointTo.y * newScale,
+        };
+        stage.position(newPos);
+    }
+
     return (
 
         <div>
             <div className="flex">
                 <div>
-                    <Stage width={imagePanelSize} height={imagePanelSize} className="mr-4">
-                        <Layer >
+                    <Stage draggable={true} ref={stageRef} width={imagePanelSize} height={imagePanelSize} className="mr-4"
+                        onWheel={onWheel}>
+                        <Layer scaleX={1} scaleY={1}>
                             <Rect width={imagePanelSize} height={imagePanelSize} stroke="black"></Rect>
                             {imageControls}
                         </Layer>
