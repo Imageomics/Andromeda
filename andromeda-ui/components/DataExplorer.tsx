@@ -167,8 +167,7 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
         <div>
             <div className="flex">
                 <div>
-                    <Stage draggable={true} ref={stageRef} width={imagePanelSize} height={imagePanelSize} className="mr-4"
-                        onWheel={onWheel}>
+                    <Stage ref={stageRef} width={imagePanelSize} height={imagePanelSize} className="mr-4">
                         <Layer scaleX={1} scaleY={1}>
                             <Rect width={imagePanelSize} height={imagePanelSize} stroke="black"></Rect>
                             {imageControls}
