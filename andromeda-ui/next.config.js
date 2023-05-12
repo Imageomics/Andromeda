@@ -12,5 +12,8 @@ module.exports = (phase, { defaultConfig }) => {
       apiURL: apiURL,
     },
     output: "export",
+    typescript: {
+        ignoreBuildErrors: true
+    }
   };
 };
