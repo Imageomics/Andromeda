@@ -32,7 +32,7 @@ function toGridCoordinates(x: number, y: number, gridSize: number, pointScaling:
 }
 
 function createImage(item: any, gridSize: number, imageSize: number, pointScaling: number,
-    showLabel: boolean, showImage: boolean, onImageMoved: any) {
+    showLabel: boolean, showImage: boolean, onImageMoved: any, stageRef: any) {
     const { imageX, imageY } = toGridCoordinates(item.x, item.y, gridSize, pointScaling);
     return <MoveableImage
         key={item.label}
@@ -45,6 +45,7 @@ function createImage(item: any, gridSize: number, imageSize: number, pointScalin
         showImage={showImage}
         showSelected={item.selected}
         onImageMoved={onImageMoved}
+        stageRef={stageRef}
     />
 }
 
@@ -52,7 +53,8 @@ export default function ImageGrid(props: ImageGridProps) {
     const { stageRef, size, imageSize, pointScaling, showLabel, showImage, images } = props;
     const imageControls = images.map(item => createImage(
         item, size, imageSize, pointScaling,
-        showLabel, showImage, onImageMoved
+        showLabel, showImage, onImageMoved,
+        stageRef
     ))
 
     function onImageMoved(imageX: number, imageY: number, label: string) {
@@ -60,7 +62,7 @@ export default function ImageGrid(props: ImageGridProps) {
         props.onImageMoved(x, y, label);
     }
 
-    return <Stage ref={stageRef} draggable={true} width={size} height={size} className="mr-4 z-20">
+    return <Stage ref={stageRef} draggable={true} width={size} height={size} className="cursor-grab">
         <Layer>
             <Rect width={size} height={size} />
             {imageControls}

@@ -7,21 +7,12 @@ const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
 });
 
 export default function Home() {
-  const [selectedFile, setSelectedFile] = useState<File>();
   const [datasetID, setDatasetID] = useState<string>();
   const [imageData, setImageData] = useState<any[]>();
   const [weightData, setWeightData] = useState<any[]>();
 
-  function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const { files } = event.target;
-    const selectedFiles = files as FileList;
-    setSelectedFile(selectedFiles?.[0]);
-  }
-
   async function performDimensionalReduction(id: string, weights: any) {
     const result = await dimensionalReduction(id, weights)
-    console.log("Images");
-    console.log(result.images);
     setDatasetID(id);
     setImageData(result.images);
     setWeightData(result.weights);
@@ -30,15 +21,13 @@ export default function Home() {
 
   async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
     const result = await reverseDimensionalReduction(id, movedPositions)
-    console.log("Weights");
-    console.log(result.weights);
     setWeightData(result.weights);
     return result;
   }
 
   async function uploadFile(selectedFile: any) {
-    const initialWeights = { all: 0.5 };
     const result = await uploadDataset(selectedFile);
+    const initialWeights = { all: 0.5 };
     await performDimensionalReduction(result.id, initialWeights);
   }
 

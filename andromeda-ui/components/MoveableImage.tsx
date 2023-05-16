@@ -12,10 +12,13 @@ interface MoveableImageProps {
     showImage: boolean;
     showSelected: boolean;
     onImageMoved: any;
+    onMouseEnter: any;
+    onMouseLeave: any;
+    stageRef: any;
 }
 
 export default function MoveableImage(props: MoveableImageProps) {
-    const { label, url, x, y, imageSize, showLabel, showImage, showSelected, onImageMoved } = props;
+    const { label, url, x, y, imageSize, showLabel, showImage, showSelected, onImageMoved, stageRef } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [image] = useImage(url);
     let imageControl = null;
@@ -50,7 +53,17 @@ export default function MoveableImage(props: MoveableImageProps) {
         onImageMoved(evt.target.x(), evt.target.y(), label);
     }
 
+    function onMouseEnter() {
+        stageRef.current.container().style.cursor = 'move';
+    }
+
+    function onMouseLeave() {
+        stageRef.current.container().style.cursor = 'grab';
+    }
+
     return <Group
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         data-label={label}
         draggable
         onDragStart={() => setIsDragging(true)}

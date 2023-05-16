@@ -22,7 +22,7 @@ export default function ThumbnailGrid(props: ThumbnailGridProps) {
         return <Circle
             stroke="black"
             opacity={0.5}
-            key={item.name}
+            key={item.label}
             x={x} y={y}
             fill="grey"
             radius={POINT_RADIUS} />
