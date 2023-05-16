@@ -8,15 +8,24 @@ interface ThumbnailGridProps {
     images: any[]
 }
 
+function scaleCoordinate(val: number, scaleAmt: number) {
+    return val * scaleAmt + scaleAmt + POINT_RADIUS + POINT_OFFSET;
+}
+
 export default function ThumbnailGrid(props: ThumbnailGridProps) {
     const { size, images } = props
     const scaleAmt = size / 4;
     let points = null;
-    // TODO rectangle showing where the ImageGrid is looking
     points = images.map(item => {
-        const x = item.x * scaleAmt + scaleAmt + POINT_RADIUS + POINT_OFFSET;
-        const y = item.y * scaleAmt + scaleAmt + POINT_RADIUS + POINT_OFFSET;
-        return <Circle key={item.name} x={x} y={y} fill="grey" radius={POINT_RADIUS} />
+        const x = scaleCoordinate(item.x, scaleAmt);
+        const y = scaleCoordinate(item.y, scaleAmt);
+        return <Circle
+            stroke="black"
+            opacity={0.5}
+            key={item.name}
+            x={x} y={y}
+            fill="grey"
+            radius={POINT_RADIUS} />
     })
     return <Stage width={size} height={size}>
         <Layer>
