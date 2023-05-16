@@ -7,7 +7,7 @@ interface WeightSliderProps {
 export default function WeightSlider({ id, weights, onChange }: WeightSliderProps) {
     const value = weights[id];
 
-    return <div key={id}>
+    return <div key={id} className="flex flex-nowrap">
         <input
             type="range"
             id={id}

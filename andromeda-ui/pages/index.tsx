@@ -1,5 +1,4 @@
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { uploadDataset, dimensionalReduction, reverseDimensionalReduction } from "../backend/dataset";
 import { Inter } from 'next/font/google'
 import React, { useState } from 'react';
@@ -35,7 +34,6 @@ export default function Home() {
     const result = await reverseDimensionalReduction(id, movedPositions)
     console.log("Weights");
     console.log(result.weights);
-    //setImageData(result.images);
     setWeightData(result.weights);
     return result;
   }
@@ -65,7 +63,6 @@ export default function Home() {
           rdrFunc={performReverseDimensionalReduction}
         />
       </>
-
   }
 
   return (

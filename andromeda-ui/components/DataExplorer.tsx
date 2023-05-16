@@ -1,12 +1,19 @@
 import WeightSlider from "../components/WeightSlider";
-import MoveableImage from "../components/MoveableImage";
-import { useState, createRef, Children } from 'react';
-import { Stage, Layer, Rect, Circle } from 'react-konva';
+import ShowRadioGroup from "../components/ShowRadioGroup";
+import ImageSizeSlider from "../components/ImageSizeSlider";
+import PointScalingSlider from "../components/PointScalingSlider";
+import ThumbnailGrid from "../components/ThumbnailGrid";
+import ColoredButton from "../components/ColoredButton";
+import ImageGrid from "../components/ImageGrid";
+import { useState, useRef } from 'react';
 
 const DEFAULT_IMAGE_SIZE = 40;
+const DEFAULT_POINT_SCALING = 1.0;
+const GRID_SIZE = 600;
+const THUMBNAIL_SIZE = 100;
 
 interface DataExplorerProps {
-    images: any[] | undefined;
+    images: any[];
     setImageData: any;
     weights: any | undefined;
     datasetID: string | undefined;
@@ -14,57 +21,27 @@ interface DataExplorerProps {
     rdrFunc: any;
 }
 
-function createImage(item: any, gridSize: number, imageSize: number,
-    showLabel: boolean, showImage: boolean, onImageMoved: any) {
-    return <MoveableImage
-        key={item.label}
-        label={item.label}
-        url={item.url}
-        x={item.x}
-        y={item.y}
-        gridSize={gridSize}
-        imageSize={imageSize}
-        showLabel={showLabel}
-        showImage={showImage}
-        showSelected={item.selected}
-        onImageMoved={onImageMoved}
-    />
-}
-
-function transformImageCoordinates(x: number, y: number, gridSize: number) {
-    //transformed x and y are in the range +/- 1
-    return {
-        "x": x / gridSize * 2.0 - 1.0,
-        "y": y / gridSize * 2.0 - 1.0,
-    }
-}
-
-export default function DataExplorer({ images, setImageData, weights, datasetID, drFunc, rdrFunc }: DataExplorerProps) {
+export default function DataExplorer(props: DataExplorerProps) {
+    const { images, setImageData, weights, datasetID, drFunc, rdrFunc } = props;
     const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
+    const [pointScaling, setPointScaling] = useState<number>(DEFAULT_POINT_SCALING);
     const [showLabel, setShowLabel] = useState<boolean>(true);
     const [showImage, setShowImage] = useState<boolean>(true);
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
+    const stageRef = useRef<any>(null);
 
-    const gridSize = 600;
-    const expandedGridSize = gridSize + DEFAULT_IMAGE_SIZE;
-    let imageControls = null;
-    function onImageMoved(imageSettings: any) {
+    function onImageMoved(x: number, y: number, label: string) {
         if (images) {
             const newImages = [...images];
-            const idx = images.findIndex((x) => x.label === imageSettings.label);
-            newImages[idx].x = imageSettings.x;
-            newImages[idx].y = imageSettings.y;
+            const idx = images.findIndex((x) => x.label === label);
+            newImages[idx].x = x;
+            newImages[idx].y = y;
             newImages[idx].selected = true;
             setImageData(newImages);
         }
     }
-    if (images) {
-        imageControls = images.map(item => createImage(
-            item, gridSize, imageSize,
-            showLabel, showImage, onImageMoved
-        ))
-    }
+
     let weightControls = null;
     function onChangeWeight(key: string, value: number) {
         let newWeights = { ...sliderWeights };
@@ -116,6 +93,10 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
         const results = await drFunc(datasetID, newWeights);
         setSliderWeights(results.weights);
         setImageData(results.images);
+        if (stageRef.current) {
+            stageRef.current.x(0);
+            stageRef.current.y(0);
+        }
         setWorking(false);
     }
 
@@ -134,88 +115,48 @@ export default function DataExplorer({ images, setImageData, weights, datasetID,
     }
 
     return (
-
-        <div>
-            <div className="flex">
-                <Stage width={expandedGridSize} height={expandedGridSize} className="mr-4">
-                    <Layer >
-                        <Rect width={gridSize} height={gridSize} stroke="black"></Rect>
-                        {imageControls}
-                    </Layer>
-                </Stage>
+        <div className="flex">
+            <div>
+                <ImageGrid
+                    stageRef={stageRef}
+                    size={GRID_SIZE}
+                    imageSize={imageSize}
+                    pointScaling={pointScaling}
+                    showLabel={showLabel}
+                    showImage={showImage}
+                    onImageMoved={onImageMoved}
+                    images={images}
+                />
                 <div>
-                    {weightControls}
+                    <ColoredButton
+                        label="Apply Moved Observations"
+                        working={working}
+                        onClick={applyMovedObservations}
+                        color="green"
+                    />
+                    <ColoredButton
+                        label="Apply Slider Weights"
+                        working={working}
+                        onClick={applySliderWeights}
+                        color="orange"
+                    />
+                    <ColoredButton
+                        label="Reset Plot"
+                        working={working}
+                        onClick={resetPlot}
+                        color="red"
+                    />
+                </div>
+                <div>
+                    <ImageSizeSlider imageSize={imageSize} setImageSize={setImageSize} />
+                    <PointScalingSlider pointScaling={pointScaling} setPointScaling={setPointScaling} />
+                    <ShowRadioGroup showImage={showImage} showLabel={showLabel} onChangeShow={onChangeShow} />
                 </div>
             </div>
             <div>
-                <button
-                    onClick={applyMovedObservations}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-green-400 hover:bg-green-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Apply Moved Observations</button>
-                <button
-                    onClick={applySliderWeights}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-orange-400 hover:bg-orange-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Apply Slider Weights</button>
-                <button
-                    onClick={resetPlot}
-                    disabled={working}
-                    className="m-2 px-6 py-2 rounded bg-red-400 hover:bg-red-500 disabled:opacity-50 text-slate-100 inline-block"
-                    type="button">Reset Plot</button>
+                <ThumbnailGrid images={images} size={THUMBNAIL_SIZE} />
+                {weightControls}
             </div>
-            <div>
-                <label htmlFor="imageSize">Adjust image size:&nbsp;</label>
-                <input
-                    id="imageSize"
-                    name="imageSize"
-                    type="range"
-                    min="10"
-                    max="100"
-                    step="0.05"
-                    value={imageSize}
-                    onChange={(evt) => setImageSize(parseInt(evt.target.value))}
-                ></input>
-                <div>
-                    <div >
-                        Show:
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showImage"
-                                name="show"
-                                value="image"
-                                checked={showImage && !showLabel}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showImage">Image</label>
-                        </div>
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showLabel"
-                                name="show"
-                                value="label"
-                                checked={showLabel && !showImage}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showLabel">Label</label>
-                        </div>
-                        <div className="inline-block m-2">
-                            <input
-                                type="radio"
-                                id="showBoth"
-                                name="show"
-                                value="both"
-                                checked={showImage && showLabel}
-                                onChange={onChangeShow}
-                            />
-                            <label className="ml-1" htmlFor="showBoth">Image and Label</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div >
+        </div>
     )
 }

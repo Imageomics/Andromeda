@@ -7,7 +7,6 @@ interface MoveableImageProps {
     url: string;
     x: number;
     y: number;
-    gridSize: number;
     imageSize: number;
     showLabel: boolean;
     showImage: boolean;
@@ -15,21 +14,10 @@ interface MoveableImageProps {
     onImageMoved: any;
 }
 
-function transformImageCoordinates(x: number, y: number, gridSize: number) {
-    //transformed x and y are in the range +/- 1
-    return {
-        "x": x / gridSize * 2.0 - 1.0,
-        "y": y / gridSize * 2.0 - 1.0,
-    }
-}
-
 export default function MoveableImage(props: MoveableImageProps) {
-    const { label, url, x, y, gridSize, imageSize, showLabel, showImage, showSelected, onImageMoved } = props;
+    const { label, url, x, y, imageSize, showLabel, showImage, showSelected, onImageMoved } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [image] = useImage(url);
-    const imageX = (x + 1.0) / 2.0 * gridSize;
-    let imageY = (y + 1.0) / 2.0 * gridSize;
-    console.log(label, " x,y:", x, ",", y, "imageX,imageY", imageX, ",", imageY);
     let imageControl = null;
     if (showImage) {
         imageControl = <Image
@@ -37,7 +25,7 @@ export default function MoveableImage(props: MoveableImageProps) {
             width={imageSize}
             height={imageSize}
             strokeWidth={2}
-            alt={"Image " + label}
+            alt={label}
         />
     }
     let labelControl = null;
@@ -45,7 +33,7 @@ export default function MoveableImage(props: MoveableImageProps) {
     let labelY = 0;
     if (showLabel) {
         if (showImage) {
-            labelX = imageSize;
+            labelX = imageSize + 2;
             labelY = imageSize / 3;
         }
         labelControl = <Text text={label} x={labelX} y={labelY} />
@@ -59,22 +47,18 @@ export default function MoveableImage(props: MoveableImageProps) {
 
     function onDragEnd(evt: any) {
         setIsDragging(false);
-        const imageSettings: any = transformImageCoordinates(evt.target.x(), evt.target.y(), gridSize);
-        imageSettings.label = label;
-        onImageMoved(imageSettings)
+        onImageMoved(evt.target.x(), evt.target.y(), label);
     }
 
-    //x and y are in the range +/- 1
     return <Group
         data-label={label}
         draggable
         onDragStart={() => setIsDragging(true)}
         onDragEnd={onDragEnd}
-        x={imageX}
-        y={imageY}>
+        x={x}
+        y={y}>
         {circleControl}
         {imageControl}
         {labelControl}
-
     </Group>;
 }
