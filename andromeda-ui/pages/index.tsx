@@ -5,6 +5,7 @@ import UploadFile from '../components/UploadFile';
 const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
   ssr: false,
 });
+import { showError } from "../util/toast";
 
 export default function Home() {
   const [datasetID, setDatasetID] = useState<string>();
@@ -26,9 +27,14 @@ export default function Home() {
   }
 
   async function uploadFile(selectedFile: any) {
-    const result = await uploadDataset(selectedFile);
-    const initialWeights = { all: 0.5 };
-    await performDimensionalReduction(result.id, initialWeights);
+    try {
+      const result = await uploadDataset(selectedFile);
+      console.log(result);
+      const initialWeights = { all: 0.5 };
+      await performDimensionalReduction(result.id, initialWeights);
+    } catch (error: any) {
+      showError(error.message);
+    }
   }
 
   let dataExplorer = null;

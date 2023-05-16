@@ -5,22 +5,29 @@ function apiURL(suffix: string) {
   return publicRuntimeConfig.apiURL + suffix;
 }
 
+async function fetch_json(url: string, props: any) {
+  const response = await fetch(url, props);
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload.description);
+  }
+  return payload;
+}
+
 export async function uploadDataset(file: File) {
-  console.log(publicRuntimeConfig.apiURL);
   const formData = new FormData();
   formData.append("file", file);
-  const response = await fetch(apiURL("/dataset/"), {
+  return await fetch_json(apiURL("/dataset/"), {
     method: "POST",
     body: formData,
   });
-  return response.json();
 }
 
 export async function dimensionalReduction(dataset_id: string, weights: any) {
   const data = {
     weights: weights,
   };
-  const response = await fetch(
+  return await fetch_json(
     apiURL("/dataset/" + dataset_id + "/dimensional-reduction"),
     {
       method: "POST",
@@ -30,7 +37,6 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
       body: JSON.stringify(data),
     }
   );
-  return response.json();
 }
 
 export async function reverseDimensionalReduction(
@@ -40,7 +46,7 @@ export async function reverseDimensionalReduction(
   const data = {
     images: movedPositions,
   };
-  const response = await fetch(
+  return await fetch_json(
     apiURL("/dataset/" + dataset_id + "/inverse-dimensional-reduction"),
     {
       method: "POST",
@@ -50,5 +56,4 @@ export async function reverseDimensionalReduction(
       body: JSON.stringify(data),
     }
   );
-  return response.json();
 }

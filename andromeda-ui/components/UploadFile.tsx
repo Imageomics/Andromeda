@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { showError } from "../util/toast";
 
 interface UploadFileProps {
     uploadFile: any;
 }
 
 export default function UploadFile(props: UploadFileProps) {
-    const [selectedFile, setSelectedFile] = useState<File>();
     const { uploadFile } = props;
+    const [selectedFile, setSelectedFile] = useState<File>();
 
     function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
         const { files } = event.target;
@@ -18,7 +19,7 @@ export default function UploadFile(props: UploadFileProps) {
         if (selectedFile) {
             await uploadFile(selectedFile);
         } else {
-            console.log("File must be selected first.");
+            showError("File must be selected first.");
         }
     }
 
@@ -32,6 +33,7 @@ export default function UploadFile(props: UploadFileProps) {
             type="file"
             className="m-2"
             onChange={onChangeSelectedFile}
+            accept=".csv"
             id="formFile" />
         <button
             className="m-2 px-6 py-2 rounded bg-blue-400 hover:bg-blue-500 disabled:opacity-50 text-slate-100 inline-block"

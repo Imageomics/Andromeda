@@ -32,7 +32,8 @@ function toGridCoordinates(x: number, y: number, gridSize: number, pointScaling:
 }
 
 function createImage(item: any, gridSize: number, imageSize: number, pointScaling: number,
-    showLabel: boolean, showImage: boolean, onImageMoved: any, stageRef: any) {
+    showLabel: boolean, showImage: boolean, onImageMoved: any,
+    onMouseEnter: any, onMouseLeave: any) {
     const { imageX, imageY } = toGridCoordinates(item.x, item.y, gridSize, pointScaling);
     return <MoveableImage
         key={item.label}
@@ -45,16 +46,25 @@ function createImage(item: any, gridSize: number, imageSize: number, pointScalin
         showImage={showImage}
         showSelected={item.selected}
         onImageMoved={onImageMoved}
-        stageRef={stageRef}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
     />
 }
 
 export default function ImageGrid(props: ImageGridProps) {
     const { stageRef, size, imageSize, pointScaling, showLabel, showImage, images } = props;
+    function onMouseEnter(evt: any) {
+        stageRef.current.container().style.cursor = 'move';
+    }
+
+    function onMouseLeave(evt: any) {
+        stageRef.current.container().style.cursor = 'grab';
+    }
+
     const imageControls = images.map(item => createImage(
         item, size, imageSize, pointScaling,
         showLabel, showImage, onImageMoved,
-        stageRef
+        onMouseEnter, onMouseLeave
     ))
 
     function onImageMoved(imageX: number, imageY: number, label: string) {

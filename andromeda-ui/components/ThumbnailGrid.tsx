@@ -1,7 +1,7 @@
 import { Stage, Layer, Rect, Circle } from 'react-konva';
 
 const POINT_RADIUS = 2;
-const POINT_OFFSET = 10;
+const POINT_OFFSET = 30;
 
 interface ThumbnailGridProps {
     size: number;
@@ -14,7 +14,7 @@ function scaleCoordinate(val: number, scaleAmt: number) {
 
 export default function ThumbnailGrid(props: ThumbnailGridProps) {
     const { size, images } = props
-    const scaleAmt = size / 4;
+    const scaleAmt = size / 6;
     let points = null;
     points = images.map(item => {
         const x = scaleCoordinate(item.x, scaleAmt);
@@ -26,7 +26,7 @@ export default function ThumbnailGrid(props: ThumbnailGridProps) {
             x={x} y={y}
             fill="grey"
             radius={POINT_RADIUS} />
-    })
+    });
     return <Stage width={size} height={size}>
         <Layer>
             <Rect stroke="grey" width={size} height={size} />

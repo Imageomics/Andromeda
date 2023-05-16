@@ -14,11 +14,11 @@ interface MoveableImageProps {
     onImageMoved: any;
     onMouseEnter: any;
     onMouseLeave: any;
-    stageRef: any;
 }
 
 export default function MoveableImage(props: MoveableImageProps) {
-    const { label, url, x, y, imageSize, showLabel, showImage, showSelected, onImageMoved, stageRef } = props;
+    const { label, url, x, y, imageSize, showLabel, showImage, showSelected,
+        onImageMoved, onMouseEnter, onMouseLeave } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [image] = useImage(url);
     let imageControl = null;
@@ -39,7 +39,11 @@ export default function MoveableImage(props: MoveableImageProps) {
             labelX = imageSize + 2;
             labelY = imageSize / 3;
         }
-        labelControl = <Text text={label} x={labelX} y={labelY} />
+        labelControl = <Text text={label}
+            x={labelX} y={labelY}
+            fontSize={14}
+            shadowOffsetX={1}
+            shadowColor="white" />
     }
     let circleControl = null;
     if (showSelected || isDragging) {
@@ -51,14 +55,6 @@ export default function MoveableImage(props: MoveableImageProps) {
     function onDragEnd(evt: any) {
         setIsDragging(false);
         onImageMoved(evt.target.x(), evt.target.y(), label);
-    }
-
-    function onMouseEnter() {
-        stageRef.current.container().style.cursor = 'move';
-    }
-
-    function onMouseLeave() {
-        stageRef.current.container().style.cursor = 'grab';
     }
 
     return <Group
