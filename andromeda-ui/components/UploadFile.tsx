@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { showError } from "../util/toast";
+import ColoredButton from './ColoredButton';
 
 interface UploadFileProps {
     uploadFile: any;
@@ -9,10 +10,14 @@ export default function UploadFile(props: UploadFileProps) {
     const { uploadFile } = props;
     const [selectedFile, setSelectedFile] = useState<File>();
 
-    function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
+    async function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
         const { files } = event.target;
         const selectedFiles = files as FileList;
-        setSelectedFile(selectedFiles?.[0]);
+        if (selectedFiles && selectedFiles.length > 0) {
+            setSelectedFile(selectedFiles[0]);
+        } else {
+            setSelectedFile(undefined);
+        }
     }
 
     async function onClickUploadFile() {
@@ -27,7 +32,7 @@ export default function UploadFile(props: UploadFileProps) {
         <label
             className="text-md font-medium"
             htmlFor="formFile">
-            Select a CSV file:
+            Select a CSV file to visualize:
         </label>
         <input
             type="file"
@@ -35,12 +40,11 @@ export default function UploadFile(props: UploadFileProps) {
             onChange={onChangeSelectedFile}
             accept=".csv"
             id="formFile" />
-        <button
-            className="m-2 px-6 py-2 rounded bg-blue-400 hover:bg-blue-500 disabled:opacity-50 text-slate-100 inline-block"
-            type="button"
+        <ColoredButton
+            label="Upload File"
+            onClick={onClickUploadFile}
             disabled={!selectedFile}
-            onClick={onClickUploadFile}>
-            Upload File
-        </button>
+            color="blue"
+        />
     </div>
 }

@@ -127,27 +127,27 @@ export default function DataExplorer(props: DataExplorerProps) {
                     onImageMoved={onImageMoved}
                     images={images}
                 />
-                <div>
+                <div className="flex gap-2 m-2">
                     <ColoredButton
                         label="Apply Moved Observations"
-                        working={working}
+                        disabled={working}
                         onClick={applyMovedObservations}
                         color="green"
                     />
                     <ColoredButton
                         label="Apply Slider Weights"
-                        working={working}
+                        disabled={working}
                         onClick={applySliderWeights}
                         color="orange"
                     />
                     <ColoredButton
                         label="Reset Plot"
-                        working={working}
+                        disabled={working}
                         onClick={resetPlot}
                         color="red"
                     />
                 </div>
-                <div>
+                <div className="mb-4">
                     <ImageSizeSlider imageSize={imageSize} setImageSize={setImageSize} />
                     <PointScalingSlider pointScaling={pointScaling} setPointScaling={setPointScaling} />
                     <ShowRadioGroup showImage={showImage} showLabel={showLabel} onChangeShow={onChangeShow} />
