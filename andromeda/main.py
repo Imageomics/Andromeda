@@ -4,7 +4,6 @@ from flask import Flask, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
-import numpy as np
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -57,8 +56,6 @@ def upload_dataset():
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
     dataset = dataset_store.create_dataset(user_file)
-    # we could send the data the the front end here
-    # data = dataset.read_dataframe().replace({np.nan: None}).to_dict("records")
     return jsonify(
         {
             "id": dataset.id
@@ -73,7 +70,7 @@ def dimensional_reduction(dataset_id):
         abort(400, "Missing weights in json payload")
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
-    dataset = dataset_store.get_dataset(dataset_id)
+    dataset = dataset_store.get_dataset(dataset_id, json_payload["columnSettings"])
     weights, image_coordinates = dataset.dimensional_reduction(json_payload["weights"])
 
     return jsonify({
@@ -90,7 +87,7 @@ def inverse_dimensional_reduction(dataset_id):
         abort(400, "Missing images in json payload")
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
-    dataset = dataset_store.get_dataset(dataset_id)
+    dataset = dataset_store.get_dataset(dataset_id, json_payload["columnSettings"])
     weights, image_coordinates = dataset.inverse_dimensional_reduction(json_payload["images"])
 
     return jsonify({

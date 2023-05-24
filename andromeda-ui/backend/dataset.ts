@@ -23,9 +23,14 @@ export async function uploadDataset(file: File) {
   });
 }
 
-export async function dimensionalReduction(dataset_id: string, weights: any) {
+export async function dimensionalReduction(
+  dataset_id: string,
+  weights: any,
+  columnSettings: any
+) {
   const data = {
     weights: weights,
+    columnSettings: columnSettings,
   };
   return await fetch_json(
     apiURL("/dataset/" + dataset_id + "/dimensional-reduction"),
@@ -41,10 +46,12 @@ export async function dimensionalReduction(dataset_id: string, weights: any) {
 
 export async function reverseDimensionalReduction(
   dataset_id: string,
-  movedPositions: any[]
+  movedPositions: any[],
+  columnSettings: any
 ) {
   const data = {
     images: movedPositions,
+    columnSettings: columnSettings,
   };
   return await fetch_json(
     apiURL("/dataset/" + dataset_id + "/inverse-dimensional-reduction"),

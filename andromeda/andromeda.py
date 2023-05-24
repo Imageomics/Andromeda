@@ -10,22 +10,17 @@ from sklearn.manifold import MDS
 from sklearn.metrics.pairwise import manhattan_distances, euclidean_distances
 
 
-def normalized_df(df):
+def normalized_df(df, label_name):
     '''
     Normalize dataframe to use with dimension_reduction or inverse_DR (dataHD inputs).
 
     @parameters:
         pd.df: original high-dimensional data
+        string: name of the label column in df
     @return[dataframe]: Dataframe with non numeric columns removed and numeric data normalized
     '''
-    df.set_index('Image_Label', inplace = True)
+    df.set_index(label_name, inplace = True)
 
-    label_names = df.index.tolist()
-    image_paths = {}
-    for name in label_names:
-        image_paths[name] = df['Image_Link'][name]
-
-    df = df.loc[:, ~df.columns.isin(['Image_Link','Species','User','Date','Time','Annotations','Hex_Color_Code'])]
     df_numeric = df.select_dtypes(include='number')  #'int32' or 'int64' or 'float32' or 'float64'
     df_numeric = df_numeric.loc[:, (df_numeric != df_numeric.iloc[0]).any()] 
     normalized_df = (df_numeric - df_numeric.mean()) / df_numeric.std()

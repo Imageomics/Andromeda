@@ -72,14 +72,11 @@ export default function ImageGrid(props: ImageGridProps) {
         props.onImageMoved(x, y, label);
     }
 
-    return <Stage ref={stageRef} draggable={true} width={size} height={size} className="cursor-grab">
+    return <Stage ref={stageRef} draggable={true} width={size} height={size}
+        className="cursor-grab border border-black mr-2">
         <Layer>
             <Rect width={size} height={size} />
             {imageControls}
         </Layer>
     </Stage>;
 }
-
-
-
-

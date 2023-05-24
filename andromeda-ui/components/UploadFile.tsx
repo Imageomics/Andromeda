@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import { showError } from "../util/toast";
+import ColoredButton from './ColoredButton';
 
 interface UploadFileProps {
     uploadFile: any;
+    showUploadButton: boolean;
+    selectedFileChanged: any;
 }
 
 export default function UploadFile(props: UploadFileProps) {
-    const { uploadFile } = props;
+    const { uploadFile, showUploadButton, selectedFileChanged } = props;
     const [selectedFile, setSelectedFile] = useState<File>();
 
-    function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
+    async function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
         const { files } = event.target;
         const selectedFiles = files as FileList;
-        setSelectedFile(selectedFiles?.[0]);
+        if (selectedFiles && selectedFiles.length > 0) {
+            setSelectedFile(selectedFiles[0]);
+            selectedFileChanged();
+        } else {
+            setSelectedFile(undefined);
+        }
     }
 
     async function onClickUploadFile() {
@@ -23,24 +31,30 @@ export default function UploadFile(props: UploadFileProps) {
         }
     }
 
-    return <div>
-        <label
-            className="text-md font-medium"
-            htmlFor="formFile">
-            Select a CSV file:
-        </label>
-        <input
-            type="file"
-            className="m-2"
-            onChange={onChangeSelectedFile}
-            accept=".csv"
-            id="formFile" />
-        <button
-            className="m-2 px-6 py-2 rounded bg-blue-400 hover:bg-blue-500 disabled:opacity-50 text-slate-100 inline-block"
-            type="button"
-            disabled={!selectedFile}
-            onClick={onClickUploadFile}>
-            Upload File
-        </button>
-    </div>
+    let uploadButton = null;
+    if (showUploadButton) {
+        uploadButton = <ColoredButton
+            label="Upload File"
+            onClick={onClickUploadFile}
+            disabled={selectedFile === undefined}
+            color="blue"
+        />
+    }
+
+    return <>
+        <div>
+            <label
+                className="text-md font-medium"
+                htmlFor="formFile">
+                Select a CSV file to visualize:
+            </label>
+            <input
+                type="file"
+                className="m-2"
+                onChange={onChangeSelectedFile}
+                accept=".csv"
+                id="formFile" />
+        </div>
+        {uploadButton}
+    </>
 }

@@ -29,7 +29,12 @@ class TestDataset(unittest.TestCase):
         client = app.test_client()
         result = client.post(f'/api/dataset/{dataset_id}/dimensional-reduction',
                              json={
-                                "weights": { "B1": 0.4 }
+                                "weights": { "B1": 0.4 },
+                                "columnSettings": {
+                                    "label": "Image_Label",
+                                    "url": "Image_URL",
+                                    "selected": ["R1","B1","G1"],
+                                }
                              })
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json, {
@@ -50,7 +55,12 @@ class TestDataset(unittest.TestCase):
         client = app.test_client()
         result = client.post(f'/api/dataset/{dataset_id}/inverse-dimensional-reduction',
                              json={
-                                "images": [{ "label": "p1", "x": 0.1, "y": 0.1 }]
+                                "images": [{ "label": "p1", "x": 0.1, "y": 0.1 }],
+                                "columnSettings": {
+                                    "label": "Image_Label",
+                                    "url": "Image_URL",
+                                    "selected": ["R1","B1","G1"],
+                                }
                              })
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json, {
