@@ -4,9 +4,6 @@ import pandas as pd
 from flask import abort
 import andromeda
 
-LABEL_COLUMN_NAME = "Image_Label"
-URL_COLUMN_NAME = "Image_Link"
-
 
 class DatasetStore(object):
     def __init__(self, base_directory):
@@ -16,24 +13,29 @@ class DatasetStore(object):
         dataset_id = str(uuid.uuid4())
         dataset = Dataset(dataset_id, self.base_directory)
         csv_file.save(dataset.get_path())
-        dataset.validate_csv()
         return dataset
 
-    def get_dataset(self, dataset_id):
-        dataset = Dataset(dataset_id, self.base_directory)
+    def get_dataset(self, dataset_id, column_settings):
+        dataset = Dataset(dataset_id,
+                          self.base_directory, 
+                          column_settings["label"], 
+                          column_settings.get("url"),
+                          column_settings["selected"])
         if not dataset.exists():
             abort(404, f"No dataset found for id {dataset_id}.")
         return dataset
 
 
 class Dataset(object):
-    def __init__(self, id, base_directory,
-                 label_column_name=LABEL_COLUMN_NAME,
-                 url_column_name=URL_COLUMN_NAME):
+    def __init__(self, id, base_directory, 
+                 label_column_name=None,
+                 url_column_name=None,
+                 selected_columns=None):
         self.id = id
         self.base_directory = base_directory
         self.label_column_name = label_column_name
         self.url_column_name = url_column_name
+        self.selected_columns = selected_columns
 
     def get_path(self):
         return os.path.join(self.base_directory, f"{self.id}.csv")
@@ -41,15 +43,12 @@ class Dataset(object):
     def exists(self):
         return os.path.exists(self.get_path())
 
-    def validate_csv(self):
-        # TODO validate CSV content against self.label_column_name and self.url_column_name
-        pass
-
     def read_dataframe(self):
         return pd.read_csv(self.get_path())
 
     def get_normalized_dataframe(self):
-        return andromeda.normalized_df(self.read_dataframe())
+        df = andromeda.normalized_df(self.read_dataframe(), self.label_column_name)
+        return df[self.selected_columns]
 
     def get_label_to_url(self):
         df = self.read_dataframe()
@@ -57,8 +56,9 @@ class Dataset(object):
 
     def add_label_and_url_columns(self, df):
         df["label"] = df.index.to_list()
-        label_to_url = self.get_label_to_url()
-        df["url"] = [label_to_url.get(label) for label in df.index.to_list()]
+        if self.url_column_name:
+            label_to_url = self.get_label_to_url()
+            df["url"] = [label_to_url.get(label) for label in df.index.to_list()]
 
     def dimensional_reduction(self, weights):
         normalized_df = self.get_normalized_dataframe()
@@ -93,13 +93,12 @@ class Dataset(object):
         self.add_label_and_url_columns(image_coordinate_df)
         return weights.to_dict(), image_coordinate_df.to_dict('records')
 
-    @staticmethod
-    def create_image_coordinate_df(image_coordinates):
+    def create_image_coordinate_df(self, image_coordinates):
         try:
             df_2D = pd.DataFrame(image_coordinates, columns=["label", "x", "y"])
             df_2D.index = df_2D["label"]
             df_2D = df_2D.drop(["label"], axis=1)
-            df_2D.index.name = "Image_Label"
+            df_2D.index.name = self.label_column_name
             return df_2D
         except ValueError as e:
             abort(400, str(e))
