@@ -17,12 +17,14 @@ interface DataExplorerProps {
     setImageData: any;
     weights: any | undefined;
     datasetID: string | undefined;
+    columnSettings: any;
     drFunc: any;
     rdrFunc: any;
+    onClickBack: any;
 }
 
 export default function DataExplorer(props: DataExplorerProps) {
-    const { images, setImageData, weights, datasetID, drFunc, rdrFunc } = props;
+    const { images, setImageData, weights, datasetID, columnSettings, drFunc, rdrFunc, onClickBack } = props;
     const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
     const [pointScaling, setPointScaling] = useState<number>(DEFAULT_POINT_SCALING);
     const [showLabel, setShowLabel] = useState<boolean>(true);
@@ -85,10 +87,7 @@ export default function DataExplorer(props: DataExplorerProps) {
 
     async function resetPlot() {
         setWorking(true);
-        let newWeights = { ...sliderWeights };
-        for (const key in newWeights) {
-            newWeights[key] = 0.5;
-        }
+        const newWeights = { all: 1.0 / columnSettings.selected.length };
         setSliderWeights(newWeights);
         const results = await drFunc(datasetID, newWeights);
         setSliderWeights(results.weights);
@@ -127,7 +126,13 @@ export default function DataExplorer(props: DataExplorerProps) {
                     onImageMoved={onImageMoved}
                     images={images}
                 />
-                <div className="flex gap-2 m-2">
+                <div className="flex gap-2 my-2">
+                    <ColoredButton
+                        label="Back"
+                        disabled={false}
+                        onClick={onClickBack}
+                        color="white"
+                    />
                     <ColoredButton
                         label="Apply Moved Observations"
                         disabled={working}

@@ -3,6 +3,8 @@ import { uploadDataset, dimensionalReduction, reverseDimensionalReduction } from
 import React, { useState } from 'react';
 import UploadFile from '../components/UploadFile';
 import ConfigureDataset from "../components/ConfigureDataset";
+import ColoredButton from "../components/ColoredButton";
+
 const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
   ssr: false,
 });
@@ -16,20 +18,6 @@ export default function Home() {
   const [weightData, setWeightData] = useState<any[]>();
   const [columnDetails, setColumnDetails] = useState<any>();
   const [columnSettings, setColumnSettings] = useState<any>();
-
-  async function performDimensionalReduction(id: string, weights: any) {
-    const result = await dimensionalReduction(id, weights, columnSettings)
-    setDatasetID(id);
-    setImageData(result.images);
-    setWeightData(result.weights);
-    return result;
-  }
-
-  async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
-    const result = await reverseDimensionalReduction(id, movedPositions, columnSettings)
-    setWeightData(result.weights);
-    return result;
-  }
 
   async function uploadFile(selectedFile: any) {
     try {
@@ -48,20 +36,60 @@ export default function Home() {
     }
   }
 
-  async function onClickVisualize() {
+  function showUploadFileButton() {
+    setDatasetID(undefined);
+    setColumnDetails(undefined);
+    setColumnSettings(undefined);
+    setImageData(undefined);
+    setWeightData(undefined);
+  }
+
+  function showEditConfig() {
+    setImageData(undefined);
+    setWeightData(undefined);
+  }
+
+  async function performDimensionalReduction(id: string, weights: any) {
+    try {
+      const result = await dimensionalReduction(id, weights, columnSettings)
+      setDatasetID(id);
+      setImageData(result.images);
+      setWeightData(result.weights);
+      return result;
+    } catch (error: any) {
+      console.log(error);
+      showError(error.message);
+    }
+    return null;
+  }
+
+  async function performReverseDimensionalReduction(id: string, movedPositions: any[]) {
+    try {
+      const result = await reverseDimensionalReduction(id, movedPositions, columnSettings)
+      setWeightData(result.weights);
+      return result;
+    } catch (error: any) {
+      console.log(error);
+      showError(error.message);
+    }
+    return null;
+  }
+
+  async function visualizeData() {
     if (datasetID) {
       const initialWeights = { all: 1.0 / columnSettings.selected.length };
       await performDimensionalReduction(datasetID, initialWeights);
-      console.log("Here1");
     }
+  }
+
+  function selectedFileChanged() {
+
   }
 
   let content = null;
   if (imageData) {
     content =
       <>
-        <hr />
-        <br />
         <DataExplorer
           datasetID={datasetID}
           images={imageData}
@@ -69,15 +97,18 @@ export default function Home() {
           setImageData={setImageData}
           drFunc={performDimensionalReduction}
           rdrFunc={performReverseDimensionalReduction}
+          columnSettings={columnSettings}
+          onClickBack={showEditConfig}
         />
-      </>
+      </>;
   } else {
     if (datasetID) {
       content = <ConfigureDataset
         columnDetails={columnDetails}
         columnSettings={columnSettings}
         setColumnSettings={setColumnSettings}
-        onClickVisualize={onClickVisualize}
+        visualizeData={visualizeData}
+        onClickBack={showUploadFileButton}
       />;
     }
   }
@@ -85,7 +116,13 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col px-12 py-2">
       <h2 className="text-3xl font-bold leading-tight">Andromeda</h2>
-      <UploadFile uploadFile={uploadFile} />
+      <div>
+        <UploadFile
+          uploadFile={uploadFile}
+          showUploadButton={datasetID === undefined}
+          selectedFileChanged={showUploadFileButton}
+        />
+      </div>
       <div>
         {content}
       </div>

@@ -23,21 +23,30 @@ export default function MoveableImage(props: MoveableImageProps) {
     const [image] = useImage(url);
     let imageControl = null;
     if (showImage) {
-        imageControl = <Image
-            image={image}
-            width={imageSize}
-            height={imageSize}
-            strokeWidth={2}
-            alt={label}
-        />
+        if (url) {
+            imageControl = <Image
+                image={image}
+                width={imageSize}
+                height={imageSize}
+                strokeWidth={2}
+                alt={label}
+            />            
+        } else {
+            imageControl = <Circle radius={4} fill="black"/>
+        }
     }
     let labelControl = null;
     let labelX = 0;
     let labelY = 0;
     if (showLabel) {
         if (showImage) {
-            labelX = imageSize + 2;
-            labelY = imageSize / 3;
+            if (url) {
+                labelX = imageSize + 2;
+                labelY = imageSize / 3;    
+            } else {
+                labelX = 6;
+                labelY = -6;
+            }
         }
         labelControl = <Text text={label}
             x={labelX} y={labelY}
@@ -49,7 +58,12 @@ export default function MoveableImage(props: MoveableImageProps) {
     if (showSelected || isDragging) {
         const halfImageSize = imageSize / 2;
         const circleRadius = halfImageSize + 6;
-        circleControl = <Circle x={halfImageSize} y={halfImageSize} radius={circleRadius} fill="green" opacity={0.5} />
+        if (url) {
+            circleControl = <Circle x={halfImageSize} y={halfImageSize} radius={circleRadius} fill="green" opacity={0.5} />
+        } else {
+            circleControl = <Circle  radius={10} fill="green" opacity={0.5} />
+        }
+        
     }
 
     function onDragEnd(evt: any) {

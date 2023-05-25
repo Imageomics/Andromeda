@@ -39,7 +39,7 @@ export default function SelectColumnsList(props: SelectColumnsListrProps) {
             {checkboxes}
         </tr>
     });
-    return <table className="m-1">
+    return <table className="">
         <tbody>
             {numericColumnTableRows}
         </tbody>

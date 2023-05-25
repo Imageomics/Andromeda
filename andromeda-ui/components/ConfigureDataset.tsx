@@ -1,16 +1,18 @@
 import SimpleSelect from "../components/SimpleSelect";
 import SelectColumnsList from "../components/SelectColumnsList";
 import ColoredButton from './ColoredButton';
+import { showError } from "../util/toast";
 
 interface ConfigureDatasetProps {
     columnDetails: any;
     columnSettings: any;
     setColumnSettings: any;
-    onClickVisualize: any
+    visualizeData: any;
+    onClickBack: any;
 }
 
 export default function ConfigureDataset(props: ConfigureDatasetProps) {
-    const { columnDetails, columnSettings, setColumnSettings, onClickVisualize } = props;
+    const { columnDetails, columnSettings, setColumnSettings, visualizeData, onClickBack } = props;
     function setLabelColumnName(value: string) {
         setColumnSettings({ ...columnSettings, label: value })
     }
@@ -58,10 +60,15 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
                 selectedColumns={columnSettings.selected}
                 changeSelectedColumn={changeSelectedColumn} />
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex gap-2">
+            <ColoredButton
+                label="Back"
+                onClick={onClickBack}
+                color="white"
+            />
             <ColoredButton
                 label="Visualize Data"
-                onClick={onClickVisualize}
+                onClick={visualizeData}
                 disabled={!columnSettings.label || columnSettings.selected.length == 0}
                 color="blue"
             />

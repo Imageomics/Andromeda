@@ -4,10 +4,12 @@ import ColoredButton from './ColoredButton';
 
 interface UploadFileProps {
     uploadFile: any;
+    showUploadButton: boolean;
+    selectedFileChanged: any;
 }
 
 export default function UploadFile(props: UploadFileProps) {
-    const { uploadFile } = props;
+    const { uploadFile, showUploadButton, selectedFileChanged } = props;
     const [selectedFile, setSelectedFile] = useState<File>();
 
     async function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -15,6 +17,7 @@ export default function UploadFile(props: UploadFileProps) {
         const selectedFiles = files as FileList;
         if (selectedFiles && selectedFiles.length > 0) {
             setSelectedFile(selectedFiles[0]);
+            selectedFileChanged();
         } else {
             setSelectedFile(undefined);
         }
@@ -28,23 +31,30 @@ export default function UploadFile(props: UploadFileProps) {
         }
     }
 
-    return <div>
-        <label
-            className="text-md font-medium"
-            htmlFor="formFile">
-            Select a CSV file to visualize:
-        </label>
-        <input
-            type="file"
-            className="m-2"
-            onChange={onChangeSelectedFile}
-            accept=".csv"
-            id="formFile" />
-        <ColoredButton
+    let uploadButton = null;
+    if (showUploadButton) {
+        uploadButton = <ColoredButton
             label="Upload File"
             onClick={onClickUploadFile}
-            disabled={!selectedFile}
+            disabled={selectedFile === undefined}
             color="blue"
         />
-    </div>
+    }
+
+    return <>
+        <div>
+            <label
+                className="text-md font-medium"
+                htmlFor="formFile">
+                Select a CSV file to visualize:
+            </label>
+            <input
+                type="file"
+                className="m-2"
+                onChange={onChangeSelectedFile}
+                accept=".csv"
+                id="formFile" />
+        </div>
+        {uploadButton}
+    </>
 }
