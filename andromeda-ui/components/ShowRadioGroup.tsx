@@ -9,7 +9,7 @@ interface ShowRadioGroupProps {
 export default function ShowRadioGroup(props: ShowRadioGroupProps) {
     const { showImage, showLabel, onChangeShow } = props;
     return <div>
-        Show:
+        Show:&nbsp;
         <LabeledRadio
             id="showImage"
             name="show"

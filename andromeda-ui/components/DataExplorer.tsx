@@ -154,6 +154,7 @@ export default function DataExplorer(props: DataExplorerProps) {
                 </div>
                 <div className="mb-4">
                     <ImageSizeSlider imageSize={imageSize} setImageSize={setImageSize} />
+                    &nbsp;&nbsp;
                     <PointScalingSlider pointScaling={pointScaling} setPointScaling={setPointScaling} />
                     <ShowRadioGroup showImage={showImage} showLabel={showLabel} onChangeShow={onChangeShow} />
                 </div>
