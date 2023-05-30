@@ -16,7 +16,7 @@ docker-compose up -d
 The `-d` flag runs the website in the background. For troubleshooting remove this flag to more easily monitor the deployment.
 
 Once the website finishes launching the website will be available on port 80: [http://localhost](http://localhost).
-Part the deployment builds the docker containers used by the website, so it may take a few minutes to finish deployment.
+Part of the deployment builds the docker containers used by the website, so it may take a few minutes to finish deployment.
 To stop the app run `docker-compose down`.
 
 ## Development
@@ -25,7 +25,7 @@ To run the website locally without using docker requires two terminal sessions.
 2. Frontend nodejs/react development server
 
 ## Python Backend
-The python backend consist of a [Flask](https://flask.palletsprojects.com/en/2.3.x/quickstart/#a-minimal-application) REST API server.
+The python backend consists of a [Flask](https://flask.palletsprojects.com/en/2.3.x/quickstart/#a-minimal-application) REST API server.
 See the [Andromeda Python README](andromeda/README.md) for instructions on running locally.
 
 ## React Frontend
