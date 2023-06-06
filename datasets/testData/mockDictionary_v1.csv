@@ -1,0 +1,34 @@
+variableName,Definition
+iNat_label,Arbitrary label for image downloaded from iNaturalist
+sat_label,Arbitrary label for satilite image
+iNat_url,Url for image downloaded from iNaturalist
+sat_url,Url  for satilite image; this will NEED TO CHANGE
+iNat_scientific_name,Sci. name given to image from iNaturalist
+iNat_datetime,Date and time image from iNaturalist was recorded; SEPARATE for actual dataset
+iNat_latitude,Latitude recorded for iNatualist image
+iNat_longitude,Longitude recorded for iNatualist image
+iNat_species_guess,iNaturalist guess for species of iNaturalst image
+sat_minRed,Min amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_firstQrtRed,25% Quantile (i.e. first QUARtile) of amount red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_medianRed,Median amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_meanRed,Mean amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_thirdQrtRed,75% Quantile (i.e. third QUARtile) of amount red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_maxRed,Max amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdRed,Std. Dev. for amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_minGreen,Min amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_firstQrtGreen,25% Quantile (i.e. first QUARtile) of amount green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_medianGreen,Median amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_meanGreen,Mean amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_thirdQrtGreen,75% Quantile (i.e. third QUARtile) of amount green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_maxGreen,Max amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdGreen,Std. Dev. for amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_minBlue,Min amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_firstQrtBlue,25% Quantile (i.e. first QUARtile) of amount blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_medianBlue,Median amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_meanBlue,Mean amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_thirdQrtBlue,75% Quantile (i.e. third QUARtile) of amount blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_maxBlue,Max amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdBlue,Std. Dev. for amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+iNat_add_numPoints,Pretend variable to represent something added by participants about the iNaturalist images; e.g. number of insects or points
+iNat_add_lux,Pretend variable to represent something added by participants about the iNaturalist images; e.g. lux measurement
+iNat_add_temp,Pretend variable to represent something added by participants about the iNaturalist images; e.g. temperature measurement
