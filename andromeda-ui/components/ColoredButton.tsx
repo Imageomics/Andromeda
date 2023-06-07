@@ -1,8 +1,9 @@
 interface ColoredButtonProps {
     label: string;
-    onClick: any;
+    onClick?: any;
     disabled?: boolean;
     color: string;
+    submit?: boolean;
 }
 
 const COLOR_CLASSNAME_LOOKUP: any = {
@@ -15,6 +16,10 @@ const COLOR_CLASSNAME_LOOKUP: any = {
 
 export default function ColoredButton(props: ColoredButtonProps) {
     const { label, disabled, color, onClick } = props;
+    let buttonType: 'button' | 'submit' = 'button';
+    if (props.submit) {
+        buttonType = 'submit';
+    }
     let className = "px-3 py-2 rounded disabled:opacity-50 inline-block";
     const colorClassName = COLOR_CLASSNAME_LOOKUP[color]
     if (colorClassName) {
@@ -24,5 +29,5 @@ export default function ColoredButton(props: ColoredButtonProps) {
         onClick={onClick}
         disabled={disabled}
         className={className}
-        type="button">{label}</button>;
+        type={buttonType}>{label}</button>;
 }

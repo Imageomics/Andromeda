@@ -1,9 +1,10 @@
 import os
-from flask import Flask
-from flask import Flask, request, jsonify, abort, json
+import datetime
+from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
+from inaturalist import get_inaturalist_csv_content
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -95,3 +96,12 @@ def inverse_dimensional_reduction(dataset_id):
         "weights": weights,
         "images": image_coordinates
     })
+
+@app.route('/api/inaturalist/<user_id>', methods=['POST'])
+def get_inaturalist_csv(user_id):
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    return Response(
+        get_inaturalist_csv_content(user_id=user_id),
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 f"attachment; filename=andromeda_inaturalist_{user_id}_{now_str}.csv"})
