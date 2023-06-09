@@ -1,7 +1,6 @@
 import io
 import csv
-import datetime
-import dateutil
+import random
 import pandas as pd
 from pyinaturalist import get_observations
 
@@ -19,9 +18,24 @@ CSV_FIELDS = [
     LABEL_FIELD, URL_FIELD, SPECIES_FIELD, USER_FIELD, 
     DATE_FIELD, TIME_FIELD, SECONDS_FIELD, PLACE_FIELD, 
     LAT_FIELD, LON_FIELD]
+SAT_MEAN_RED = "sat_meanRed"
+SAT_MEAN_GREEN = "sat_meanGreen"
+SAT_MEAN_BLUE = "sat_meanBlue"
+SAT_CSV_FIELDS = [
+    SAT_MEAN_RED,
+    SAT_MEAN_GREEN,
+    SAT_MEAN_BLUE
+]
 
 
-def get_inaturalist_observations(user_id):
+def augment_observations(obs_ary, sat_dataset):
+    for obs in obs_ary:
+        obs[SAT_MEAN_RED] = random.random()
+        obs[SAT_MEAN_GREEN] = random.random()
+        obs[SAT_MEAN_BLUE] = random.random()
+
+
+def get_inaturalist_observations(user_id, sat_dataset):
     result = []
     idx = 0
     observations = get_observations(user_id=user_id, page='all')
@@ -57,12 +71,19 @@ def get_inaturalist_observations(user_id):
             LAT_FIELD: lat,
             LON_FIELD: lon,
         })
+    if sat_dataset:
+        augment_observations(obs_ary=result, sat_dataset=sat_dataset)
     return result
 
-def get_inaturalist_csv_content(user_id):
+def get_inaturalist_csv_content(user_id, sat_dataset):
     output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=CSV_FIELDS)
+    fieldnames = CSV_FIELDS[:]
+    if sat_dataset:
+        fieldnames += SAT_CSV_FIELDS
+    print(fieldnames)
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
     writer.writeheader()
-    for obs in get_inaturalist_observations(user_id=user_id):
+    for obs in get_inaturalist_observations(user_id=user_id,
+                                            sat_dataset=sat_dataset):
         writer.writerow(obs)
     return output.getvalue()

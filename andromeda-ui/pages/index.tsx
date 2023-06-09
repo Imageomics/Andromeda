@@ -3,7 +3,7 @@ import { uploadDataset, dimensionalReduction, reverseDimensionalReduction } from
 import React, { useState } from 'react';
 import UploadFile from '../components/UploadFile';
 import ConfigureDataset from "../components/ConfigureDataset";
-import ColoredButton from "../components/ColoredButton";
+import TitleBar from "../components/TitleBar";
 
 const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
   ssr: false,
@@ -114,18 +114,21 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col px-12 py-2">
-      <h2 className="text-3xl font-bold leading-tight">Andromeda</h2>
-      <div>
-        <UploadFile
-          uploadFile={uploadFile}
-          showUploadButton={datasetID === undefined}
-          selectedFileChanged={showUploadFileButton}
-        />
-      </div>
-      <div>
-        {content}
-      </div>
-    </main>
+    <>
+      <TitleBar selected="/" />
+      <main className="flex min-h-screen flex-col px-6 py-4">
+        <h3 className="text-xl font-bold leading-tight">Visualize Multidimensional Data</h3>
+        <div>
+          <UploadFile
+            uploadFile={uploadFile}
+            showUploadButton={datasetID === undefined}
+            selectedFileChanged={showUploadFileButton}
+          />
+        </div>
+        <div>
+          {content}
+        </div>
+      </main>
+    </>
   )
 }
