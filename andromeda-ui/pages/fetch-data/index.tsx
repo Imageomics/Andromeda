@@ -8,10 +8,24 @@ import { useState } from 'react';
 import { showError } from "../../util/toast";
 
 const SHOW_OBS_MAX = 6;
+const FETCH_WARNINGS: any = {
+    missing_lat_long: `Warning:
+    Missing latitude and longitude for some iNaturalist observations.
+    Please fix these observations at iNaturalist.org.`
+}
+
+function makeMessages(warnings: string[]): string {
+    if (warnings) {
+        const messages = warnings.map((x: string) => FETCH_WARNINGS[x] || x);
+        return messages.join(", ");
+    }
+    return "";
+}
 
 export default function GeneratePage() {
     const [iNatUser, setINatUser] = useState<string>();
     const [satDataset, setSatDataset] = useState<string>("");
+    const [warning, setWarning] = useState<string>("");
     const [fetching, setFetching] = useState<boolean>(false);
     const [showObservations, setShowObservations] = useState<boolean>(false);
     const [observations, setObservations] = useState<any[]>();
@@ -20,20 +34,15 @@ export default function GeneratePage() {
         setSatDataset(e.target.value);
     }
 
-    async function onClickDownload() {
-        if (iNatUser) {
-            const result = await generateCSV(iNatUser, satDataset);
-            console.log(result);
-        } else {
-            showError("You must enter a value for the iNaturalist Username field.")
-        }
-    }
-
     async function onClickFetch() {
         if (iNatUser) {
+            setWarning("");
             setFetching(true);
             const result = await fetchObservations(iNatUser, satDataset);
             setObservations(result.data);
+            if (result.warnings) {
+                setWarning(makeMessages(result.warnings));
+            }
             setShowObservations(true);
             setFetching(false);
         } else {
@@ -47,6 +56,10 @@ export default function GeneratePage() {
 
     let content = null;
     if (showObservations && iNatUser) {
+        let warningNotice = null;
+        if (warning) {
+            warningNotice = <div className="text-red-600 mt-4 mb-6">{warning}</div>
+        }
         if (observations?.length) {
             const csvURL = apiURL("/inaturalist/") + iNatUser + "/csv";
 
@@ -56,6 +69,7 @@ export default function GeneratePage() {
                     satDataset={satDataset}
                     observations={observations}
                     maxObs={SHOW_OBS_MAX} />
+                {warningNotice}
                 <div className="flex gap-2 my-2">
                     <ColoredButton label="Back" color="white" onClick={onClickBack} />
                     < DownloadCSVButton csvURL={csvURL} iNatUser={iNatUser} satDataset={satDataset} />
@@ -66,7 +80,7 @@ export default function GeneratePage() {
         }
     } else {
         content = <>
-            <p className="max-w-2xl text-sm m-2">
+            <p className="max-w-2xl text-sm my-2">
                 Find iNaturalist observations to create a dataset that can be visualized in Andromeda.
                 Optionally select a Satellite dataset to augment and filter the observations.
             </p>
@@ -91,7 +105,7 @@ export default function GeneratePage() {
     return <>
         <TitleBar selected="/create" />
         <main className="flex min-h-screen flex-col px-6 py-4">
-            <h3 className="text-xl font-bold leading-tight">Create a CSV</h3>
+            <h3 className="text-xl font-bold leading-tight">Fetch Data</h3>
             {content}
         </main>
     </>;

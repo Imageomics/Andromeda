@@ -21,6 +21,6 @@ export default function TitleBar(props: TitleBarProps) {
     return <nav className="flex items-center bg-teal-500 p-3">
         <h2 className="text-3xl semi-bold leading-tight text-white mr-6 ">Andromeda</h2>
         <Link href="/" className={homeClassName}>Home</Link>
-        <Link href="/create" className={createClassName}>Create</Link>
+        <Link href="/fetch-data" className={createClassName}>Fetch Data</Link>
     </nav>;
 }

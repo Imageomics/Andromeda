@@ -38,6 +38,7 @@ def augment_observations(obs_ary, sat_dataset):
 def get_inaturalist_observations(user_id, sat_dataset):
     result = []
     idx = 0
+    missing_lat_long = False
     observations = get_observations(user_id=user_id, page='all')
     for obs in observations['results']:
         idx += 1
@@ -59,6 +60,8 @@ def get_inaturalist_observations(user_id, sat_dataset):
             lon = None
         place_guess = obs.get('place_guess')
         user_login = obs.get('user', {}).get('login')
+        if not lat or not lon:
+            missing_lat_long = True
         result.append({
             LABEL_FIELD: label,
             URL_FIELD: image_url,
@@ -73,7 +76,11 @@ def get_inaturalist_observations(user_id, sat_dataset):
         })
     if sat_dataset:
         augment_observations(obs_ary=result, sat_dataset=sat_dataset)
-    return result
+    warnings = []
+    if missing_lat_long:
+        warnings.append("missing_lat_long")
+    return result, warnings
+
 
 def get_inaturalist_csv_content(user_id, sat_dataset):
     output = io.StringIO()
@@ -83,7 +90,7 @@ def get_inaturalist_csv_content(user_id, sat_dataset):
     print(fieldnames)
     writer = csv.DictWriter(output, fieldnames=fieldnames)
     writer.writeheader()
-    for obs in get_inaturalist_observations(user_id=user_id,
-                                            sat_dataset=sat_dataset):
+    observations, _ = get_inaturalist_observations(user_id=user_id, sat_dataset=sat_dataset)
+    for obs in observations:
         writer.writerow(obs)
     return output.getvalue()

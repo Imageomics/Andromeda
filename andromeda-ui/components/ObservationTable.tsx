@@ -68,7 +68,7 @@ export default function ObservationTable(props: ObservationTableProps) {
     }
 
     return <>
-        <div>
+        <div className="my-1">
             <span className="text-lg flex-auto">Observations by {iNatUser}</span>
         </div>
         <table className="border-collapse border">

@@ -100,11 +100,12 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['POST'])
 def get_inaturalist(user_id):
     json_payload = request.get_json()
-    obs = get_inaturalist_observations(user_id=user_id,
+    obs, warnings = get_inaturalist_observations(user_id=user_id,
                                        sat_dataset=json_payload.get("satDataset"))
     return jsonify({
         "user_id": user_id,
         "data": obs,
+        "warnings": warnings
     })
 
 @app.route('/api/inaturalist/<user_id>/csv', methods=['POST'])
