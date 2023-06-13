@@ -56,7 +56,6 @@ def upload_dataset():
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
     dataset = dataset_store.create_dataset(user_file)
-
     return jsonify(
         {
             "id": dataset.id
@@ -71,7 +70,7 @@ def dimensional_reduction(dataset_id):
         abort(400, "Missing weights in json payload")
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
-    dataset = dataset_store.get_dataset(dataset_id)
+    dataset = dataset_store.get_dataset(dataset_id, json_payload["columnSettings"])
     weights, image_coordinates = dataset.dimensional_reduction(json_payload["weights"])
 
     return jsonify({
@@ -88,7 +87,7 @@ def inverse_dimensional_reduction(dataset_id):
         abort(400, "Missing images in json payload")
 
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
-    dataset = dataset_store.get_dataset(dataset_id)
+    dataset = dataset_store.get_dataset(dataset_id, json_payload["columnSettings"])
     weights, image_coordinates = dataset.inverse_dimensional_reduction(json_payload["images"])
 
     return jsonify({

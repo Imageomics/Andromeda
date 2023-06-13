@@ -40,6 +40,11 @@ class TestDataset(unittest.TestCase):
 
         ds = DatasetStore(base_directory="tmp")
         dataset = ds.create_dataset(user_file)
+        dataset = ds.get_dataset(dataset.id, column_settings={
+            "label": "Image_Label",
+            "url": "Image_Link",
+            "selected": ["R1", "B1", "G1"]
+        })
         def mock_read_csv():
             return pd.read_csv(StringIO(CSV_CONTENT))
         dataset.read_dataframe = mock_read_csv
@@ -59,6 +64,11 @@ class TestDataset(unittest.TestCase):
 
         ds = DatasetStore(base_directory="tmp")
         dataset = ds.create_dataset(user_file)
+        dataset = ds.get_dataset(dataset.id, column_settings={
+            "label": "Image_Label",
+            "url": "Image_Link",
+            "selected": ["R1", "B1", "G1"]
+        })        
         def mock_read_csv():
             return pd.read_csv(StringIO(CSV_CONTENT))
         dataset.read_dataframe = mock_read_csv

@@ -13,7 +13,7 @@ class TestAndromeda(unittest.TestCase):
         ]
         df = pd.DataFrame(data, columns=['Image_Label', 'Image_Link', 'Count', 'Weight', 'Category'])
 
-        result = normalized_df(df)
+        result = normalized_df(df, label_name="Image_Label")
 
         self.assertEqual(result.index.to_list(), ['p1', 'p2', 'p3'])
         # only numeric columns are kept
@@ -35,7 +35,7 @@ p1,https://example.com/p1.jpg,50,80,20
 p2,https://example.com/p2.jpg,100,110,60
 """
         df = pd.read_csv(StringIO(csv_text))
-        ndf = normalized_df(df)
+        ndf = normalized_df(df, label_name="Image_Label")
         weight_vals = [0.00001] * len(ndf.columns)
         weights = pd.Series(weight_vals, index=ndf.columns, name="Weight")
         df_2D = dimension_reduction(ndf, weights)
@@ -48,7 +48,7 @@ p1,https://example.com/p1.jpg,50,80,20
 p2,https://example.com/p2.jpg,100,110,60
 """
         df = pd.read_csv(StringIO(csv_text))
-        ndf = normalized_df(df)
+        ndf = normalized_df(df, label_name="Image_Label")
         data = [
             ("p1", 0.5, 0.0),
             ("p2", 0.0, 0.5),

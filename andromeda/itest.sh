@@ -17,12 +17,12 @@ echo "Received dataset id: $ID"
 
 echo "Performing dimensional_reduction on $ID"
 curl -X POST -H "Content-Type: application/json" \
-    -d '{"weights": {"all": 0.01}}'  \
+    -d '{"weights": {"all": 0.01}, "columnSettings": {"label":"Image_Label","selected":["R1","G1","B1"]}}'  \
     http://127.0.0.1:5000/api/dataset/$ID/dimensional-reduction | jq
 
 echo "Performing dimensional_reduction on $ID with image coordinates"
 curl -X POST -H "Content-Type: application/json" \
-    -d '{"images": [ { "label": "p1", "x": 0.5920513794381642, "y": -0.009178126747895218 }, { "label": "p2", "x": -0.4686290075683762, "y": -0.34844575009740675 } ]}' \
+    -d '{"images": [ { "label": "p1", "x": 0.5920513794381642, "y": -0.009178126747895218 }, { "label": "p2", "x": -0.4686290075683762, "y": -0.34844575009740675 } ], "columnSettings": {"label":"Image_Label","selected":["R1","G1","B1"]}}' \
     http://127.0.0.1:5000/api/dataset/$ID/inverse-dimensional-reduction
 
 echo "Done"
