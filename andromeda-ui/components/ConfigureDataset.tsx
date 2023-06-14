@@ -56,7 +56,7 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
         <div>
             <div className="text-md font-medium">Columns</div>
             <SelectColumnsList
-                numericColumns={columnDetails.numeric}
+                columns={columnDetails.columns}
                 selectedColumns={columnSettings.selected}
                 changeSelectedColumn={changeSelectedColumn} />
         </div>
