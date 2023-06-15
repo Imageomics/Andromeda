@@ -1,7 +1,7 @@
 const CHECKBOXES_PER_ROW = 10;
 
 interface SelectColumnsListrProps {
-    numericColumns: string[];
+    columns: string[];
     selectedColumns: string[];
     changeSelectedColumn: any;
 }
@@ -16,10 +16,10 @@ function groupItems(items: string[], size: number) {
 }
 
 export default function SelectColumnsList(props: SelectColumnsListrProps) {
-    const { numericColumns, selectedColumns, changeSelectedColumn } = props
-    const items = numericColumns.slice();
-    const groupedItems = groupItems(numericColumns, CHECKBOXES_PER_ROW)
-    const numericColumnTableRows = groupedItems.map((columnNamesSubset: string[], idx: number) => {
+    const { columns, selectedColumns, changeSelectedColumn } = props
+    const items = columns.slice();
+    const groupedItems = groupItems(columns, CHECKBOXES_PER_ROW)
+    const columnTableRows = groupedItems.map((columnNamesSubset: string[], idx: number) => {
         console.log(idx, columnNamesSubset);
         const checkboxes: any = columnNamesSubset.map((x) => {
             const name = "select_column_" + x;
@@ -41,7 +41,7 @@ export default function SelectColumnsList(props: SelectColumnsListrProps) {
     });
     return <table className="">
         <tbody>
-            {numericColumnTableRows}
+            {columnTableRows}
         </tbody>
     </table>;
 }

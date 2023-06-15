@@ -75,14 +75,21 @@ export function getURLColumnNames(rows: any[]) {
   }
 }
 
-function valuesAreNumbers(rows: any[], columnName: string) {
-  return rows.every((x) => typeof x[columnName] === "number");
+function isValidNumericColumn(rows: any[], columnName: string) {
+  const isNummeric = rows.every((x) => typeof x[columnName] === "number");
+  if (isNummeric) {
+    // must have more than one value
+    const values = new Set(rows.map((x) => x[columnName]));
+    return values.size > 1;
+  }
+  return false;
 }
 
-export function getNumericColumnNames(rows: any[]) {
-  // find and return array of column names with numeric values
+export function getValidNumericColumnNames(rows: any[]) {
+  // find and return array of column names that contain numeric values
+  // and have more than one value
   return getColumnNames(rows).filter((columnName) =>
-    valuesAreNumbers(rows, columnName)
+    isValidNumericColumn(rows, columnName)
   );
 }
 
@@ -92,7 +99,7 @@ export function createColumnDetails(rows: any[]) {
   return {
     labels: getLabelColumnNames(rows),
     urls: getURLColumnNames(rows),
-    numeric: getNumericColumnNames(rows),
+    columns: getValidNumericColumnNames(rows),
   };
 }
 
@@ -103,10 +110,9 @@ export function createColumnSettings(columnDetails: any) {
   if (columnDetails.urls.length > 0) {
     url = columnDetails.urls[0];
   }
-  console.log("columnDetails", columnDetails);
   return {
     label: columnDetails.labels[0],
     url: url,
-    selected: columnDetails.numeric.slice(),
+    selected: columnDetails.columns.slice(),
   };
 }
