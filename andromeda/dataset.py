@@ -50,7 +50,8 @@ class Dataset(object):
         return os.path.exists(self.get_path())
 
     def read_dataframe(self):
-        return pd.read_csv(self.get_path())
+        # Disabling logic that adds NaN for empty strings to avoid invalid JSON creation later
+        return pd.read_csv(self.get_path(), keep_default_na=False)
 
     def get_normalized_dataframe(self):
         df = andromeda.normalized_df(self.read_dataframe(), self.label_column_name)
