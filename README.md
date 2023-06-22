@@ -37,7 +37,8 @@ sudo certbot certonly --nginx
 ```
 Following prompted agreements, registration, and specifying andromeda.imageomics.org, the certificates are installed to:
 
-Certifate: `/etc/letsencrypt/live/andromeda.imageomics.org/fullchain.pem`
+Certificate: `/etc/letsencrypt/live/andromeda.imageomics.org/fullchain.pem`
+
 Key: `/etc/letsencrypt/live/andromeda.imageomics.org/privkey.pem`
 
 Finally, shut down Nginx on the system to avoid interference with the container:
