@@ -8,7 +8,7 @@ Development requires [python3](https://www.python.org/) and [nodejs](https://nod
 
 ## Deployment
 To deploy the website on a machine running docker run the following commands:
-```
+```bash
 git clone https://github.com/Imageomics/Andromeda.git
 cd Andromeda/
 docker-compose up -d
@@ -18,6 +18,33 @@ The `-d` flag runs the website in the background. For troubleshooting remove thi
 Once the website finishes launching the website will be available on port 80: [http://localhost](http://localhost).
 Part of the deployment builds the docker containers used by the website, so it may take a few minutes to finish deployment.
 To stop the app run `docker-compose down`.
+
+### Certbot Setup on AWS
+Certificates can be installed to the EC2 VM using Certbot with Nginx on pip following [EFF instructions](https://certbot.eff.org/instructions?ws=nginx&os=pip).
+```bash
+sudo python3 -m venv /opt/certbot/
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+And to install Nginx on the Amazon Linux 2023 (following [instructions](https://awswithatiq.com/how-to-install-nginx-in-amazon-linux-2023/)) and run Certbot:
+```bash
+docker-compose down
+sudo dnf update -y
+sudo dnf install nginx -y
+sudo systemctl start nginx
+sudo certbot certonly --nginx
+```
+Following prompted agreements, registration, and specifying andromeda.imageomics.org, the certificates are installed to:
+
+Certifate: `/etc/letsencrypt/live/andromeda.imageomics.org/fullchain.pem`
+Key: `/etc/letsencrypt/live/andromeda.imageomics.org/privkey.pem`
+
+Finally, shut down Nginx on the system to avoid interference with the container:
+```bash
+sudo systemctl stop nginx
+nohup docker-compose up -d &
+```
 
 ## Development
 To run the website locally without using docker requires two terminal sessions.
