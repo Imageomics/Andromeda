@@ -1,9 +1,10 @@
 import os
-from flask import Flask
-from flask import Flask, request, jsonify, abort, json
+import datetime
+from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
+from inaturalist import get_inaturalist_observations, get_inaturalist_fieldnames, create_csv_str
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -95,3 +96,32 @@ def inverse_dimensional_reduction(dataset_id):
         "weights": weights,
         "images": image_coordinates
     })
+
+
+@app.route('/api/inaturalist/<user_id>', methods=['GET'])
+def get_inaturalist(user_id):
+    format = request.args.get("format", "json").lower()
+    fieldnames = get_inaturalist_fieldnames()
+    obs, warnings = get_inaturalist_observations(user_id=user_id)
+    if format == "json":    
+        return jsonify({
+            "user_id": user_id,
+            "data": obs,
+            "warnings": warnings
+        })
+    elif format == "csv":
+        return csv_reponse_for_observations(
+            fieldnames=fieldnames,
+            observations=obs,
+            user_id=user_id
+        )
+    else:
+        abort(400, "Unsupported format parameter value " + format)
+
+def csv_reponse_for_observations(fieldnames, observations, user_id):
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    return Response(
+        create_csv_str(fieldnames=fieldnames, observations=observations),
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                f"attachment; filename=andromeda_inaturalist_{user_id}_{now_str}.csv"})        
