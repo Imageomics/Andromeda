@@ -44,7 +44,7 @@ Key: `/etc/letsencrypt/live/andromeda.imageomics.org/privkey.pem`
 Finally, shut down Nginx on the system to avoid interference with the container:
 ```bash
 sudo systemctl stop nginx
-nohup docker-compose up -d &
+docker-compose up -d
 ```
 
 ## Development
