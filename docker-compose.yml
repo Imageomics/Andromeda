@@ -20,7 +20,10 @@ services:
     expose:
       - "8080"
     ports:
-      - "80:8080"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
 
 networks:
   apinetwork:
