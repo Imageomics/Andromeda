@@ -101,3 +101,40 @@ Calculate weights for the given image coordinates.
     }
     ```
 
+### Fetch iNaturalist observations as JSON data
+Read all observations for iNaturalist user and return as JSON.
+- GET __/api/inaturalist/<inat_user>__
+  - Output
+    ```  
+    {
+      "data": [
+        {
+          "Date": "...",
+          "Image_Label": "...",
+          "Image_Link": "...",
+          "Lat": 42.9349293461,
+          "Long": -88.0380119262,
+          "Place": "...",
+          "Seconds": 57785,
+          "Species": "White-tailed Deer",
+          "Time": "...",
+          "User": "..."
+        },
+        ...
+      "user_id": "...",
+      "warnings": [
+        "missing_lat_long"
+      ]
+    }
+    ```
+
+### Fetch iNaturalist observations as CSV data
+Read all observations for iNaturalist user and return as a CSV file.
+- GET __/api/inaturalist/<inat_user>?format=csv__
+  - Output
+    ```  
+    Image_Label,Image_Link,Species,User,Date,Time,Seconds,Place,Lat,Long
+    p1,https://static.inaturalist.org/photos/12647253/medium.jpg,White-tailed Deer,lhouse,2017-12-31,16:03:05,57785,"Whitnall Park, Hales Corners, WI, US",42.9349293461,-88.0380119262
+    ...
+    ```
+NOTE: Since the result is a CSV file no warnings will be returned.

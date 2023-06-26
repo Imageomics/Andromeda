@@ -25,4 +25,11 @@ curl -X POST -H "Content-Type: application/json" \
     -d '{"images": [ { "label": "p1", "x": 0.5920513794381642, "y": -0.009178126747895218 }, { "label": "p2", "x": -0.4686290075683762, "y": -0.34844575009740675 } ], "columnSettings": {"label":"Image_Label","selected":["R1","G1","B1"]}}' \
     http://127.0.0.1:5000/api/dataset/$ID/inverse-dimensional-reduction
 
+echo "Fetching inaturalist observations"
+curl http://127.0.0.1:5000/api/inaturalist/lhouse
+
+echo "Fetching inaturalist observations as CSV"
+curl http://127.0.0.1:5000/api/inaturalist/lhouse?format=csv
+
+echo ""
 echo "Done"
