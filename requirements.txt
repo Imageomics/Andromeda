@@ -9,3 +9,4 @@ sklearn
 matplotlib
 ipywidgets
 ipyplot
+ipykernel
