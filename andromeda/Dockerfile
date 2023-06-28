@@ -7,4 +7,4 @@ RUN pip3 install gunicorn && pip3 install -r requirements.txt
 COPY . /api
 WORKDIR /api
 
-CMD ["gunicorn", "-w", "17", "-b", ":5000", "-t", "360", "wsgi:app"]
+CMD /api/run.sh
