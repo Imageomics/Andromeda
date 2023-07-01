@@ -4,7 +4,7 @@ from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
-from inaturalist import get_inaturalist_observations, get_inaturalist_fieldnames, create_csv_str
+from inaturalist import get_inaturalist_observations, create_csv_str
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -101,18 +101,20 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['GET'])
 def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
-    fieldnames = get_inaturalist_fieldnames()
-    obs, warnings = get_inaturalist_observations(user_id=user_id)
+    # TODO read query params for add_sat_csv_data and add_sat_api_data
+    observations = get_inaturalist_observations(user_id=user_id,
+                                                 add_sat_csv_data=True,
+                                                 add_sat_api_data=True)
     if format == "json":    
         return jsonify({
             "user_id": user_id,
-            "data": obs,
-            "warnings": warnings
+            "data": observations.data,
+            "warnings": observations.warnings
         })
     elif format == "csv":
         return csv_reponse_for_observations(
-            fieldnames=fieldnames,
-            observations=obs,
+            fieldnames=observations.fieldnames,
+            observations=observations.data,
             user_id=user_id
         )
     else:

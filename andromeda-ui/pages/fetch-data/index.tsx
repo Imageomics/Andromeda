@@ -13,7 +13,9 @@ const SHOW_OBS_MAX = 6;
 const FETCH_WARNINGS: any = {
     missing_lat_long: `Warning:
     Missing latitude and longitude for some iNaturalist observations.
-    Please fix these observations at iNaturalist.org.`
+    Please fix these observations at iNaturalist.org.`,
+    multiple_sat_matches: `Multiple satellite entries found for a single location.`,
+    no_sat_matches: `No matching satellite data found.`
 }
 
 function makeMessages(warnings: string[]): string {
