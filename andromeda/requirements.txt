@@ -3,3 +3,4 @@ scikit-learn==1.2.2
 Flask==2.3.2
 Flask-Cors==3.0.10
 pyinaturalist==0.18.0
+geopandas==0.13.2
