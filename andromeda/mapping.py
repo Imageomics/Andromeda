@@ -6,6 +6,85 @@ from arcgis.geometry import Polygon, filters, project, intersect, areas_and_leng
 ### Ultimate goal is to return percentage of each type of cover within the 1/2-mile box around the image's lat/lon.
 ### Will be added to the type of cover columns within the DataFrame.
 
+## Region bins: Grassy, Dense Wood, Woody, Suburban, Watery, Urban
+# Grassy areas (pastures and school yards as well as golf courses):
+GRASSY = ['ATHLETIC FIELDS (SCHOOLS)',  
+            'CEMETERY',
+            'CROPLAND AND PASTURELAND',
+            'OLD FIELD (< 25% BRUSH COVERED)',
+            'ORCHARDS/VINEYARDS/NURSERIES/HORTICULTURAL AREAS',
+            'OTHER AGRICULTURE',
+            'PLANTATION',
+            'RECREATIONAL LAND'
+            ]
+# Dense woody areas (forests that are hardwood [deciduous] and soft wood [coniferous] and mixed:
+DENSE_WOOD = ['CONIFEROUS FOREST (>50% CROWN CLOSURE)',
+                'DECIDUOUS FOREST (>50% CROWN CLOSURE)',
+                'MIXED FOREST (>50% CONIFEROUS WITH >50% CROWN CLOSURE)',
+                'MIXED FOREST (>50% DECIDUOUS WITH >50% CROWN CLOSURE)'
+                ]
+# Woody areas (< 50% tree cover and shrublands where grass shows through but still lots of tall or short trees:
+WOODY = ['CONIFEROUS BRUSH/SHRUBLAND',
+        'CONIFEROUS FOREST (10-50% CROWN CLOSURE)',  
+        'DECIDUOUS BRUSH/SHRUBLAND',
+        'DECIDUOUS FOREST (10-50% CROWN CLOSURE)',
+        'MIXED DECIDUOUS/CONIFEROUS BRUSH/SHRUBLAND',
+        'MIXED FOREST (>50% CONIFEROUS WITH 10-50% CROWN CLOSURE)',
+        'MIXED FOREST (>50% DECIDUOUS WITH 10-50% CROWN CLOSURE)'
+        ]
+# Suburban lawns (grassy areas with houses and gardens full of potential flowers; don’t need single or multiple dwelling differentiation, though):
+SUBURBAN = ['MIXED RESIDENTIAL',
+            'RESIDENTIAL, RURAL, SINGLE UNIT',
+            'RESIDENTIAL, SINGLE UNIT, LOW DENSITY',
+            'RESIDENTIAL, SINGLE UNIT, MEDIUM DENSITY'
+            ]
+# Watery areas and their associated wild areas that will contain some riverine grass and trees:
+WATERY = ['AGRICULTURAL WETLANDS (MODIFIED)',
+            'ARTIFICIAL LAKES',
+            'CONIFEROUS SCRUB/SHRUB WETLANDS', 
+            'CONIFEROUS WOODED WETLANDS',
+            'DISTURBED WETLANDS (MODIFIED)',
+            'DECIDUOUS SCRUB/SHRUB WETLANDS',
+            'DECIDUOUS WOODED WETLANDS',
+            'DISTURBED WETLANDS (MODIFIED)',
+            'HERBACEOUS WETLANDS',
+            'MANAGED WETLAND IN BUILT-UP MAINTAINED REC AREA',
+            'MANAGED WETLAND IN MAINTAINED LAWN GREENSPACE',
+            'MIXED SCRUB/SHRUB WETLANDS (CONIFEROUS DOM.)',
+            'MIXED SCRUB/SHRUB WETLANDS (DECIDUOUS DOM.)',
+            'MIXED WOODED WETLANDS (DECIDUOUS DOM.)',
+            'NATURAL LAKES',
+            'PHRAGMITES DOMINATE INTERIOR WETLANDS',
+            'STORMWATER BASIN',
+            'STREAMS AND CANALS'
+            ]
+# Areas with minimal natural habitats—urban areas (city centers, commercial sprawl, shopping centers, malls, 
+# plenty of parking lots with gravel or blacktop (few potential flowers)).  
+# This is a catch all category where flowers will be rare:
+URBAN = ['COMMERCIAL/SERVICES',
+        'EXTRACTIVE MINING',
+        'INDUSTRIAL',
+        'MAJOR ROADWAY',
+        'MIXED TRANSPORTATION CORRIDOR OVERLAP AREA',
+        'MIXED URBAN OR BUILT-UP LAND',
+        'OTHER URBAN OR BUILT-UP LAND',
+        'RAILROADS',
+        'RESIDENTIAL, HIGH DENSITY OR MULTIPLE DWELLING',
+        'STADIUM, THEATERS, CULTURAL CENTERS AND ZOOS',
+        'TRANSITIONAL AREAS',
+        'TRANSPORTATION/COMMUNICATION/UTILITIES',
+        'UPLAND RIGHTS-OF-WAY DEVELOPED',
+        'UPLAND RIGHTS-OF-WAY UNDEVELOPED',
+        'WETLAND RIGHTS-OF-WAY'
+        ]
+REGION_DICT = {'GRASSY': GRASSY,
+                'DENSE_WOOD': DENSE_WOOD,
+                'WOODY': WOODY,
+                'SUBURBAN': SUBURBAN,
+                'WATERY': WATERY,
+                'URBAN': URBAN
+}
+
 # Fixed distance for boxes center on image lat/lon
 BOUNDING_RADIUS = 0.25
 # Convert distance to degrees (approx)
@@ -21,13 +100,16 @@ WEBMAP_ID = "2705228b2b154d0a906ef7a54e533fac"
 
 def get_layer(username, password):
     '''
-    Function to retrieve the Feature Layer.
+    Function to retrieve the Feature Layer (NJ Land Use/Land Cover). (Alternate - pass GIS after authentication earlier)
     
     Parameters:
     -----------
+    username - String. ArcGIS username input by user.
+    password - String. ArcGIS password input by user.
 
     Returns:
     --------
+    layer - Feature Layer of the map (this has all the data/pointers for queries by lat/lon).
     
     '''
     # Authenticate with ArcGIS Online
@@ -52,9 +134,12 @@ def get_area_of_interest(lat, lon):
 
     Parameters:
     -----------
+    lat - Float. Latitude to center on.
+    lon - Float. Longitude to center on.
 
     Returns:
     --------
+    area_of_interest - arcgis Polygon. Half-mile square centered at the location the image was taken at, described by lat/lon values.
     
     '''
     # Define boundary square around the coordinates
@@ -82,7 +167,7 @@ def get_aoi_feature_areas(layer, aoi):
 
     Prameters:
     ----------
-    layer - Map layer.
+    layer - ArcGIS map layer to query.
     aoi - Area of interest (1/2-mile box around image lat/lon).
 
     Returns:
@@ -97,15 +182,22 @@ def get_aoi_feature_areas(layer, aoi):
     feature_set = layer.query(geometry_filter = filters.intersects(aoi))
     
     # Collect feature labels and their areas for all features in feature_set into DataFrame with Object_ID as unique identifier
+    # Region_Label is the label provided by NJ ('Region' will be used to describe the region category (Grassy, Dense Wood, Woody, Suburban, Watery, Urban))
     # Acres is full acreage of the region
     # Intersect_Area is the area of the intersection of the region with the area of interest, measured in square meters
-    feature_areas = pd.DataFrame(columns=['Object_ID', 'Region', 'Acres', 'Intersect_Area']) 
+    feature_areas = pd.DataFrame(columns=['Object_ID', 'Region_Label', 'Region', 'Acres', 'Intersect_Area']) 
     for feature in feature_set.features:
         feature_geometry = feature.geometry
         object_id = feature.attributes['OBJECTID']
         region_label = feature.attributes['LABEL15']
         region_acres = feature.attributes['ACRES']
         feature_spatial_ref = feature_geometry['spatialReference']['wkid'] # WKID 102100, original WGS1984 Web Mercator projection
+        
+        # Get region category of the NJ Label:
+        for region in REGION_DICT.keys():
+            if region_label in REGION_DICT[region]:
+                region_cat = region
+                break
         
         # Match spatial refs
         feature_geometry = project(geometries = [feature_geometry],
@@ -117,7 +209,7 @@ def get_aoi_feature_areas(layer, aoi):
         intersection = intersect(spatial_ref, 
                                  [aoi], 
                                  feature_geometry)
-        # Get area of intersetion
+        # Get square meter area of intersetion
         area = areas_and_lengths(polygons = intersection[0], 
                                     length_unit = 9001, # meters
                                     area_unit = 9001, 
@@ -125,25 +217,46 @@ def get_aoi_feature_areas(layer, aoi):
                                     spatial_ref = spatial_ref)
         # Add row to DataFrame
         feature_areas.loc[len(feature_areas)] = {'Object_ID': object_id, 
-                                                 'Region': region_label, 
+                                                 'Region_Label': region_label, 
+                                                 'Region': region_cat,
                                                  'Acres': region_acres, 
                                                  'Intersect_Area': area['areas'][0]}
 
     return feature_areas
 
-def get_landcover_percentages(feature_areas):
+def get_landcover_percentages(layer, lat, lon):
     '''
-    Function to determine percentage of area of interest covered by each land cover of interest.
+    Function to determine percentage of area of interest covered by each land cover category (Grassy, Dense Wood, Woody, Suburban, Watery, Urban).
     
     Parameters:
     -----------
+    layer - ArcGIS map layer to query.
+    lat - Float. Latitude to center on.
+    lon - Float. Longitude to center on.
 
     Returns:
     --------
+    region_percents - Dictionary of percentage of land in area of interest covered by each region category (index: Grassy, Dense Wood, Woody, Suburban, Watery, Urban).
 
     '''
+    aoi = get_area_of_interest(lat, lon)
+    feature_areas = get_aoi_feature_areas(layer, aoi)
+    total_area = 0
+    region_percents = {'GRASSY': 0,
+                    'DENSE_WOOD': 0,
+                    'WOODY': 0,
+                    'SUBURBAN': 0,
+                    'WATERY': 0,
+                    'URBAN': 0
+    }
+    # Get total area of each region (Grassy, Dense Wood, Woody, Suburban, Watery, Urban) and sum total area
     for region in feature_areas.Region.unique():
         region_sum = feature_areas.loc[feature_areas.Region == region, 'Intersect_Area'].sum()
         feature_areas.loc[feature_areas.Region == region, 'Region_Intersect_Total'] = region_sum
+        total_area = total_area + region_sum
+    # Collect percentage of each region type 
+    for region in REGION_DICT.keys():
+        region_sum = feature_areas.loc[feature_areas.Region == region, 'Region_Intersect_Total'].values[0]
+        region_percents[region] = region_sum/total_area
 
-    return feature_areas
+    return region_percents
