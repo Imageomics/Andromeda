@@ -1,6 +1,7 @@
 import pandas as pd
 import shapely
 import geopandas
+from mapping import get_layer, get_landcover_percentages
 
 SAT_LABEL = "sat_label"
 # 4 columns representing bounds of the satellite data
@@ -45,5 +46,31 @@ def add_satellite_csv_data(observations, lat_fieldname, long_fieldname, satellit
 
 
 def add_satellite_api_data(observations, lat_fieldname, long_fieldname):
-    # TODO add in code to fetch data from a satellite API and add to the observations
-    pass
+    '''
+    TODO determine where user login belongs for access to ArcGIS, if here add to parameters, otherwise gis is parameter and update get_layer accordingly.
+    NOTE get_layer should only be called once per dataset request, while get_landcover_percentages and the functions it depends on are row-by-row (lat, lon pair dependent).
+    
+    Function to fetch data from a ArcGIS API and add to the observations.
+
+    Parameters:
+    -----------
+    observations - Observations object. Contains iNaturalist data and possibly matching satellite data.
+    lat_fieldname - Latitude column/reference name.
+    long_fieldname - Longitude column/reference name.
+    
+    '''
+    REGIONS = ['GRASSY',
+                'DENSE_WOOD',
+                'WOODY',
+                'SUBURBAN',
+                'WATERY',
+                'URBAN'
+                ]
+    observations.add_fieldnames(REGIONS)
+    layer = get_layer() # UPDATE VARIABLES
+    for obs in observations.data:
+        lat = obs[lat_fieldname]
+        lon = obs[long_fieldname]
+        if lat and lon:
+            percentages = get_landcover_percentages(layer, lat, lon)
+            obs.update(percentages)
