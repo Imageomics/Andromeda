@@ -6,15 +6,12 @@ from arcgis.geometry import Polygon, filters, project, intersect, areas_and_leng
 ### Ultimate goal is to return percentage of each type of cover within the 1/2-mile box around the image's lat/lon.
 ### Will be added to the type of cover columns within the DataFrame.
 
-## Region bins: Grassy, Dense Wood, Woody, Suburban, Watery, Urban
+## Region bins: Grassy, Dense Wood, Woody, Suburban, Watery, Urban, Agricultural
 # Grassy areas (pastures and school yards as well as golf courses):
 GRASSY = ['ATHLETIC FIELDS (SCHOOLS)',  
             'CEMETERY',
             'CROPLAND AND PASTURELAND',
             'OLD FIELD (< 25% BRUSH COVERED)',
-            'ORCHARDS/VINEYARDS/NURSERIES/HORTICULTURAL AREAS',
-            'OTHER AGRICULTURE',
-            'PLANTATION',
             'RECREATIONAL LAND'
             ]
 # Dense woody areas (forests that are hardwood [deciduous] and soft wood [coniferous] and mixed:
@@ -61,7 +58,9 @@ WATERY = ['AGRICULTURAL WETLANDS (MODIFIED)',
 # Areas with minimal natural habitats—urban areas (city centers, commercial sprawl, shopping centers, malls, 
 # plenty of parking lots with gravel or blacktop (few potential flowers)).  
 # This is a catch all category where flowers will be rare:
-URBAN = ['COMMERCIAL/SERVICES',
+URBAN = ['ALTERED LANDS',
+        'BRIDGE OVER WATER',
+        'COMMERCIAL/SERVICES',
         'EXTRACTIVE MINING',
         'INDUSTRIAL',
         'MAJOR ROADWAY',
@@ -77,12 +76,19 @@ URBAN = ['COMMERCIAL/SERVICES',
         'UPLAND RIGHTS-OF-WAY UNDEVELOPED',
         'WETLAND RIGHTS-OF-WAY'
         ]
+# Agricultural -- distinct from pasture, which should be grassy.
+AGRICULTURAL = ['ORCHARDS/VINEYARDS/NURSERIES/HORTICULTURAL AREAS',
+                'OTHER AGRICULTURE',
+                'PLANTATION',
+                'FORMER AGRICULTURAL WETLAND (BECOMING SHRUBBY, NOT BUILT-UP)']
+# Region dictionary
 REGION_DICT = {'GRASSY': GRASSY,
                 'DENSE_WOOD': DENSE_WOOD,
                 'WOODY': WOODY,
                 'SUBURBAN': SUBURBAN,
                 'WATERY': WATERY,
-                'URBAN': URBAN
+                'URBAN': URBAN,
+                'AGRICULTURAL': AGRICULTURAL
 }
 
 # Fixed distance for boxes center on image lat/lon
@@ -247,7 +253,8 @@ def get_landcover_percentages(layer, lat, lon):
                     'WOODY': 0,
                     'SUBURBAN': 0,
                     'WATERY': 0,
-                    'URBAN': 0
+                    'URBAN': 0,
+                    'AGRICULTURAL': 0
     }
     # Get total area of each region (Grassy, Dense Wood, Woody, Suburban, Watery, Urban) and sum total area
     for region in feature_areas.Region.unique():
