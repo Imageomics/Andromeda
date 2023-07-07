@@ -15,6 +15,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install libkrb5 for Kerberos on Linux
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+            sudo apt install -y libkrb5-dev
+            pip install requests-kerberos  
       - name: Install dependencies
         working-directory: ./andromeda
         run: |
