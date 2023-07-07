@@ -45,7 +45,7 @@ def add_satellite_csv_data(observations, lat_fieldname, long_fieldname, satellit
         observations.add_warning("no_sat_matches")
 
 
-def add_satellite_api_data(observations, lat_fieldname, long_fieldname):
+def add_landcover_api_data(observations, lat_fieldname, long_fieldname):
     '''
     TODO determine where user login belongs for access to ArcGIS, if here add to parameters, otherwise gis is parameter and update get_layer accordingly.
     NOTE get_layer should only be called once per dataset request, while get_landcover_percentages and the functions it depends on are row-by-row (lat, lon pair dependent).
@@ -67,7 +67,7 @@ def add_satellite_api_data(observations, lat_fieldname, long_fieldname):
                 'URBAN'
                 ]
     observations.add_fieldnames(REGIONS)
-    layer = get_layer() # UPDATE VARIABLES
+    layer = get_layer()
     for obs in observations.data:
         lat = obs[lat_fieldname]
         lon = obs[long_fieldname]

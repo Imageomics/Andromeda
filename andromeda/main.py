@@ -101,10 +101,10 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['GET'])
 def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
-    # TODO read query params for add_sat_csv_data and add_sat_api_data
+    # TODO read query params for add_sat_csv_data and add_land_api_data
     observations = get_inaturalist_observations(user_id=user_id,
                                                  add_sat_csv_data=True,
-                                                 add_sat_api_data=True)
+                                                 add_land_api_data=True)
     if format == "json":    
         return jsonify({
             "user_id": user_id,

@@ -8,11 +8,20 @@ This server allows users to upload CSV files and perform dimensional reduction o
 
 ## Setup
 
-Install depenencies within a python virtual environment:
+Install dependencies within a python virtual environment:
 
 ```
 pip install -r requirements.txt
 ```
+
+### Note on ArcGIS Install 
+
+It requires the downgrade of `urllib3` to version 1.26.0 until the fall 2023 update of `arcgis` package, at which point the requirements file for this app will be updated.
+
+#### For M1 & M2 Macs:
+
+The `arcgis` package is not yet native to Apple Silicon, so it requires Rosetta 2 emulating Intel i386 architecture (see note [here](https://joelmccune.com/install-arcgis-python-api-on-apple-silicon/) on Conda setup). 
+
 
 ## Running
 
