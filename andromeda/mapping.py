@@ -2,6 +2,7 @@ import pandas as pd
 from arcgis.gis import GIS
 from arcgis.features import FeatureLayer
 from arcgis.geometry import Polygon, filters, project, intersect, areas_and_lengths
+import os
 
 ### Ultimate goal is to return percentage of each type of cover within the 1/2-mile box around the image's lat/lon.
 ### Will be added to the type of cover columns within the DataFrame.
@@ -104,7 +105,7 @@ LON_BOUNDING_RADIUS_DEG = BOUNDING_RADIUS / 54.6 # 54.6 miles per degree at 38 d
 # Web map ID for map utilizign the above layer: https://www.arcgis.com/home/search.html?restrict=false&sortField=relevance&sortOrder=desc&searchTerm=2705228b2b154d0a906ef7a54e533fac#content
 WEBMAP_ID = "2705228b2b154d0a906ef7a54e533fac"
 
-def get_layer(username, password):
+def get_layer():
     '''
     Function to retrieve the Feature Layer (NJ Land Use/Land Cover). (Alternate - pass GIS after authentication earlier)
     
@@ -119,7 +120,8 @@ def get_layer(username, password):
     
     '''
     # Authenticate with ArcGIS Online
-    gis = GIS("https://www.arcgis.com", username, password)
+    # The API key should be stored as an environment variable in a .env file in the root directory of the deployment environment.
+    gis = GIS(api_key=os.environ.get('ARCGIS_API_KEY'))
 
     # Access the webmap item by ID and get operational layers from the data
     webmap_item = gis.content.get(WEBMAP_ID)

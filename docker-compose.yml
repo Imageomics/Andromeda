@@ -10,6 +10,9 @@ services:
       - apinetwork
     expose:
       - "5000"
+    environment:
+      - BACKEND_WORKERS=${BACKEND_WORKERS}
+      - ARCGIS_API_KEY=${ARCGIS_API_KEY}
 
   nginx:
     container_name: frontend
