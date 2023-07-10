@@ -1,0 +1,37 @@
+variableName,Definition
+sat_label,Label for satellite image
+sat_url,Url  for satellite image
+sat_Location,General Location name for satellite image
+sat_Type,Categorical: farm   garden   golf   or school
+sat_Lat-Center,Latitude for Center of satellite image
+sat_Lon-Center,Longitude for Center of satellite image
+sat_Lat-NW,Latitude for upper   NW corner of satellite image
+sat_Lon-NW,Longitude for upper   NW corner of  satellite image
+sat_Lat-SE,Latitude for lower   SE corner of  satellite image
+sat_Lon-SE,Longitude for lower   SE corner of satellite image
+sat_medianRed,Median amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdRed,Std. Dev. for amt of red across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_medianGreen,Median amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdGreen,Std. Dev. for amt of green across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_medianBlue,Median amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_sdBlue,Std. Dev. for amt of blue across all pixels of satillite image; Satillite images were 1) resized to have same pixel dimensions; 2) summarized using pixel RGB data.  
+sat_cl1red,Mean red in X biggest cluster (e.g.   cl1=biggest cluster;  cl2= 2nd biggest cluster;  etc.)
+sat_cl2red,Mean red in X biggest cluster (e.g.   cl1=biggest cluster;  cl2= 2nd biggest cluster;  etc.)
+sat_cl3red,Mean red in X biggest cluster (e.g.   cl1=biggest cluster;  cl2= 2nd biggest cluster;  etc.)
+sat_cl4red,Mean red in X biggest cluster (e.g.   cl1=biggest cluster;  cl2= 2nd biggest cluster;  etc.)
+sat_cl1green,Mean green in X biggest cluster (e.g.  cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl2green,Mean green in X biggest cluster (e.g.  cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl3green,Mean green in X biggest cluster (e.g.  cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl4green,Mean green in X biggest cluster (e.g.  cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl1blue,Mean blue in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster;  etc.)
+sat_cl2blue,Mean blue in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster;  etc.)
+sat_cl3blue,Mean blue in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster;  etc.)
+sat_cl4blue,Mean blue in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster;  etc.)
+sat_cl1size,Proportion of image pixels in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl2size,Proportion of image pixels in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl3size,Proportion of image pixels in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl4size,Proportion of image pixels in X biggest cluster (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl1name,Name of color defined by X biggest cluster centroid (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl2name,Name of color defined by X biggest cluster centroid (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl3name,Name of color defined by X biggest cluster centroid (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
+sat_cl4name,Name of color defined by X biggest cluster centroid (e.g. cl1=biggest cluster; cl2= 2nd biggest cluster; etc.)
