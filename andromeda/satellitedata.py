@@ -1,13 +1,18 @@
+import os
 import pandas as pd
 import shapely
 import geopandas
 
-SAT_LABEL = "sat_label"
 # 4 columns representing bounds of the satellite data
 LAT_NW = "sat_Lat-NW"
 LON_NW = "sat_Lon-NW"
 LAT_SE = "sat_Lat-SE"
 LON_SE = "sat_Lon-SE"
+RGB_SATELLITE_URL = os.environ.get(
+    "ANDROMEDA_RGB_SATELLITE_URL",
+    "https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
+)
+LANDCOVER_SATELLITE_URL = os.environ.get("ANDROMEDA_LANDCOVER_URL")
 
 
 def make_shapely_box(row):
@@ -26,8 +31,8 @@ def find_satellite_records(sat_df, sat_geo_series, lat, long):
     return sat_df[matches_ary].to_dict(orient="records")
 
 
-def add_satellite_csv_data(observations, lat_fieldname, long_fieldname, satellite_csv_url):
-    sat_df, sat_geo_series = read_satellite_data(satellite_csv_url)
+def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, url):
+    sat_df, sat_geo_series = read_satellite_data(url)
     observations.add_fieldnames(list(sat_df.columns))
     has_a_match = False
     for obs in observations.data:
@@ -44,6 +49,12 @@ def add_satellite_csv_data(observations, lat_fieldname, long_fieldname, satellit
         observations.add_warning("no_sat_matches")
 
 
-def add_satellite_api_data(observations, lat_fieldname, long_fieldname):
-    # TODO add in code to fetch data from a satellite API and add to the observations
-    pass
+def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
+    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, RGB_SATELLITE_URL)
+
+
+def add_satellite_landcover_data(observations, lat_fieldname, long_fieldname):
+    if LANDCOVER_SATELLITE_URL:
+        merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, LANDCOVER_SATELLITE_URL)
+    else:
+        observations.add_warning("landcover_not_setup")

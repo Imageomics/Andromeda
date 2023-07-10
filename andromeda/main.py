@@ -47,6 +47,12 @@ def validate_upload_filename(filename):
         abort(400, "Only CSV files with the .csv extension are allowed to be uploaded.")
 
 
+def get_boolean_param(request, param_name):
+    # Return boolean value in query parameters, defaults to false
+    str_value = request.args.get(param_name, "false")
+    return str_value.lower() == "true"
+
+
 @app.route('/api/dataset/', methods=['POST'])
 def upload_dataset():
     # check if the post request has the file part
@@ -101,15 +107,16 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['GET'])
 def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
-    # TODO read query params for add_sat_csv_data and add_sat_api_data
+    add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
+    add_landcover_data = get_boolean_param(request, "add_landcover_data")
     observations = get_inaturalist_observations(user_id=user_id,
-                                                 add_sat_csv_data=True,
-                                                 add_sat_api_data=True)
-    if format == "json":    
+                                                 add_sat_rgb_data=add_sat_rgb_data,
+                                                 add_landcover_data=add_landcover_data)
+    if format == "json":
         return jsonify({
             "user_id": user_id,
             "data": observations.data,
-            "warnings": observations.warnings
+            "warnings": list(observations.warnings)
         })
     elif format == "csv":
         return csv_reponse_for_observations(
@@ -119,6 +126,7 @@ def get_inaturalist(user_id):
         )
     else:
         abort(400, "Unsupported format parameter value " + format)
+
 
 def csv_reponse_for_observations(fieldnames, observations, user_id):
     now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")

@@ -15,20 +15,21 @@ const FETCH_WARNINGS: any = {
     Missing latitude and longitude for some iNaturalist observations.
     Please fix these observations at iNaturalist.org.`,
     multiple_sat_matches: `Multiple satellite entries found for a single location.`,
-    no_sat_matches: `No matching satellite data found.`
+    no_sat_matches: `No matching satellite data found.`,
+    landcover_not_setup: `Landcover data is not currently supported.`
 }
 
 function makeMessages(warnings: string[]): string {
     if (warnings) {
         const messages = warnings.map((x: string) => FETCH_WARNINGS[x] || x);
-        return messages.join(", ");
+        return messages.join(" ");
     }
     return "";
 }
 
 export default function GeneratePage() {
     const [iNatUser, setINatUser] = useState<string>("");
-    const [addSatCSVData, setAddSatCSVData] = useState<boolean>(false);
+    const [addSatRGBData, setAddSatRGBData] = useState<boolean>(false);
     const [addLandCover, setAddLandCover] = useState<boolean>(false);
     const [warning, setWarning] = useState<string>("");
     const [fetching, setFetching] = useState<boolean>(false);
@@ -40,7 +41,7 @@ export default function GeneratePage() {
             setWarning("");
             setFetching(true);
             try {
-                const result = await fetchObservations(iNatUser, addSatCSVData, addLandCover);
+                const result = await fetchObservations(iNatUser, addSatRGBData, addLandCover);
                 setObservations(result.data);
                 if (result.warnings.length) {
                     setWarning(makeMessages(result.warnings));
@@ -75,7 +76,7 @@ export default function GeneratePage() {
         warningNotice = <WarningNotice message={warning} />;
     }
     if (showObservations) {
-        const csvURL = makeObservationURL(iNatUser, addSatCSVData, addLandCover, "csv");
+        const csvURL = makeObservationURL(iNatUser, addSatRGBData, addLandCover, "csv");
         content = <div>
             <ObservationTable
                 iNatUser={iNatUser}
@@ -92,8 +93,8 @@ export default function GeneratePage() {
             <FetchDataForm
                 iNatUser={iNatUser}
                 setINatUser={setINatUser}
-                addSatCSVData={addSatCSVData}
-                setAddSatCSVData={setAddSatCSVData}
+                addSatRGBData={addSatRGBData}
+                setAddSatRGBData={setAddSatRGBData}
                 addLandCover={addLandCover}
                 setAddLandCover={setAddLandCover}
                 disableFetchButton={fetching}

@@ -2,7 +2,7 @@ import io
 import csv
 import pandas as pd
 from pyinaturalist import get_observations
-from satellitedata import add_satellite_csv_data
+from satellitedata import add_satellite_rgb_data, add_satellite_landcover_data
 
 LABEL_FIELD = "Image_Label"
 URL_FIELD = "Image_Link"
@@ -26,31 +26,30 @@ CSV_FIELDS = [
     LAT_FIELD,
     LON_FIELD,
 ]
-SATELLITE_DATA_URL = "https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satImgs3Cluster_1000-ft.csv"
 
 
 class Observations(object):
     def __init__(self, fieldnames):
         self.fieldnames = fieldnames
         self.data = []
-        self.warnings = []
+        self.warnings = set()
 
     def add(self, row):
         self.data.append(row)
 
     def add_warning(self, warning):
-        self.warnings.append(warning)
+        self.warnings.add(warning)
 
     def add_fieldnames(self, new_fieldnames):
         self.fieldnames.extend(new_fieldnames)
 
 
-def get_inaturalist_observations(user_id, add_sat_csv_data, add_sat_api_data):
+def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data):
     idx = 0
     missing_lat_long = False
     observations = Observations(fieldnames=CSV_FIELDS[:])
-    obeservations_response = get_observations(user_id=user_id, page="all")
-    for obs in obeservations_response["results"]:
+    observations_response = get_observations(user_id=user_id, page="all")
+    for obs in observations_response["results"]:
         idx += 1
         label = f"p{idx}"
         df = pd.DataFrame.from_dict(obs, orient="index")
@@ -91,11 +90,11 @@ def get_inaturalist_observations(user_id, add_sat_csv_data, add_sat_api_data):
     if missing_lat_long:
         observations.add_warning("missing_lat_long")
 
-    if add_sat_csv_data:
-        add_satellite_csv_data(observations, LAT_FIELD, LON_FIELD, SATELLITE_DATA_URL)
+    if add_sat_rgb_data:
+        add_satellite_rgb_data(observations, LAT_FIELD, LON_FIELD)
 
-    if add_sat_api_data:
-        add_sat_api_data(observations, LAT_FIELD, LON_FIELD)
+    if add_landcover_data:
+        add_satellite_landcover_data(observations, LAT_FIELD, LON_FIELD)
 
     return observations
 

@@ -21,6 +21,11 @@ Part of the deployment builds the docker containers used by the website, so it m
 To stop the app run `docker-compose down`.
 
 Settings for the app can be changed in `.env`.
+Options for `.env`:
+- BACKEND_WORKERS - number of [workers used by gunicorn](https://docs.gunicorn.org/en/latest/run.html#commonly-used-arguments)
+- ANDROMEDA_RGB_SATELLITE_URL - URL pointing to a CSV file for joining RGB data
+- ANDROMEDA_LANDCOVER_URL - Optional URL pointing to a CSV file for joining Landcover data
+
 
 ### Certbot Setup on AWS
 Certificates can be installed to the EC2 VM using Certbot with Nginx on pip following [EFF instructions](https://certbot.eff.org/instructions?ws=nginx&os=pip).
