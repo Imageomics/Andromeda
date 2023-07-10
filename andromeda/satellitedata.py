@@ -1,7 +1,7 @@
 import pandas as pd
 import shapely
 import geopandas
-from mapping import get_layer, get_landcover_percentages
+from mapping_copy import get_layer, get_landcover_percentages
 
 SAT_LABEL = "sat_label"
 # 4 columns representing bounds of the satellite data
@@ -64,7 +64,8 @@ def add_landcover_api_data(observations, lat_fieldname, long_fieldname):
                 'WOODY',
                 'SUBURBAN',
                 'WATERY',
-                'URBAN'
+                'URBAN',
+                'AGRICULTURAL'
                 ]
     observations.add_fieldnames(REGIONS)
     layer = get_layer()

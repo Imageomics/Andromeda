@@ -1,8 +1,8 @@
+import os
 import pandas as pd
 from arcgis.gis import GIS
 from arcgis.features import FeatureLayer
 from arcgis.geometry import Polygon, filters, project, intersect, areas_and_lengths
-import os
 
 ### Ultimate goal is to return percentage of each type of cover within the 1/2-mile box around the image's lat/lon.
 ### Will be added to the type of cover columns within the DataFrame.
@@ -109,11 +109,6 @@ def get_layer():
     '''
     Function to retrieve the Feature Layer (NJ Land Use/Land Cover). (Alternate - pass GIS after authentication earlier)
     
-    Parameters:
-    -----------
-    username - String. ArcGIS username input by user.
-    password - String. ArcGIS password input by user.
-
     Returns:
     --------
     layer - Feature Layer of the map (this has all the data/pointers for queries by lat/lon).
@@ -193,7 +188,7 @@ def get_aoi_feature_areas(layer, aoi):
     # Region_Label is the label provided by NJ ('Region' will be used to describe the region category (Grassy, Dense Wood, Woody, Suburban, Watery, Urban))
     # Acres is full acreage of the region
     # Intersect_Area is the area of the intersection of the region with the area of interest, measured in square meters
-    feature_areas = pd.DataFrame(columns=['Object_ID', 'Region_Label', 'Region', 'Acres', 'Intersect_Area']) 
+    feature_areas = pd.DataFrame(columns=['Object_ID', 'Region_Label', 'Region', 'Acres', 'Intersect_Area', 'Region_Intersect_Total']) 
     for feature in feature_set.features:
         feature_geometry = feature.geometry
         object_id = feature.attributes['OBJECTID']
@@ -228,7 +223,8 @@ def get_aoi_feature_areas(layer, aoi):
                                                  'Region_Label': region_label, 
                                                  'Region': region_cat,
                                                  'Acres': region_acres, 
-                                                 'Intersect_Area': area['areas'][0]}
+                                                 'Intersect_Area': area['areas'][0],
+                                                 'Region_Intersect_Total': 0}
 
     return feature_areas
 
@@ -263,9 +259,11 @@ def get_landcover_percentages(layer, lat, lon):
         region_sum = feature_areas.loc[feature_areas.Region == region, 'Intersect_Area'].sum()
         feature_areas.loc[feature_areas.Region == region, 'Region_Intersect_Total'] = region_sum
         total_area = total_area + region_sum
+    
     # Collect percentage of each region type 
-    for region in REGION_DICT.keys():
-        region_sum = feature_areas.loc[feature_areas.Region == region, 'Region_Intersect_Total'].values[0]
-        region_percents[region] = region_sum/total_area
+    if total_area != 0:
+        for region in REGION_DICT.keys():
+            region_sum = feature_areas.loc[feature_areas.Region == region, 'Region_Intersect_Total'].values[0]
+            region_percents[region] = region_sum/total_area
 
     return region_percents
