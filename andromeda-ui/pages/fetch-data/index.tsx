@@ -28,6 +28,8 @@ function makeMessages(warnings: string[]): string {
 
 export default function GeneratePage() {
     const [iNatUser, setINatUser] = useState<string>("");
+    const [addSatCSVData, setAddSatCSVData] = useState<boolean>(false);
+    const [addLandCover, setAddLandCover] = useState<boolean>(false);
     const [warning, setWarning] = useState<string>("");
     const [fetching, setFetching] = useState<boolean>(false);
     const [showObservations, setShowObservations] = useState<boolean>(false);
@@ -38,7 +40,7 @@ export default function GeneratePage() {
             setWarning("");
             setFetching(true);
             try {
-                const result = await fetchObservations(iNatUser);
+                const result = await fetchObservations(iNatUser, addSatCSVData, addLandCover);
                 setObservations(result.data);
                 if (result.warnings.length) {
                     setWarning(makeMessages(result.warnings));
@@ -73,7 +75,7 @@ export default function GeneratePage() {
         warningNotice = <WarningNotice message={warning} />;
     }
     if (showObservations) {
-        const csvURL = makeObservationURL(iNatUser, "csv");
+        const csvURL = makeObservationURL(iNatUser, addSatCSVData, addLandCover, "csv");
         content = <div>
             <ObservationTable
                 iNatUser={iNatUser}
@@ -90,6 +92,10 @@ export default function GeneratePage() {
             <FetchDataForm
                 iNatUser={iNatUser}
                 setINatUser={setINatUser}
+                addSatCSVData={addSatCSVData}
+                setAddSatCSVData={setAddSatCSVData}
+                addLandCover={addLandCover}
+                setAddLandCover={setAddLandCover}
                 disableFetchButton={fetching}
                 onClickFetch={onClickFetch}/>
             {warningNotice}
