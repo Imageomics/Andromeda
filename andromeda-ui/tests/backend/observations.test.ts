@@ -8,13 +8,23 @@ jest.mock('next/config', () => () => ({
 }))
 
 test("makeObservationURL can create a json url", () => {
-    const expected = "https://example.com/api/inaturalist/bob?format=json";
-    expect(makeObservationURL("bob", "json")).toStrictEqual(expected);
+    const expected = "https://example.com/api/inaturalist/bob?format=json&add_sat_rgb_data=false&add_landcover_data=false";
+    expect(makeObservationURL("bob", false, false, "json")).toStrictEqual(expected);
 });
 
 test("makeObservationURL creates a CSV URL", () => {
-    const expected = "https://example.com/api/inaturalist/bob?format=csv";
-    expect(makeObservationURL("bob", "csv")).toStrictEqual(expected);
+    const expected = "https://example.com/api/inaturalist/bob?format=csv&add_sat_rgb_data=false&add_landcover_data=false";
+    expect(makeObservationURL("bob",false, false, "csv")).toStrictEqual(expected);
+});
+
+test("makeObservationURL can add RGB data param", () => {
+    const expected = "https://example.com/api/inaturalist/bob?format=json&add_sat_rgb_data=true&add_landcover_data=false";
+    expect(makeObservationURL("bob", true, false, "json")).toStrictEqual(expected);
+});
+
+test("makeObservationURL can add landcover data param", () => {
+    const expected = "https://example.com/api/inaturalist/bob?format=json&add_sat_rgb_data=false&add_landcover_data=true";
+    expect(makeObservationURL("bob", false, true, "json")).toStrictEqual(expected);
 });
 
 test("fetchObservations returns JSON result of observations", async () => {
@@ -23,8 +33,8 @@ test("fetchObservations returns JSON result of observations", async () => {
         "data": [{"label": "p1"}],
         "warnings": ["some_warning"]        
     }
-    fetchMock.get('https://example.com/api/inaturalist/bob?format=json', payload);
-    const results = await fetchObservations("bob");
+    fetchMock.get('https://example.com/api/inaturalist/bob?format=json&add_sat_rgb_data=false&add_landcover_data=false', payload);
+    const results = await fetchObservations("bob", false, false);
     expect(results).toStrictEqual(payload);
     fetchMock.restore();
 });

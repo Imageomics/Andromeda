@@ -82,7 +82,8 @@ class TestDataset(unittest.TestCase):
     def test_get_inaturalist(self, mock_get_inaturalist_observations):
         observations = [{"Image_Label": "p1"}]
         warnings = ["missing_lat_long"]
-        mock_get_inaturalist_observations.return_value = (observations, warnings)
+        mock_get_inaturalist_observations.return_value = Mock(
+            data=observations, warnings=warnings)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob")
         self.assertEqual(result.status_code, 200)
@@ -99,7 +100,12 @@ class TestDataset(unittest.TestCase):
     def test_get_inaturalist_csv(self, mock_get_inaturalist_observations):
         observations = [{"Image_Label": "p1"}]
         warnings = ["missing_lat_long"]
-        mock_get_inaturalist_observations.return_value = (observations, warnings)
+        fieldnames = ["Image_Label", "Image_Link", "Species", "User", "Date", "Time",
+                      "Seconds", "Place", "Lat", "Long"]
+        mock_get_inaturalist_observations.return_value = Mock(
+            data=observations,
+            fieldnames=fieldnames,
+            warnings=warnings)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=csv")
         self.assertEqual(result.status_code, 200)
@@ -111,8 +117,24 @@ class TestDataset(unittest.TestCase):
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_xml(self, mock_get_inaturalist_observations):
-        mock_get_inaturalist_observations.return_value = ([], [])
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=xml")
         self.assertEqual(result.status_code, 400)
         self.assertEqual(result.json.get("description"), "Unsupported format parameter value xml")
+
+    @patch("main.get_inaturalist_observations")
+    def test_get_inaturalist_add_rgb(self, mock_get_inaturalist_observations):
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
+        client = app.test_client()
+        result = client.get(f"/api/inaturalist/bob?format=json&add_sat_rgb_data=true")
+        self.assertEqual(result.status_code, 200)
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=True, add_landcover_data=False)
+
+    @patch("main.get_inaturalist_observations")
+    def test_get_inaturalist_add_landcover(self, mock_get_inaturalist_observations):
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
+        client = app.test_client()
+        result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
+        self.assertEqual(result.status_code, 200)
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, add_landcover_data=True)

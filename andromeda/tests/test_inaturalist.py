@@ -2,7 +2,6 @@ import unittest
 import datetime
 from unittest.mock import patch
 from inaturalist import (
-    get_inaturalist_fieldnames,
     get_inaturalist_observations,
     create_csv_str,
 )
@@ -34,10 +33,11 @@ class TestINaturalist(unittest.TestCase):
         }
         mock_get_observations.return_value = {"results": [item]}
 
-        obs, warnings = get_inaturalist_observations(user_id="user-1")
-
-        self.assertEqual(len(obs), 1)
-        first_obs = obs[0]
+        observations = get_inaturalist_observations(user_id="user-1",
+                                                    add_sat_rgb_data=False,
+                                                    add_landcover_data=False)
+        self.assertEqual(len(observations.data), 1)
+        first_obs = observations.data[0]
         self.assertEqual(first_obs.keys(), set(expected_columns))
         self.assertEqual(first_obs["Image_Label"], "p1")
         self.assertEqual(first_obs["Image_Link"], "https://example.com/p1_medium.png")
@@ -46,7 +46,33 @@ class TestINaturalist(unittest.TestCase):
         self.assertEqual(first_obs["Place"], "Duke University")
         self.assertEqual(first_obs["Lat"], 35.3299475067)
         self.assertEqual(first_obs["Long"], -84.1795960441)
-        self.assertEqual(warnings, [])
+        self.assertEqual(observations.warnings, set())
+
+    @patch("inaturalist.get_observations")
+    @patch("inaturalist.add_satellite_rgb_data")
+    @patch("inaturalist.add_satellite_landcover_data")
+    def test_get_inaturalist_observations_rgb(self, mock_add_satellite_landcover_data,
+                                              mock_add_satellite_rgb_data,
+                                              mock_get_observations):
+        mock_get_observations.return_value = {"results": []}
+        observations = get_inaturalist_observations(user_id="user-1",
+                                                    add_sat_rgb_data=True,
+                                                    add_landcover_data=False)
+        mock_add_satellite_rgb_data.assert_called_with(observations, 'Lat', 'Long')
+        mock_add_satellite_landcover_data.assert_not_called()
+
+    @patch("inaturalist.get_observations")
+    @patch("inaturalist.add_satellite_rgb_data")
+    @patch("inaturalist.add_satellite_landcover_data")
+    def test_get_inaturalist_observations_landcover(self, mock_add_satellite_landcover_data,
+                                                    mock_add_satellite_rgb_data,
+                                                    mock_get_observations):
+        mock_get_observations.return_value = {"results": []}
+        observations = get_inaturalist_observations(user_id="user-1",
+                                                    add_sat_rgb_data=False,
+                                                    add_landcover_data=True)
+        mock_add_satellite_rgb_data.assert_not_called()
+        mock_add_satellite_landcover_data.assert_called_with(observations, 'Lat', 'Long')
 
     @patch("inaturalist.get_observations")
     def test_get_inaturalist_observations_lat_lon_warning(self, mock_get_observations):
@@ -61,24 +87,11 @@ class TestINaturalist(unittest.TestCase):
 
         mock_get_observations.return_value = {"results": [item]}
 
-        obs, warnings = get_inaturalist_observations(user_id="user-1")
-        self.assertEqual(len(obs), 1)
-        self.assertEqual(warnings, ["missing_lat_long"])
-
-    def test_get_inaturalist_fieldnames(self):
-        expected_names = [
-            "Image_Label",
-            "Image_Link",
-            "Species",
-            "User",
-            "Date",
-            "Time",
-            "Seconds",
-            "Place",
-            "Lat",
-            "Long",
-        ]
-        self.assertEqual(get_inaturalist_fieldnames(), expected_names)
+        observations = get_inaturalist_observations(user_id="user-1",
+                                                    add_sat_rgb_data=False,
+                                                    add_landcover_data=False)
+        self.assertEqual(len(observations.data), 1)
+        self.assertEqual(observations.warnings,set(["missing_lat_long"]))
 
     def test_create_csv_str(self):
         observations = [

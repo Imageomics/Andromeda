@@ -12,6 +12,8 @@ services:
       - "5000"
     environment:
       - BACKEND_WORKERS=${BACKEND_WORKERS}
+      - ANDROMEDA_RGB_SATELLITE_URL=${ANDROMEDA_RGB_SATELLITE_URL}
+      - ANDROMEDA_LANDCOVER_URL=${ANDROMEDA_LANDCOVER_URL}
 
   nginx:
     container_name: frontend

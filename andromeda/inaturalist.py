@@ -2,6 +2,7 @@ import io
 import csv
 import pandas as pd
 from pyinaturalist import get_observations
+from satellitedata import add_satellite_rgb_data, add_satellite_landcover_data
 
 LABEL_FIELD = "Image_Label"
 URL_FIELD = "Image_Link"
@@ -27,12 +28,28 @@ CSV_FIELDS = [
 ]
 
 
-def get_inaturalist_observations(user_id):
-    result = []
+class Observations(object):
+    def __init__(self, fieldnames):
+        self.fieldnames = fieldnames
+        self.data = []
+        self.warnings = set()
+
+    def add(self, row):
+        self.data.append(row)
+
+    def add_warning(self, warning):
+        self.warnings.add(warning)
+
+    def add_fieldnames(self, new_fieldnames):
+        self.fieldnames.extend(new_fieldnames)
+
+
+def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data):
     idx = 0
     missing_lat_long = False
-    observations = get_observations(user_id=user_id, page="all")
-    for obs in observations["results"]:
+    observations = Observations(fieldnames=CSV_FIELDS[:])
+    observations_response = get_observations(user_id=user_id, page="all")
+    for obs in observations_response["results"]:
         idx += 1
         label = f"p{idx}"
         df = pd.DataFrame.from_dict(obs, orient="index")
@@ -56,7 +73,7 @@ def get_inaturalist_observations(user_id):
         user_login = obs.get("user", {}).get("login")
         if not lat or not lon:
             missing_lat_long = True
-        result.append(
+        observations.add(
             {
                 LABEL_FIELD: label,
                 URL_FIELD: image_url,
@@ -70,14 +87,16 @@ def get_inaturalist_observations(user_id):
                 LON_FIELD: lon,
             }
         )
-    warnings = []
     if missing_lat_long:
-        warnings.append("missing_lat_long")
-    return result, warnings
+        observations.add_warning("missing_lat_long")
 
+    if add_sat_rgb_data:
+        add_satellite_rgb_data(observations, LAT_FIELD, LON_FIELD)
 
-def get_inaturalist_fieldnames():
-    return CSV_FIELDS[:]
+    if add_landcover_data:
+        add_satellite_landcover_data(observations, LAT_FIELD, LON_FIELD)
+
+    return observations
 
 
 def create_csv_str(fieldnames, observations):

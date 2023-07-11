@@ -4,7 +4,7 @@ from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
-from inaturalist import get_inaturalist_observations, get_inaturalist_fieldnames, create_csv_str
+from inaturalist import get_inaturalist_observations, create_csv_str
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 app = Flask(__name__)
@@ -45,6 +45,12 @@ def validate_upload_filename(filename):
 
     if not has_csv_extension(filename):
         abort(400, "Only CSV files with the .csv extension are allowed to be uploaded.")
+
+
+def get_boolean_param(request, param_name):
+    # Return boolean value in query parameters, defaults to false
+    str_value = request.args.get(param_name, "false")
+    return str_value.lower() == "true"
 
 
 @app.route('/api/dataset/', methods=['POST'])
@@ -101,22 +107,26 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['GET'])
 def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
-    fieldnames = get_inaturalist_fieldnames()
-    obs, warnings = get_inaturalist_observations(user_id=user_id)
-    if format == "json":    
+    add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
+    add_landcover_data = get_boolean_param(request, "add_landcover_data")
+    observations = get_inaturalist_observations(user_id=user_id,
+                                                 add_sat_rgb_data=add_sat_rgb_data,
+                                                 add_landcover_data=add_landcover_data)
+    if format == "json":
         return jsonify({
             "user_id": user_id,
-            "data": obs,
-            "warnings": warnings
+            "data": observations.data,
+            "warnings": list(observations.warnings)
         })
     elif format == "csv":
         return csv_reponse_for_observations(
-            fieldnames=fieldnames,
-            observations=obs,
+            fieldnames=observations.fieldnames,
+            observations=observations.data,
             user_id=user_id
         )
     else:
         abort(400, "Unsupported format parameter value " + format)
+
 
 def csv_reponse_for_observations(fieldnames, observations, user_id):
     now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
