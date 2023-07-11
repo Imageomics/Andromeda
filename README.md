@@ -11,6 +11,7 @@ To deploy the website on a machine running docker run the following commands:
 ```bash
 git clone https://github.com/Imageomics/Andromeda.git
 cd Andromeda/
+cp example.env .env
 docker-compose up -d
 ```
 The `-d` flag runs the website in the background. For troubleshooting remove this flag to more easily monitor the deployment.
@@ -18,6 +19,8 @@ The `-d` flag runs the website in the background. For troubleshooting remove thi
 Once the website finishes launching the website will be available on port 80: [http://localhost](http://localhost).
 Part of the deployment builds the docker containers used by the website, so it may take a few minutes to finish deployment.
 To stop the app run `docker-compose down`.
+
+Settings for the app can be changed in `.env`.
 
 ### Certbot Setup on AWS
 Certificates can be installed to the EC2 VM using Certbot with Nginx on pip following [EFF instructions](https://certbot.eff.org/instructions?ws=nginx&os=pip).
