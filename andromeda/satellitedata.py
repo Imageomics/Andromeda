@@ -25,13 +25,26 @@ def read_satellite_data(url):
     return sat_df, sat_geo_series
 
 
-def find_satellite_records(sat_df, sat_geo_series, lat, long):
+def find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix):
     point = shapely.Point(lat, long)
-    matches_ary = sat_geo_series.contains(point)
-    return sat_df[matches_ary].to_dict(orient="records")
+    # Compute distances to the center of all satellite regions to our point
+    distances = sat_geo_series.centroid.distance(point)
+
+    # Find the region(s) that have the minimum distance to the point
+    min_distance = distances.min()
+    is_min_distance = distances == min_distance
+    matches = sat_df[is_min_distance].copy()
+    matched_series = sat_geo_series[is_min_distance]
+
+    # Add `in` column with values of 1 or 0 if the point is within the region
+    matches[f"{column_prefix}_in"] = matched_series.contains(point).astype(int)
+    # Add `distance` column with value of distance from the point to the region centroid
+    matches[f"{column_prefix}_distance"] = matched_series.centroid.distance(point)
+
+    return matches.to_dict(orient="records")
 
 
-def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, url):
+def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, column_prefix, url):
     sat_df, sat_geo_series = read_satellite_data(url)
     observations.add_fieldnames(list(sat_df.columns))
     has_a_match = False
@@ -39,7 +52,7 @@ def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, url):
         lat = obs[lat_fieldname]
         long = obs[long_fieldname]
         if lat and long:
-            matches = find_satellite_records(sat_df, sat_geo_series, lat, long)
+            matches = find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix)
             if matches:
                 if len(matches) > 1:
                     observations.add_warning("multiple_sat_matches")
@@ -50,11 +63,13 @@ def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, url):
 
 
 def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
-    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, RGB_SATELLITE_URL)
+    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, "sat", 
+                           RGB_SATELLITE_URL)
 
 
 def add_satellite_landcover_data(observations, lat_fieldname, long_fieldname):
     if LANDCOVER_SATELLITE_URL:
-        merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, LANDCOVER_SATELLITE_URL)
+        merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, "land_type",
+                               LANDCOVER_SATELLITE_URL)
     else:
         observations.add_warning("landcover_not_setup")
