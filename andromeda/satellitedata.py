@@ -28,7 +28,18 @@ def read_satellite_data(url):
 def find_satellite_records(sat_df, sat_geo_series, lat, long):
     point = shapely.Point(lat, long)
     matches_ary = sat_geo_series.contains(point)
-    return sat_df[matches_ary].to_dict(orient="records")
+    matches = sat_df[matches_ary]
+    # if the point exists in multiple regions find the closest to the centroid
+    if len(matches.index) > 1:
+        # calculate the distance between the point and the regions
+        distances = sat_geo_series.centroid.distance(point)
+        # find the minimum distance
+        min_distance = min(distances)
+        # find the closest points
+        closest = distances == min_distance
+        # those are our matches
+        matches = sat_df[closest]
+    return matches.to_dict(orient="records")
 
 
 def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, url):
