@@ -46,7 +46,8 @@ def find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix):
 
 def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, column_prefix, url):
     sat_df, sat_geo_series = read_satellite_data(url)
-    observations.add_fieldnames(list(sat_df.columns))
+    new_fieldnames = list(sat_df.columns) + [f"{column_prefix}_in", f"{column_prefix}_distance"]
+    observations.add_fieldnames(new_fieldnames)
     has_a_match = False
     for obs in observations.data:
         lat = obs[lat_fieldname]

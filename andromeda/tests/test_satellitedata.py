@@ -87,6 +87,10 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(obs["Number"], 222)
         self.assertEqual(obs["sat_in"], 1)
         self.assertEqual(obs["sat_distance"], 0)
+        observations.add_fieldnames.assert_called_with([
+            'sat_Lat-NW', 'sat_Lon-NW', 'sat_Lat-SE', 'sat_Lon-SE', 'Number',
+            'sat_in', 'sat_distance']
+        )
 
     @patch("satellitedata.pd")
     @patch("satellitedata.RGB_SATELLITE_URL")
