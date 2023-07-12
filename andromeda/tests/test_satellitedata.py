@@ -5,13 +5,23 @@ from unittest.mock import Mock, patch
 from satellitedata import (
     add_satellite_rgb_data,
     add_satellite_landcover_data,
-    find_satellite_records,
-    LAT_NW, LAT_SE, LON_NW, LON_SE
+    RGB_SAT_CONFIG,
+    LANDCOVER_SAT_CONFIG
 )
 
-
 def sample_rgb_dataframe():
-    columns = [LAT_NW, LON_NW, LAT_SE, LON_SE, "Number"]
+    columns = ["sat_Lat-NW", "sat_Lon-NW", "sat_Lat-SE", "sat_Lon-SE", "Number"]
+    data = [
+        (40.332624,	-74.749758,	40.313732,	-74.707701, 111),
+        (40.365821,	-74.76289,	40.345643,	-74.720636, 222),
+        (31, 31, 27, 27, 333),
+        (32, 32, 28, 28, 444),
+    ]
+    return pd.DataFrame.from_records(data, columns=columns)
+
+
+def sample_landcover_dataframe():
+    columns = ["land_Lat-NW", "land_Lon-NW", "land_Lat-SE", "land_Lon-SE", "Number"]
     data = [
         (40.332624,	-74.749758,	40.313732,	-74.707701, 111),
         (40.365821,	-74.76289,	40.345643,	-74.720636, 222),
@@ -41,9 +51,8 @@ def sample_observation_data():
 
 class TestSatelliteData(unittest.TestCase):
     @patch("satellitedata.pd")
-    @patch("satellitedata.RGB_SATELLITE_URL")
-    def test_add_satellite_rgb_data_distance(self, mock_rgb_url, mock_pd):
-        columns = [LAT_NW, LON_NW, LAT_SE, LON_SE, "Number"]
+    def test_add_satellite_rgb_data_distance(self, mock_pd):
+        columns = ["sat_Lat-NW", "sat_Lon-NW", "sat_Lat-SE", "sat_Lon-SE", "Number"]
         data = [
             (31, 31, 27, 27, 111),
             (32, 32, 30, 30, 222),
@@ -93,8 +102,7 @@ class TestSatelliteData(unittest.TestCase):
         )
 
     @patch("satellitedata.pd")
-    @patch("satellitedata.RGB_SATELLITE_URL")
-    def test_add_satellite_rgb_data(self, mock_rgb_url, mock_pd):
+    def test_add_satellite_rgb_data(self, mock_pd):
         sat_df = sample_rgb_dataframe()
         mock_pd.read_csv.return_value = sat_df
         observations = Mock(data=sample_observation_data())
@@ -116,7 +124,7 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.data[2]["sat_in"], 0)
         self.assertLess(observations.data[2]["sat_distance"], 0.1)
         self.assertEqual(observations.add_warning.called, False)
-        mock_pd.read_csv.assert_called_with(mock_rgb_url)
+        mock_pd.read_csv.assert_called_with(RGB_SAT_CONFIG.url)
 
     @patch("satellitedata.pd")
     def test_add_satellite_rgb_data_not_in_region(self, mock_pd):
@@ -158,9 +166,8 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.add_warning.called, False)
 
     @patch("satellitedata.pd")
-    @patch("satellitedata.LANDCOVER_SATELLITE_URL")
-    def test_add_satellite_landcover_data(self, mock_lc_url, mock_pd):
-        sat_df = sample_rgb_dataframe()
+    def test_add_satellite_landcover_data(self, mock_pd):
+        sat_df = sample_landcover_dataframe()
         mock_pd.read_csv.return_value = sat_df
         observations = Mock(data=sample_observation_data())
         add_satellite_landcover_data(
@@ -175,4 +182,4 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.data[2]["id"], "p3")
         self.assertEqual(observations.data[2].get("Number"), 111)
         self.assertEqual(observations.add_warning.called, False)
-        mock_pd.read_csv.assert_called_with(mock_lc_url)
+        mock_pd.read_csv.assert_called_with(LANDCOVER_SAT_CONFIG.url)
