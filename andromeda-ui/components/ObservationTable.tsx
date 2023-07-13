@@ -34,15 +34,17 @@ export default function ObservationTable(props: ObservationTableProps) {
                 {x[colname]}
             </td>;
         })
+        let imageLink= null;
+        if (x.Image_Link) {
+            imageLink = <Image width={50} height={50}
+                            src={x.Image_Link}
+                            alt={x.Image_Label}
+                            title={x.Image_Link} />
+        }
         return <tr key={x.Image_Label}>
             <td className={TD_CLASSNAME + " sticky left-0 bg-white"}>{x.Image_Label}</td>
             <td className={TD_CLASSNAME}>
-                <Image
-                    width={50}
-                    height={50}
-                    src={x.Image_Link}
-                    alt={x.Image_Label}
-                    title={x.Image_Link} />
+                {imageLink}
             </td>
             <td className={TD_CLASSNAME}>
                 {x.Date}
