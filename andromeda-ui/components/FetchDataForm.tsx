@@ -39,5 +39,8 @@ export default function FetchDataForm(props: FetchDataFormProps) {
         <div className="my-2">
             <ColoredButton disabled={disableFetchButton} label="Fetch Observations" color="blue" onClick={onClickFetch} />
         </div>
+        <p className="text-sm mt-4" >
+            Note: The RGB and landcover satellite data is specific to the Princeton, NJ area, as it was developed for QUEST 2023.
+        </p>
     </>;
 }
