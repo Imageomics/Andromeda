@@ -3,29 +3,56 @@ import pandas as pd
 import shapely
 import geopandas
 
-# 4 columns representing bounds of the satellite data
-LAT_NW = "sat_Lat-NW"
-LON_NW = "sat_Lon-NW"
-LAT_SE = "sat_Lat-SE"
-LON_SE = "sat_Lon-SE"
-RGB_SATELLITE_URL = os.environ.get(
-    "ANDROMEDA_RGB_SATELLITE_URL",
-    "https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
+
+class SatConfig(object):
+    def __init__(self, column_prefix, fields, url_env_variable, url_default):
+        self.column_prefix = column_prefix
+        self.fields = fields
+        self.url = os.environ.get(url_env_variable, url_default)
+
+
+RGB_SAT_CONFIG = SatConfig(
+    column_prefix="sat",
+    fields={ # fieldnames in the CSV representing bounds of the satellite data
+        "LAT_NW": "sat_Lat-NW",
+        "LON_NW": "sat_Lon-NW",
+        "LAT_SE": "sat_Lat-SE",
+        "LON_SE": "sat_Lon-SE"
+    },
+    url_env_variable="ANDROMEDA_RGB_SATELLITE_URL",
+    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
 )
-LANDCOVER_SATELLITE_URL = os.environ.get("ANDROMEDA_LANDCOVER_URL")
+
+LANDCOVER_SAT_CONFIG = SatConfig(
+    column_prefix="land",
+    fields={ # fieldnames in the CSV representing bounds of the satellite data
+        "LAT_NW": "land_Lat-NW",
+        "LON_NW": "land_Lon-NW",
+        "LAT_SE": "land_Lat-SE",
+        "LON_SE": "land_Lon-SE"
+    },
+    url_env_variable="ANDROMEDA_LANDCOVER_URL",
+    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/landcover-nj-2023.csv"
+)
 
 
-def make_shapely_box(row):
-    return shapely.box(row[LAT_SE], row[LON_NW], row[LAT_NW], row[LON_SE])
+def make_shapely_box(row, fields):
+    lat_se = fields["LAT_SE"]
+    lon_nw = fields["LON_NW"]
+    lat_nw = fields["LAT_NW"]
+    lon_se = fields["LON_SE"]
+    return shapely.box(row[lat_se], row[lon_nw], row[lat_nw], row[lon_se])
 
 
-def read_satellite_data(url):
-    sat_df = pd.read_csv(url)
-    sat_geo_series = geopandas.GeoSeries(sat_df.apply(make_shapely_box, axis=1))
+def read_satellite_data(config):
+    sat_df = pd.read_csv(config.url)
+    box_df = sat_df.apply(make_shapely_box, axis=1, fields=config.fields)
+    sat_geo_series = geopandas.GeoSeries(box_df)
     return sat_df, sat_geo_series
 
 
-def find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix):
+def find_satellite_records(sat_df, sat_geo_series, lat, long, config):
+    column_prefix = config.column_prefix
     point = shapely.Point(lat, long)
     # Compute distances to the center of all satellite regions to our point
     distances = sat_geo_series.centroid.distance(point)
@@ -44,8 +71,9 @@ def find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix):
     return matches.to_dict(orient="records")
 
 
-def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, column_prefix, url):
-    sat_df, sat_geo_series = read_satellite_data(url)
+def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, config):
+    sat_df, sat_geo_series = read_satellite_data(config)
+    column_prefix = config.column_prefix
     new_fieldnames = list(sat_df.columns) + [f"{column_prefix}_in", f"{column_prefix}_distance"]
     observations.add_fieldnames(new_fieldnames)
     has_a_match = False
@@ -53,7 +81,7 @@ def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, column_p
         lat = obs[lat_fieldname]
         long = obs[long_fieldname]
         if lat and long:
-            matches = find_satellite_records(sat_df, sat_geo_series, lat, long, column_prefix)
+            matches = find_satellite_records(sat_df, sat_geo_series, lat, long, config)
             if matches:
                 if len(matches) > 1:
                     observations.add_warning("multiple_sat_matches")
@@ -64,13 +92,10 @@ def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, column_p
 
 
 def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
-    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, "sat", 
-                           RGB_SATELLITE_URL)
+    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname,
+                           RGB_SAT_CONFIG)
 
 
 def add_satellite_landcover_data(observations, lat_fieldname, long_fieldname):
-    if LANDCOVER_SATELLITE_URL:
-        merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, "land_type",
-                               LANDCOVER_SATELLITE_URL)
-    else:
-        observations.add_warning("landcover_not_setup")
+    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname,
+                            LANDCOVER_SAT_CONFIG)
