@@ -32,7 +32,7 @@ LANDCOVER_SAT_CONFIG = SatConfig(
         "LON_SE": "land_Lon-SE"
     },
     url_env_variable="ANDROMEDA_LANDCOVER_URL",
-    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/landcover-changes/datasets/satelliteData/landcover-nj-2023-7-12.csv"
+    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/landcover-nj-2023.csv"
 )
 
 
