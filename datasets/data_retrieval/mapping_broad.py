@@ -246,15 +246,7 @@ def get_aoi_feature_areas(layer, aoi):
                                     length_unit = 9001, # meters
                                     area_unit = 9001, 
                                     calculation_type = 'preserveShape', 
-                                    spatial_ref = aoi_spatial_ref)
-###
-    # area = arcgis.geometry.areas_and_lengths(polygons = intersection[0], 
-    #                                          length_unit= 9001, 
-    #                                          area_unit=9001, 
-    #                                          calculation_type='geodesic', 
-    #                                          spatial_ref = spatial_ref)
-###            
-
+                                    spatial_ref = aoi_spatial_ref)      
 
         # Add row to DataFrame
         feature_areas.loc[len(feature_areas)] = {'Region_Label': region_label, 
@@ -270,11 +262,6 @@ def get_landcover_percentages(feature_areas):
     
     Parameters:
     -----------
-    layer - ArcGIS map layer to query.
-    lat - Float. Latitude to center on.
-    lon - Float. Longitude to center on.
-    radius - Float. Fraction of a mile to use as side length for area of interest square.
-    aoi - Area of interest. ArcGIS Polygon object.
     feature_areas - DataFrame containing regions and the area of their intersection with the given area of interest (lat/lon).
 
     Returns:
@@ -282,8 +269,6 @@ def get_landcover_percentages(feature_areas):
     region_percents - Dictionary of percentage of land in area of interest covered by each region category (index: Grassy, Dense Wood, Woody, Suburban, Watery, Urban).
 
     '''
-    #aoi = get_area_of_interest(lat, lon, radius)
-    #feature_areas = get_aoi_feature_areas(layer, aoi)
     total_area = 0
     region_percents = {'GRASSY': 0,
                     'DENSE_WOOD': 0,
@@ -331,7 +316,8 @@ def get_broad_regions(input_filename, output_filename, retries=3):
                 if ref_label in processed_data.ref_label.values:
                     logging.info(f"Skipping row {i} - {ref_label} as it's already processed.")
                     continue
-
+                
+                # Get 1-mi box centered at given lat-lon values
                 aoi = get_area_of_interest(lat, lon, 0.5)
 
                 for attempt in range(retries):
