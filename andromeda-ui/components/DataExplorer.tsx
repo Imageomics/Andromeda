@@ -8,13 +8,14 @@ import ImageGrid from "../components/ImageGrid";
 import { useState, useRef } from 'react';
 
 const DEFAULT_IMAGE_SIZE = 40;
-const DEFAULT_POINT_SCALING = 1.0;
-const GRID_SIZE = 600;
+const GRID_SIZE = 500;
 const THUMBNAIL_SIZE = 100;
 
 interface DataExplorerProps {
     images: any[];
     setImageData: any;
+    pointScaling: number;
+    setPointScaling: (scaling: number) => void
     weights: any | undefined;
     datasetID: string | undefined;
     columnSettings: any;
@@ -25,9 +26,10 @@ interface DataExplorerProps {
 
 
 export default function DataExplorer(props: DataExplorerProps) {
-    const { images, setImageData, weights, datasetID, columnSettings, drFunc, rdrFunc, onClickBack } = props;
+    const { images, setImageData, pointScaling, setPointScaling,
+        weights, datasetID, columnSettings,
+        drFunc, rdrFunc, onClickBack } = props;
     const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
-    const [pointScaling, setPointScaling] = useState<number>(DEFAULT_POINT_SCALING);
     const [showLabel, setShowLabel] = useState<boolean>(true);
     const [showImage, setShowImage] = useState<boolean>(true);
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
@@ -127,7 +129,7 @@ export default function DataExplorer(props: DataExplorerProps) {
                     onImageMoved={onImageMoved}
                     images={images}
                 />
-                <div className="flex gap-2 my-2">
+                <div className="flex gap-2 my-2 mr-2">
                     <ColoredButton
                         label="Back"
                         disabled={false}

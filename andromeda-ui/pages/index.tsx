@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
-import { uploadDataset, dimensionalReduction, reverseDimensionalReduction } from "../backend/dataset";
+import { uploadDataset, dimensionalReduction, reverseDimensionalReduction,
+  calculatePointScaling } from "../backend/dataset";
 import React, { useState } from 'react';
 import UploadFile from '../components/UploadFile';
 import ConfigureDataset from "../components/ConfigureDataset";
@@ -11,6 +12,7 @@ const DataExplorer = dynamic(() => import("../components/DataExplorer"), {
 import { showError } from "../util/toast";
 import { parseCSVFile, createColumnDetails, createColumnSettings } from "../backend/parseCSV";
 
+const DEFAULT_POINT_SCALING = 1.0;
 
 export default function Home() {
   const [datasetID, setDatasetID] = useState<string>();
@@ -18,6 +20,7 @@ export default function Home() {
   const [weightData, setWeightData] = useState<any[]>();
   const [columnDetails, setColumnDetails] = useState<any>();
   const [columnSettings, setColumnSettings] = useState<any>();
+  const [pointScaling, setPointScaling] = useState<number>(DEFAULT_POINT_SCALING);
 
   async function uploadFile(selectedFile: any) {
     try {
@@ -53,6 +56,7 @@ export default function Home() {
     try {
       const result = await dimensionalReduction(id, weights, columnSettings)
       setDatasetID(id);
+      setPointScaling(calculatePointScaling(result.images));
       setImageData(result.images);
       setWeightData(result.weights);
       return result;
@@ -99,6 +103,8 @@ export default function Home() {
           rdrFunc={performReverseDimensionalReduction}
           columnSettings={columnSettings}
           onClickBack={showEditConfig}
+          pointScaling={pointScaling}
+          setPointScaling={setPointScaling}
         />
       </>;
   } else {
