@@ -1,4 +1,4 @@
-const CHECKBOXES_PER_ROW = 10;
+const CHECKBOXES_PER_ROW = 6;
 
 interface SelectColumnsListrProps {
     columns: string[];
