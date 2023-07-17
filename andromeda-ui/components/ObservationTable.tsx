@@ -28,7 +28,10 @@ export default function ObservationTable(props: ObservationTableProps) {
     if (observations.length > 0) {
         extraColumns = Object.keys(observations[0]).filter((x) => !KNOWN_COLUMNS.has(x))
     }
-    const rows = observations.slice(0, maxObs).map((x) => {
+    // since the default order of observations is date ascending reverse
+    // show we are showing the most recent observations
+    const exampleObservations = observations.slice().reverse().slice(0, maxObs);
+    const rows = exampleObservations.map((x) => {
         const extraColumnValues = extraColumns.map(colname => {
             return <td key={colname + "_" + x.Image_Label} className={TD_CLASSNAME}>
                 {x[colname]}
