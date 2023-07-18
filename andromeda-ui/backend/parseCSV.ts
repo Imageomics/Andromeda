@@ -1,23 +1,5 @@
 import Papa from "papaparse";
 
-const DEFAULT_UNSELECTED_COLUMNS = new Set([
-  "sat_Lat-Center",
-  "sat_Lon-Center",
-  "sat_Lat-NW",
-  "sat_Lon-NW",
-  "sat_Lat-SE",
-  "sat_Lon-SE",
-  "land_Lat-Center",
-  "land_Lon-Center",
-  "land_Lat-NW",
-  "land_Lon-NW",
-  "land_Lat-SE",
-  "land_Lon-SE",
-  "sat_in",
-  "land_in",
-  "Seconds"
-])
-
 export async function parseCSVFile(file: File) {
   // Wrap Papa.parse in a promise to allow async/await usage
   const promise: any = new Promise((resolve, reject) => {
@@ -121,25 +103,27 @@ export function createColumnDetails(rows: any[]) {
   };
 }
 
-function isDefaultSelectedColName(colName: string) {
-  return !DEFAULT_UNSELECTED_COLUMNS.has(colName);
+export function groupColumnsByType(columns: string[], ancillaryColumnSet: Set<string>) {
+  return {
+      regularColumns: columns.filter((colname) => !ancillaryColumnSet.has(colname)),
+      ancillaryColumns: columns.filter((colname) => ancillaryColumnSet.has(colname))
+  };
 }
 
-export function getDefaultSelectedColumns(columnDetails: any) {
-  const selectedColumns = columnDetails.columns.slice();
-  return selectedColumns.filter(isDefaultSelectedColName);
-}
-
-export function createColumnSettings(columnDetails: any) {
+export function createColumnSettings(columnDetails: any, columnConfig: any) {
   // column settings are the user adjustable values
   // that determine how the CSV file is used by the MDS code
   let url = undefined;
   if (columnDetails.urls.length > 0) {
     url = columnDetails.urls[0];
   }
+  const { regularColumns, ancillaryColumns} = groupColumnsByType(
+    columnDetails.columns,
+    new Set(columnConfig.ancillary_columns));
   return {
     label: columnDetails.labels[0],
     url: url,
-    selected: getDefaultSelectedColumns(columnDetails),
+    selected: regularColumns,
+    ancillaryColumns: ancillaryColumns
   };
 }

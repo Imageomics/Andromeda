@@ -138,3 +138,9 @@ class TestDataset(unittest.TestCase):
         result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
         self.assertEqual(result.status_code, 200)
         mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, add_landcover_data=True)
+
+    def test_get_get_column_config(self):
+        client = app.test_client()
+        result = client.get(f"/api/column-config")
+        self.assertEqual(result.status_code, 200)
+        self.assertIn("ancillary_columns", result.json.keys())

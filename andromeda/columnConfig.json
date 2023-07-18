@@ -1,0 +1,21 @@
+{
+    "ancillary_columns": [
+        "sat_Lat-Center",
+        "sat_Lon-Center",
+        "sat_Lat-NW",
+        "sat_Lon-NW",
+        "sat_Lat-SE",
+        "sat_Lon-SE",
+        "land_Lat-Center",
+        "land_Lon-Center",
+        "land_Lat-NW",
+        "land_Lon-NW",
+        "land_Lat-SE",
+        "land_Lon-SE",
+        "sat_in",
+        "land_in",
+        "sat_distance",
+        "land_distance",
+        "Seconds"
+    ]
+}

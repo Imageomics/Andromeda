@@ -66,3 +66,7 @@ export function calculatePointScaling(images: any[]) {
     return 1.0; // default scaling
   }
 }
+
+export async function getColumnConfig() {
+  return await fetch_json(apiURL("/column-config"), {});
+}
