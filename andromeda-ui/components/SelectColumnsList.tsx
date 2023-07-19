@@ -1,4 +1,4 @@
-const CHECKBOXES_PER_ROW = 10;
+const CHECKBOXES_PER_ROW = 6;
 
 interface SelectColumnsListrProps {
     columns: string[];
@@ -17,7 +17,6 @@ function groupItems(items: string[], size: number) {
 
 export default function SelectColumnsList(props: SelectColumnsListrProps) {
     const { columns, selectedColumns, changeSelectedColumn } = props
-    const items = columns.slice();
     const groupedItems = groupItems(columns, CHECKBOXES_PER_ROW)
     const columnTableRows = groupedItems.map((columnNamesSubset: string[], idx: number) => {
         console.log(idx, columnNamesSubset);
@@ -39,7 +38,7 @@ export default function SelectColumnsList(props: SelectColumnsListrProps) {
             {checkboxes}
         </tr>
     });
-    return <table className="">
+    return <table className="ml-1">
         <tbody>
             {columnTableRows}
         </tbody>

@@ -138,3 +138,13 @@ Read all observations for iNaturalist user and return as a CSV file.
     ...
     ```
 NOTE: Since the result is a CSV file no warnings will be returned.
+
+### Get column configuration settings
+Retrieve configuration about ancillary column names
+- GET __/api/column-config/__
+  - Output
+    ```
+     "ancillary_columns": [
+        "sat_Lat-Center", ...
+     ]
+    ```

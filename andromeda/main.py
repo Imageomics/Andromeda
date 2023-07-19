@@ -1,4 +1,5 @@
 import os
+import json
 import datetime
 from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
@@ -7,6 +8,8 @@ from dataset import DatasetStore
 from inaturalist import get_inaturalist_observations, create_csv_str
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
+COLUMN_CONFIG = os.environ.get('ANDROMEDA_COLUMN_CONFIG', 'columnConfig.json')
+
 app = Flask(__name__)
 if os.environ.get('ANDROMEDA_DEV_MODE'):
     print("Warning: Disabling CORS checking for local development.")
@@ -135,3 +138,10 @@ def csv_reponse_for_observations(fieldnames, observations, user_id):
         mimetype="text/csv",
         headers={"Content-disposition":
                 f"attachment; filename=andromeda_inaturalist_{user_id}_{now_str}.csv"})        
+
+
+@app.route('/api/column-config', methods=['GET'])
+def get_column_config():
+    with open(COLUMN_CONFIG, 'r') as infile:
+        payload = json.load(infile)
+    return jsonify(payload)

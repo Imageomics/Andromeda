@@ -1,7 +1,7 @@
 import SimpleSelect from "../components/SimpleSelect";
 import SelectColumnsList from "../components/SelectColumnsList";
 import ColoredButton from './ColoredButton';
-import { showError } from "../util/toast";
+import { groupColumnsByType } from "../backend/parseCSV";
 
 interface ConfigureDatasetProps {
     columnDetails: any;
@@ -39,6 +39,21 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
             setValue={setURLColumnName}
             values={columnDetails.urls} />
     }
+    const {regularColumns, ancillaryColumns} = groupColumnsByType(
+        columnDetails.columns,
+        new Set(columnSettings.ancillaryColumns)
+    )
+
+    let selectAncillaryColumns = null;
+    if (ancillaryColumns.length) {
+        selectAncillaryColumns = <>
+            <div className="text-md font-medium">Ancillary Columns</div>
+            <SelectColumnsList
+                columns={ancillaryColumns}
+                selectedColumns={columnSettings.selected}
+                changeSelectedColumn={changeSelectedColumn} />
+        </>
+    }
 
     return <div>
         <h2 className="text-xl mb-2 font-bold">Configure Visualization</h2>
@@ -56,9 +71,10 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
         <div>
             <div className="text-md font-medium">Columns</div>
             <SelectColumnsList
-                columns={columnDetails.columns}
+                columns={regularColumns}
                 selectedColumns={columnSettings.selected}
                 changeSelectedColumn={changeSelectedColumn} />
+            {selectAncillaryColumns}
         </div>
         <div className="mt-4 flex gap-2">
             <ColoredButton

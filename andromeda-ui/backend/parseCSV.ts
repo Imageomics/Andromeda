@@ -103,16 +103,27 @@ export function createColumnDetails(rows: any[]) {
   };
 }
 
-export function createColumnSettings(columnDetails: any) {
+export function groupColumnsByType(columns: string[], ancillaryColumnSet: Set<string>) {
+  return {
+      regularColumns: columns.filter((colname) => !ancillaryColumnSet.has(colname)),
+      ancillaryColumns: columns.filter((colname) => ancillaryColumnSet.has(colname))
+  };
+}
+
+export function createColumnSettings(columnDetails: any, columnConfig: any) {
   // column settings are the user adjustable values
   // that determine how the CSV file is used by the MDS code
   let url = undefined;
   if (columnDetails.urls.length > 0) {
     url = columnDetails.urls[0];
   }
+  const { regularColumns, ancillaryColumns} = groupColumnsByType(
+    columnDetails.columns,
+    new Set(columnConfig.ancillary_columns));
   return {
     label: columnDetails.labels[0],
     url: url,
-    selected: columnDetails.columns.slice(),
+    selected: regularColumns,
+    ancillaryColumns: ancillaryColumns
   };
 }

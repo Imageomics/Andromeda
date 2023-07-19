@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 import { uploadDataset, dimensionalReduction, reverseDimensionalReduction,
-  calculatePointScaling } from "../backend/dataset";
+  calculatePointScaling, getColumnConfig } from "../backend/dataset";
 import React, { useState } from 'react';
 import UploadFile from '../components/UploadFile';
 import ConfigureDataset from "../components/ConfigureDataset";
@@ -27,7 +27,8 @@ export default function Home() {
       const result = await uploadDataset(selectedFile);
       const rows = await parseCSVFile(selectedFile);
       const details = createColumnDetails(rows);
-      const settings = createColumnSettings(details);
+      const columnConfig = await getColumnConfig();
+      const settings = createColumnSettings(details, columnConfig);
       setDatasetID(result.id);
       setColumnDetails(details);
       setColumnSettings(settings);
@@ -84,10 +85,6 @@ export default function Home() {
       const initialWeights = { all: 1.0 / columnSettings.selected.length };
       await performDimensionalReduction(datasetID, initialWeights);
     }
-  }
-
-  function selectedFileChanged() {
-
   }
 
   let content = null;
