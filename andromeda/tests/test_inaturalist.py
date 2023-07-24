@@ -4,6 +4,8 @@ from unittest.mock import patch
 from inaturalist import (
     get_inaturalist_observations,
     create_csv_str,
+    BadObservationException,
+    OBSERVED_ON_MISSING_MSG
 )
 
 
@@ -104,3 +106,21 @@ class TestINaturalist(unittest.TestCase):
         self.assertEqual(
             result.strip(), "Image_Label,Image_Link\np1,https://example.com/p1.png"
         )
+
+    @patch("inaturalist.get_observations")
+    def test_get_inaturalist_observations_no_observed(self, mock_get_observations):
+        item = {
+            "photos": [{"url": "https://example.com/p1_square.png"}],
+            "p1": ["ABC"],
+            "place_guess": "Duke University",
+            "user": {"login": "bob"},
+            "species_guess": "Equus grevyi",
+        }
+        mock_get_observations.return_value = {"results": [item]}
+
+        with self.assertRaises(BadObservationException) as raised_exception:
+            get_inaturalist_observations(
+                user_id="user-1",
+                add_sat_rgb_data=False,
+                add_landcover_data=False)
+        self.assertEqual(str(raised_exception.exception), OBSERVED_ON_MISSING_MSG)

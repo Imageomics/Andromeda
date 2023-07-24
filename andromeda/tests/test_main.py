@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 from io import BytesIO
 from main import app
-
+from inaturalist import BadObservationException, OBSERVED_ON_MISSING_MSG
 
 class TestDataset(unittest.TestCase):
     @patch("main.DatasetStore")
@@ -138,6 +138,14 @@ class TestDataset(unittest.TestCase):
         result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
         self.assertEqual(result.status_code, 200)
         mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, add_landcover_data=True)
+
+    @patch("main.get_inaturalist_observations")
+    def test_get_inaturalist_bad_observation(self, mock_get_inaturalist_observations):
+        mock_get_inaturalist_observations.side_effect = BadObservationException(OBSERVED_ON_MISSING_MSG)
+        client = app.test_client()
+        result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
+        self.assertEqual(result.status_code, 400)
+        self.assertIn("missing the 'Observed' date/time", result.text)
 
     def test_get_get_column_config(self):
         client = app.test_client()
