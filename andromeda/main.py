@@ -5,7 +5,7 @@ from flask import Flask, Response, request, jsonify, abort, json
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
-from inaturalist import get_inaturalist_observations, create_csv_str
+from inaturalist import get_inaturalist_observations, create_csv_str, BadObservationException
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 COLUMN_CONFIG = os.environ.get('ANDROMEDA_COLUMN_CONFIG', 'columnConfig.json')
@@ -112,23 +112,26 @@ def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
     add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
     add_landcover_data = get_boolean_param(request, "add_landcover_data")
-    observations = get_inaturalist_observations(user_id=user_id,
-                                                 add_sat_rgb_data=add_sat_rgb_data,
-                                                 add_landcover_data=add_landcover_data)
-    if format == "json":
-        return jsonify({
-            "user_id": user_id,
-            "data": observations.data,
-            "warnings": list(observations.warnings)
-        })
-    elif format == "csv":
-        return csv_reponse_for_observations(
-            fieldnames=observations.fieldnames,
-            observations=observations.data,
-            user_id=user_id
-        )
-    else:
-        abort(400, "Unsupported format parameter value " + format)
+    try:
+        observations = get_inaturalist_observations(user_id=user_id,
+                                                    add_sat_rgb_data=add_sat_rgb_data,
+                                                    add_landcover_data=add_landcover_data)
+        if format == "json":
+            return jsonify({
+                "user_id": user_id,
+                "data": observations.data,
+                "warnings": list(observations.warnings)
+            })
+        elif format == "csv":
+            return csv_reponse_for_observations(
+                fieldnames=observations.fieldnames,
+                observations=observations.data,
+                user_id=user_id
+            )
+        else:
+            abort(400, "Unsupported format parameter value " + format)
+    except BadObservationException as ex:
+        abort(400, str(ex))
 
 
 def csv_reponse_for_observations(fieldnames, observations, user_id):

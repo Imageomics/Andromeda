@@ -26,6 +26,14 @@ CSV_FIELDS = [
     LAT_FIELD,
     LON_FIELD,
 ]
+OBSERVED_ON_MISSING_MSG = """
+One or more observations are missing the 'Observed' date/time value.
+Please manually add this information to the observation(s) in the inaturalist.org website.
+"""
+
+
+class BadObservationException(Exception):
+    pass
 
 
 class Observations(object):
@@ -50,6 +58,9 @@ def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data):
     observations = Observations(fieldnames=CSV_FIELDS[:])
     observations_response = get_observations(user_id=user_id, page="all")
     for obs in observations_response["results"]:
+        observed_on = obs.get("observed_on")
+        if not observed_on:
+            raise BadObservationException(OBSERVED_ON_MISSING_MSG)
         idx += 1
         label = f"p{idx}"
         df = pd.DataFrame.from_dict(obs, orient="index")
@@ -59,7 +70,7 @@ def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data):
             image_url = obs.get("photos")[0].get("url").replace("square", "medium")
         else:
             image_url = None
-        observed_on = pd.to_datetime(obs.get("observed_on"))
+        observed_on = pd.to_datetime(observed_on)
         observed_seconds = (
             observed_on.hour * 3600 + observed_on.minute * 60 + observed_on.second
         )
