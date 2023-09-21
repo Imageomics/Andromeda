@@ -13,7 +13,7 @@ COLUMN_CONFIG = os.environ.get('ANDROMEDA_COLUMN_CONFIG', 'columnConfig.json')
 app = Flask(__name__)
 if os.environ.get('ANDROMEDA_DEV_MODE'):
     print("Warning: Disabling CORS checking for local development.")
-    CORS(app, origins=["http://127.0.0.1:3000"]) # Disable CORS so local react app can use the API
+    CORS(app, origins=["http://localhost:3000"]) # Disable CORS so local react app can use the API
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) # ensure the upload destination exists
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200 MB
