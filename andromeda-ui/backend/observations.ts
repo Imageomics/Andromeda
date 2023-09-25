@@ -1,7 +1,8 @@
 import { fetch_json, apiURL } from "./util";
 
-export async function fetchObservations(iNatUser: string, addSatRGB: boolean, addLandCover: boolean) {
-    const url = makeObservationURL(iNatUser, addSatRGB, addLandCover, "json");
+export async function fetchObservations(iNatUser: string, addLandCover: boolean,
+  maxObs: number) {
+    const url = makeObservationURL(iNatUser, addLandCover, "json", maxObs);
     return await fetch_json(url, {
       method: "GET",
       headers: {
@@ -10,12 +11,21 @@ export async function fetchObservations(iNatUser: string, addSatRGB: boolean, ad
     });
 }
 
-export function makeObservationURL(iNatUser: string, addSatRGB: boolean, addLandCover: boolean, format: "json" | "csv") {
-  let base_url = "/inaturalist/" + iNatUser;
-  if (format) {
-    base_url += "?format=" + format;
+export function makeObservationURL(iNatUser: string, addLandCover: boolean, 
+      format: "json" | "csv", maxObs?: number) {
+  let base_url = "/inaturalist/" + iNatUser + "?format=" + format;
+  if (maxObs) {
+    base_url += "&limit=" + maxObs;
   }
-  base_url += "&add_sat_rgb_data=" + addSatRGB;
   base_url += "&add_landcover_data=" + addLandCover;
   return apiURL(base_url);
+}
+
+export function downloadSecondsEstimate(numObservations: number) {
+  const seconds = numObservations * 5;
+  if (seconds < 60) {
+    return seconds + "seconds";
+  } else {
+    return Math.ceil(seconds / 60) + " minutes"
+  }
 }

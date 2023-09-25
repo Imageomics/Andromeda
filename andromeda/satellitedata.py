@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import shapely
 import geopandas
+import latloncover
+import time
+from functools import lru_cache
 
 
 class SatConfig(object):
@@ -96,6 +99,18 @@ def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
                            RGB_SAT_CONFIG)
 
 
+@lru_cache(maxsize=32)
+def get_landcoverage_classification(lat, lon):
+    return latloncover.get_classification(lat, lon)
+
+
 def add_satellite_landcover_data(observations, lat_fieldname, long_fieldname):
-    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname,
-                            LANDCOVER_SAT_CONFIG)
+    added_new_field_names = False
+    for obs in observations.data:
+        result = get_landcoverage_classification(lat=obs[lat_fieldname], lon=obs[long_fieldname])
+        # Pause between requests to avoid overwhelming the CropScape server
+        time.sleep(0.1)
+        if not added_new_field_names:
+            observations.add_fieldnames(result.keys())
+            added_new_field_names = True
+        obs.update(result)

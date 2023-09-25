@@ -13,7 +13,7 @@ COLUMN_CONFIG = os.environ.get('ANDROMEDA_COLUMN_CONFIG', 'columnConfig.json')
 app = Flask(__name__)
 if os.environ.get('ANDROMEDA_DEV_MODE'):
     print("Warning: Disabling CORS checking for local development.")
-    CORS(app) # Disable CORS so local react app can use the API
+    CORS(app, origins=["http://127.0.0.1:3000"]) # Disable CORS so local react app can use the API
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) # ensure the upload destination exists
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200 MB
@@ -56,6 +56,14 @@ def get_boolean_param(request, param_name):
     return str_value.lower() == "true"
 
 
+def get_int_param(request, param_name):
+    # Return integer value in query parameters, defaults to None
+    str_value = request.args.get(param_name)
+    if str_value:
+        return int(str_value)
+    return None
+
+
 @app.route('/api/dataset/', methods=['POST'])
 def upload_dataset():
     # check if the post request has the file part
@@ -82,7 +90,6 @@ def dimensional_reduction(dataset_id):
     dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
     dataset = dataset_store.get_dataset(dataset_id, json_payload["columnSettings"])
     weights, image_coordinates = dataset.dimensional_reduction(json_payload["weights"])
-
     return jsonify({
         "id": dataset_id,
         "weights": weights,
@@ -112,13 +119,16 @@ def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
     add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
     add_landcover_data = get_boolean_param(request, "add_landcover_data")
+    limit = get_int_param(request, "limit")
     try:
         observations = get_inaturalist_observations(user_id=user_id,
                                                     add_sat_rgb_data=add_sat_rgb_data,
-                                                    add_landcover_data=add_landcover_data)
+                                                    add_landcover_data=add_landcover_data,
+                                                    limit=limit)
         if format == "json":
             return jsonify({
                 "user_id": user_id,
+                "total": observations.total,
                 "data": observations.data,
                 "warnings": list(observations.warnings)
             })

@@ -83,13 +83,14 @@ class TestDataset(unittest.TestCase):
         observations = [{"Image_Label": "p1"}]
         warnings = ["missing_lat_long"]
         mock_get_inaturalist_observations.return_value = Mock(
-            data=observations, warnings=warnings)
+            data=observations, warnings=warnings, total=1)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob")
         self.assertEqual(result.status_code, 200)
         self.assertEqual(
             result.json,
             {
+                'total': 1,
                 "data": [{"Image_Label": "p1"}],
                 "user_id": "bob",
                 "warnings": ["missing_lat_long"],
@@ -117,7 +118,7 @@ class TestDataset(unittest.TestCase):
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_xml(self, mock_get_inaturalist_observations):
-        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[], total=0)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=xml")
         self.assertEqual(result.status_code, 400)
@@ -125,19 +126,21 @@ class TestDataset(unittest.TestCase):
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_add_rgb(self, mock_get_inaturalist_observations):
-        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[], total=0)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=json&add_sat_rgb_data=true")
         self.assertEqual(result.status_code, 200)
-        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=True, add_landcover_data=False)
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=True, 
+                                                             add_landcover_data=False, limit=None)
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_add_landcover(self, mock_get_inaturalist_observations):
-        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[])
+        mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[], total=0)
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
         self.assertEqual(result.status_code, 200)
-        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, add_landcover_data=True)
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, 
+                                                             add_landcover_data=True, limit=None)
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_bad_observation(self, mock_get_inaturalist_observations):

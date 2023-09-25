@@ -5,7 +5,7 @@ import DownloadFileButton from "../../components/DownloadFileButton";
 import FetchDataForm from "../../components/FetchDataForm";
 import WarningNotice from "../../components/WarningNotice";
 import Main from "../../components/Main";
-import { fetchObservations, makeObservationURL } from "../../backend/observations";
+import { fetchObservations, makeObservationURL, downloadSecondsEstimate } from "../../backend/observations";
 import { useState } from 'react';
 import { showError } from "../../util/toast";
 
@@ -29,20 +29,21 @@ function makeMessages(warnings: string[]): string {
 
 export default function GeneratePage() {
     const [iNatUser, setINatUser] = useState<string>("");
-    const [addSatRGBData, setAddSatRGBData] = useState<boolean>(false);
     const [addLandCover, setAddLandCover] = useState<boolean>(false);
     const [warning, setWarning] = useState<string>("");
     const [fetching, setFetching] = useState<boolean>(false);
     const [showObservations, setShowObservations] = useState<boolean>(false);
     const [observations, setObservations] = useState<any[]>([]);
+    const [totalObservations, setTotalObservations] = useState<number>(0);
 
     async function onClickFetch() {
         if (iNatUser) {
             setWarning("");
             setFetching(true);
             try {
-                const result = await fetchObservations(iNatUser, addSatRGBData, addLandCover);
+                const result = await fetchObservations(iNatUser, addLandCover, SHOW_OBS_MAX);
                 setObservations(result.data);
+                setTotalObservations(result.total);
                 if (result.warnings.length) {
                     setWarning(makeMessages(result.warnings));
                     setShowObservations(true);
@@ -75,17 +76,26 @@ export default function GeneratePage() {
     if (warning) {
         warningNotice = <WarningNotice message={warning} />;
     }
+    let downloadingNote = null;
+    if (addLandCover) {
+        const estimatedTimeMsg = downloadSecondsEstimate(totalObservations);
+        downloadingNote = <span className="py-2 ml-2 text-sm italic align-text-bottom">
+            NOTE: Downloading will take ~ {estimatedTimeMsg} for this dataset due to fetching landcover data.
+        </span>;
+    }
     if (showObservations) {
-        const csvURL = makeObservationURL(iNatUser, addSatRGBData, addLandCover, "csv");
+        const csvURL = makeObservationURL(iNatUser, addLandCover, "csv");
         content = <div>
             <ObservationTable
                 iNatUser={iNatUser}
                 observations={observations}
+                totalObservations={totalObservations}
                 maxObs={SHOW_OBS_MAX} />
             {warningNotice}
             <div className="flex gap-2 my-2">
                 <ColoredButton label="Back" color="white" onClick={onClickBack} />
                 <DownloadFileButton url={csvURL}  />
+                {downloadingNote}
             </div>
         </div>;
     } else {
@@ -93,8 +103,6 @@ export default function GeneratePage() {
             <FetchDataForm
                 iNatUser={iNatUser}
                 setINatUser={setINatUser}
-                addSatRGBData={addSatRGBData}
-                setAddSatRGBData={setAddSatRGBData}
                 addLandCover={addLandCover}
                 setAddLandCover={setAddLandCover}
                 disableFetchButton={fetching}

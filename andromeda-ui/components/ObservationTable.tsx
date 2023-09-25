@@ -3,6 +3,7 @@ import Image from 'next/image'
 interface ObservationTableProps {
     iNatUser: string | undefined;
     observations: any[];
+    totalObservations: number;
     maxObs: number;
 }
 
@@ -22,15 +23,13 @@ const KNOWN_COLUMNS = new Set([
 ]);
 
 export default function ObservationTable(props: ObservationTableProps) {
-    const { observations, maxObs, iNatUser } = props;
+    const { observations, maxObs, iNatUser, totalObservations } = props;
     const showing = Math.min(observations.length, maxObs);
     let extraColumns: string[] = [];
     if (observations.length > 0) {
         extraColumns = Object.keys(observations[0]).filter((x) => !KNOWN_COLUMNS.has(x))
     }
-    // since the default order of observations is date ascending reverse
-    // show we are showing the most recent observations
-    const exampleObservations = observations.slice().reverse().slice(0, maxObs);
+    const exampleObservations = observations.slice().slice(0, maxObs);
     const rows = exampleObservations.map((x) => {
         const extraColumnValues = extraColumns.map(colname => {
             return <td key={colname + "_" + x.Image_Label} className={TD_CLASSNAME}>
@@ -106,7 +105,7 @@ export default function ObservationTable(props: ObservationTableProps) {
             </table>
         </div>
         <span className="text-sm">
-            Showing {showing} rows ({observations.length} in total)
+            Showing {showing} rows ({totalObservations} in total)
         </span>
 
     </>;
