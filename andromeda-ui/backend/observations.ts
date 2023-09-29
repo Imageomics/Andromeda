@@ -1,5 +1,7 @@
 import { fetch_json, apiURL } from "./util";
 
+export const LANDCOVER_FETCH_SECONDS = 5;
+
 export async function fetchObservations(iNatUser: string, addLandCover: boolean,
   maxObs: number) {
     const url = makeObservationURL(iNatUser, addLandCover, "json", maxObs);
@@ -22,7 +24,7 @@ export function makeObservationURL(iNatUser: string, addLandCover: boolean,
 }
 
 export function downloadSecondsEstimate(numObservations: number) {
-  const seconds = numObservations * 5;
+  const seconds = numObservations * LANDCOVER_FETCH_SECONDS;
   if (seconds < 60) {
     return seconds + "seconds";
   } else {

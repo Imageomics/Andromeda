@@ -1,5 +1,6 @@
 import ColoredButton from "../components/ColoredButton";
 import LatLonCoverNote from "../components/LatLonCoverNote";
+import {LANDCOVER_FETCH_SECONDS} from "../backend/observations";
 
 interface FetchDataFormProps {
     iNatUser: string | undefined;
@@ -29,7 +30,7 @@ export default function FetchDataForm(props: FetchDataFormProps) {
         
             <label title={LAND_COVER_TOOLTIP} className="mr-2 text-md font-medium" htmlFor="AddLandCover">Landcover Satellite Data:</label>
             <input title={LAND_COVER_TOOLTIP} className="accent-cyan-600" type="checkbox" id="AddLandCover" checked={addLandCover} onChange={onChangeLand}></input>
-            <span className="ml-2 text-sm italic align-text-bottom">(takes ~5 seconds per observation)</span>
+            <span className="ml-2 text-sm italic align-text-bottom">(takes ~{LANDCOVER_FETCH_SECONDS} seconds per observation)</span>
         </div>
         <div className="my-2">
             <ColoredButton spinnerOnDisabled={true} disabled={disableFetchButton} label="Fetch Observations" color="blue" onClick={onClickFetch} />
