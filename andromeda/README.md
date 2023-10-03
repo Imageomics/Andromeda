@@ -24,7 +24,7 @@ Andromeda has support for including a custom satellite CSV dataset that users ca
 See [quest-2023-RGB-customData.json](../datasets/satelliteData/quest-2023-RGB-customData.json) for an example.
 
  
-To activate the custom dataset functionality set the `ANDROMEDA_CUSTOM_DATA`.
+To activate the custom dataset functionality set the `ANDROMEDA_CUSTOM_DATA` environment variable.
 For example to activate the `quest-2023-RGB-customData.json` run the following before running the app.
 ```
 export ANDROMEDA_CUSTOM_DATA=../datasets/satelliteData/quest-2023-RGB-customData.json
