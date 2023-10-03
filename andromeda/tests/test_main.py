@@ -1,8 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
+import os
+from unittest.mock import Mock, patch, mock_open
 from io import BytesIO
 from main import app
 from inaturalist import BadObservationException, OBSERVED_ON_MISSING_MSG
+import satellitedata
 
 class TestDataset(unittest.TestCase):
     @patch("main.DatasetStore")
@@ -128,9 +130,9 @@ class TestDataset(unittest.TestCase):
     def test_get_inaturalist_add_rgb(self, mock_get_inaturalist_observations):
         mock_get_inaturalist_observations.return_value = Mock(data=[], warnings=[], total=0)
         client = app.test_client()
-        result = client.get(f"/api/inaturalist/bob?format=json&add_sat_rgb_data=true")
+        result = client.get(f"/api/inaturalist/bob?format=json&add_custom_sat_data=true")
         self.assertEqual(result.status_code, 200)
-        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=True, 
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_custom_sat_data=True, 
                                                              add_landcover_data=False, limit=None)
 
     @patch("main.get_inaturalist_observations")
@@ -139,7 +141,7 @@ class TestDataset(unittest.TestCase):
         client = app.test_client()
         result = client.get(f"/api/inaturalist/bob?format=json&add_landcover_data=true")
         self.assertEqual(result.status_code, 200)
-        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_sat_rgb_data=False, 
+        mock_get_inaturalist_observations.assert_called_with(user_id='bob', add_custom_sat_data=False, 
                                                              add_landcover_data=True, limit=None)
 
     @patch("main.get_inaturalist_observations")
@@ -150,8 +152,25 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(result.status_code, 400)
         self.assertIn("missing the 'Observed' date/time", result.text)
 
-    def test_get_get_column_config(self):
+    def test_get_column_config(self):
         client = app.test_client()
         result = client.get(f"/api/column-config")
         self.assertEqual(result.status_code, 200)
         self.assertIn("ancillary_columns", result.json.keys())
+
+    def test_get_custom_data_config_not_setup(self):
+        client = app.test_client()
+        result = client.get(f"/api/custom-data-config")
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json, None)
+
+    def test_get_custom_data_config(self):
+        client = app.test_client()
+        try:
+            satellitedata.CUSTOM_DATA_PATH = "../datasets/satelliteData/quest-2023-RGB-customData.json"
+            result = client.get(f"/api/custom-data-config")
+        finally:
+            satellitedata.CUSTOM_DATA_PATH = None
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json["label"], "Add RGB Satellite Data")
+        self.assertEqual(result.json["column_prefix"], "sat")

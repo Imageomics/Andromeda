@@ -1,15 +1,14 @@
 import pandas as pd
+import json
 import unittest
 from unittest.mock import Mock, patch
 
 from satellitedata import (
-    add_satellite_rgb_data,
-    add_satellite_landcover_data,
-    RGB_SAT_CONFIG,
-    LANDCOVER_SAT_CONFIG
+    add_custom_satellite_data,
+    add_satellite_landcover_data
 )
 
-def sample_rgb_dataframe():
+def sample_custom_sat_dataframe():
     columns = ["sat_Lat-NW", "sat_Lon-NW", "sat_Lat-SE", "sat_Lon-SE", "Number"]
     data = [
         (40.332624,	-74.749758,	40.313732,	-74.707701, 111),
@@ -50,8 +49,15 @@ def sample_observation_data():
 
 
 class TestSatelliteData(unittest.TestCase):
+    def setUp(self):
+        with open("../datasets/satelliteData/quest-2023-RGB-customData.json") as infile:
+            self.custom_sat_data = json.load(infile)
+        return super().setUp()
+
     @patch("satellitedata.pd")
-    def test_add_satellite_rgb_data_distance(self, mock_pd):
+    @patch("satellitedata.get_custom_sat_data_config")
+    def test_add_custom_satellite_data_distance(self, mock_get_csd_config, mock_pd):
+        mock_get_csd_config.return_value = self.custom_sat_data
         columns = ["sat_Lat-NW", "sat_Lon-NW", "sat_Lat-SE", "sat_Lon-SE", "Number"]
         data = [
             (31, 31, 27, 27, 111),
@@ -76,7 +82,7 @@ class TestSatelliteData(unittest.TestCase):
             },
         ]
         observations = Mock(data=observation_data)
-        add_satellite_rgb_data(
+        add_custom_satellite_data(
             observations=observations,
             lat_fieldname='Lat',
             long_fieldname='Long')
@@ -102,11 +108,13 @@ class TestSatelliteData(unittest.TestCase):
         )
 
     @patch("satellitedata.pd")
-    def test_add_satellite_rgb_data(self, mock_pd):
-        sat_df = sample_rgb_dataframe()
+    @patch("satellitedata.get_custom_sat_data_config")
+    def test_add_custom_satellite_data(self, mock_get_csd_config, mock_pd):
+        mock_get_csd_config.return_value = self.custom_sat_data
+        sat_df = sample_custom_sat_dataframe()
         mock_pd.read_csv.return_value = sat_df
         observations = Mock(data=sample_observation_data())
-        add_satellite_rgb_data(
+        add_custom_satellite_data(
             observations=observations,
             lat_fieldname='Lat',
             long_fieldname='Long')
@@ -124,11 +132,12 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.data[2]["sat_in"], 0)
         self.assertLess(observations.data[2]["sat_distance"], 0.1)
         self.assertEqual(observations.add_warning.called, False)
-        mock_pd.read_csv.assert_called_with(RGB_SAT_CONFIG.url)
 
     @patch("satellitedata.pd")
-    def test_add_satellite_rgb_data_not_in_region(self, mock_pd):
-        sat_df = sample_rgb_dataframe()
+    @patch("satellitedata.get_custom_sat_data_config")
+    def test_add_custom_satellite_data_not_in_region(self, mock_get_csd_config, mock_pd):
+        mock_get_csd_config.return_value = self.custom_sat_data
+        sat_df = sample_custom_sat_dataframe()
         mock_pd.read_csv.return_value = sat_df
         unmatched_lat_long_data = [{
             "id": "p3",
@@ -136,7 +145,7 @@ class TestSatelliteData(unittest.TestCase):
             "Long": -74.75
         }]
         observations = Mock(data=unmatched_lat_long_data)
-        add_satellite_rgb_data(
+        add_custom_satellite_data(
             observations=observations,
             lat_fieldname='Lat',
             long_fieldname='Long')
@@ -147,8 +156,10 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.add_warning.called, False)
 
     @patch("satellitedata.pd")
-    def test_add_satellite_rgb_data_duplicates(self, mock_pd):
-        sat_df = sample_rgb_dataframe()
+    @patch("satellitedata.get_custom_sat_data_config")
+    def test_add_custom_satellite_data_duplicates(self, mock_get_csd_config, mock_pd):
+        mock_get_csd_config.return_value = self.custom_sat_data
+        sat_df = sample_custom_sat_dataframe()
         mock_pd.read_csv.return_value = sat_df
         unmatched_lat_long_data = [{
             "id": "p3",
@@ -156,7 +167,7 @@ class TestSatelliteData(unittest.TestCase):
             "Long": 30
         }]
         observations = Mock(data=unmatched_lat_long_data)
-        add_satellite_rgb_data(
+        add_custom_satellite_data(
             observations=observations,
             lat_fieldname='Lat',
             long_fieldname='Long')
@@ -164,6 +175,21 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.data[0]["id"], "p3")
         self.assertEqual(observations.data[0].get("Number"), 444)
         self.assertEqual(observations.add_warning.called, False)
+
+    @patch("satellitedata.pd")
+    @patch("satellitedata.get_custom_sat_data_config")
+    def test_add_custom_satellite_data_not_setup(self, mock_get_csd_config, mock_pd):
+        mock_get_csd_config.return_value = None
+        sat_df = sample_custom_sat_dataframe()
+        mock_pd.read_csv.return_value = sat_df
+        observations = Mock(data=[])
+        with self.assertRaises(ValueError) as raised_exception:
+            add_custom_satellite_data(
+                observations=observations,
+                lat_fieldname='Lat',
+                long_fieldname='Long')
+        self.assertEqual(str(raised_exception.exception),
+                         "ERROR: Missing custom data satellite data config file.")
 
     @patch("satellitedata.time")
     @patch("satellitedata.get_landcoverage_classification")

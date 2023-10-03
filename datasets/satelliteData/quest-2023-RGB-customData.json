@@ -1,0 +1,12 @@
+{
+    "label": "Add RGB Satellite Data",
+    "note": "Note: The RGB satellite data is specific to the Princeton, NJ area, as it was developed for QUEST 2023.",
+    "column_prefix": "sat",
+    "fields": {
+        "LAT_NW": "sat_Lat-NW",
+        "LON_NW": "sat_Lon-NW",
+        "LAT_SE": "sat_Lat-SE",
+        "LON_SE": "sat_Lon-SE"
+    },
+    "url": "https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
+}

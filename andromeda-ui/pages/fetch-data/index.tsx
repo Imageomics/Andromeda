@@ -5,8 +5,9 @@ import DownloadFileButton from "../../components/DownloadFileButton";
 import FetchDataForm from "../../components/FetchDataForm";
 import WarningNotice from "../../components/WarningNotice";
 import Main from "../../components/Main";
-import { fetchObservations, makeObservationURL, downloadSecondsEstimate } from "../../backend/observations";
-import { useState } from 'react';
+import { fetchObservations, makeObservationURL, downloadSecondsEstimate,
+    getCustomDataConfig } from "../../backend/observations";
+import { useState, useEffect, use } from 'react';
 import { showError } from "../../util/toast";
 
 const SHOW_OBS_MAX = 6;
@@ -30,18 +31,30 @@ function makeMessages(warnings: string[]): string {
 export default function GeneratePage() {
     const [iNatUser, setINatUser] = useState<string>("");
     const [addLandCover, setAddLandCover] = useState<boolean>(false);
+    const [addCustomSatData, setAddCustomSatData] = useState<boolean>(false);
     const [warning, setWarning] = useState<string>("");
     const [fetching, setFetching] = useState<boolean>(false);
     const [showObservations, setShowObservations] = useState<boolean>(false);
     const [observations, setObservations] = useState<any[]>([]);
     const [totalObservations, setTotalObservations] = useState<number>(0);
+    const [loaded, setLoaded] = useState<boolean>(false);
+    const [customSataDataConfig, setCustomSataDataConfig] = useState<any>();
+
+    useEffect(() => {
+        const fetchData = async () => {
+          const result = await getCustomDataConfig()
+          setCustomSataDataConfig(result);
+          setLoaded(true);
+        };
+        fetchData().catch(console.error);
+      }, []);
 
     async function onClickFetch() {
         if (iNatUser) {
             setWarning("");
             setFetching(true);
             try {
-                const result = await fetchObservations(iNatUser, addLandCover, SHOW_OBS_MAX);
+                const result = await fetchObservations(iNatUser, addCustomSatData, addLandCover, SHOW_OBS_MAX);
                 setObservations(result.data);
                 setTotalObservations(result.total);
                 if (result.warnings.length) {
@@ -84,7 +97,7 @@ export default function GeneratePage() {
         </span>;
     }
     if (showObservations) {
-        const csvURL = makeObservationURL(iNatUser, addLandCover, "csv");
+        const csvURL = makeObservationURL(iNatUser, addCustomSatData, addLandCover, "csv");
         content = <div>
             <ObservationTable
                 iNatUser={iNatUser}
@@ -99,16 +112,22 @@ export default function GeneratePage() {
             </div>
         </div>;
     } else {
-        content =  <div>
-            <FetchDataForm
-                iNatUser={iNatUser}
-                setINatUser={setINatUser}
-                addLandCover={addLandCover}
-                setAddLandCover={setAddLandCover}
-                disableFetchButton={fetching}
-                onClickFetch={onClickFetch}/>
-            {warningNotice}
-        </div>
+        if (loaded) {
+            content =  <div>
+                <FetchDataForm
+                    iNatUser={iNatUser}
+                    setINatUser={setINatUser}
+                    addLandCover={addLandCover}
+                    setAddLandCover={setAddLandCover}
+                    customSataDataConfig={customSataDataConfig}
+                    addCustomSatData={addCustomSatData}
+                    setAddCustomSatData={setAddCustomSatData}
+                    disableFetchButton={fetching}
+                    onClickFetch={onClickFetch}/>
+                {warningNotice}
+            </div>
+        }
+
     }
     return <>
         <TitleBar selected="/fetch-data" />

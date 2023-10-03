@@ -2,7 +2,7 @@ import io
 import csv
 import pandas as pd
 import pyinaturalist
-from satellitedata import add_satellite_rgb_data, add_satellite_landcover_data
+from satellitedata import add_custom_satellite_data, add_satellite_landcover_data
 
 LABEL_FIELD = "Image_Label"
 URL_FIELD = "Image_Link"
@@ -77,7 +77,7 @@ def get_label(idx, total_observations, reversed):
     return f"p{num}"
 
 
-def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data, limit):
+def get_inaturalist_observations(user_id, add_custom_sat_data, add_landcover_data, limit):
     idx = 0
     missing_lat_long = False
     obeservation_ary, total_observations = get_observations(user_id=user_id, limit=limit)
@@ -126,8 +126,8 @@ def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data, 
     if missing_lat_long:
         observations.add_warning("missing_lat_long")
 
-    if add_sat_rgb_data:
-        add_satellite_rgb_data(observations, LAT_FIELD, LON_FIELD)
+    if add_custom_sat_data:
+        add_custom_satellite_data(observations, LAT_FIELD, LON_FIELD)
 
     if add_landcover_data:
         add_satellite_landcover_data(observations, LAT_FIELD, LON_FIELD)

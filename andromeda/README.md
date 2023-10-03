@@ -14,6 +14,22 @@ Install depenencies within a python virtual environment:
 pip install -r requirements.txt
 ```
 
+## Custom Dataset
+Andromeda has support for including a custom satellite CSV dataset that users can merge their iNaturalist observation data with. The dataset must have 4 columns representing the lat/lon bounding box to compare against the observation lat/lon. To use this feature a JSON config file must be provided with the following items:
+- label - Label for checkbox in UI describing the CSV dataset
+- note - Note about the dataset
+- column_prefix - prefix to add column names during merging
+- fields - dictionary of LAT_NW,LON_NW,LAT_SE,LON_SE referencing the bounding box columns in the CSV dataset
+
+See [quest-2023-RGB-customData.json](../datasets/satelliteData/quest-2023-RGB-customData.json) for an example.
+
+ 
+To activate the custom dataset functionality set the `ANDROMEDA_CUSTOM_DATA`.
+For example to activate the `quest-2023-RGB-customData.json` run the following before running the app.
+```
+export ANDROMEDA_CUSTOM_DATA=../datasets/satelliteData/quest-2023-RGB-customData.json
+```
+
 ## Running
 
 By default flask performs CORS checking which is useful in production.
@@ -147,4 +163,23 @@ Retrieve configuration about ancillary column names
      "ancillary_columns": [
         "sat_Lat-Center", ...
      ]
+    ```
+
+### Get custom dataset configuration
+Retrieve config settings for the custom satellite dataset
+- GET __/api/custom-data-config/__
+  - Example Output
+    ```
+    {
+        "label": "Add RGB Satellite Data",
+        "note": "Note: The RGB satellite data is specific to the Princeton, NJ area, as it was developed for QUEST 2023.",
+        "column_prefix": "sat",
+        "fields": {
+            "LAT_NW": "sat_Lat-NW",
+            "LON_NW": "sat_Lon-NW",
+            "LAT_SE": "sat_Lat-SE",
+            "LON_SE": "sat_Lon-SE"
+        },
+        "url": "https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
+    }
     ```

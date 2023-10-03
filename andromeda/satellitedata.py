@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import shapely
 import geopandas
@@ -6,37 +7,14 @@ import latloncover
 import time
 from functools import lru_cache
 
+CUSTOM_DATA_PATH = os.environ.get('ANDROMEDA_CUSTOM_DATA')
+
 
 class SatConfig(object):
-    def __init__(self, column_prefix, fields, url_env_variable, url_default):
-        self.column_prefix = column_prefix
-        self.fields = fields
-        self.url = os.environ.get(url_env_variable, url_default)
-
-
-RGB_SAT_CONFIG = SatConfig(
-    column_prefix="sat",
-    fields={ # fieldnames in the CSV representing bounds of the satellite data
-        "LAT_NW": "sat_Lat-NW",
-        "LON_NW": "sat_Lon-NW",
-        "LAT_SE": "sat_Lat-SE",
-        "LON_SE": "sat_Lon-SE"
-    },
-    url_env_variable="ANDROMEDA_RGB_SATELLITE_URL",
-    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
-)
-
-LANDCOVER_SAT_CONFIG = SatConfig(
-    column_prefix="land",
-    fields={ # fieldnames in the CSV representing bounds of the satellite data
-        "LAT_NW": "land_Lat-NW",
-        "LON_NW": "land_Lon-NW",
-        "LAT_SE": "land_Lat-SE",
-        "LON_SE": "land_Lon-SE"
-    },
-    url_env_variable="ANDROMEDA_LANDCOVER_URL",
-    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/landcover-nj-2023.csv"
-)
+    def __init__(self, config_dict):
+        self.column_prefix = config_dict["column_prefix"]
+        self.fields = config_dict["fields"]
+        self.url = config_dict["url"]
 
 
 def make_shapely_box(row, fields):
@@ -94,9 +72,20 @@ def merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, config):
         observations.add_warning("no_sat_matches")
 
 
-def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
-    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname,
-                           RGB_SAT_CONFIG)
+def add_custom_satellite_data(observations, lat_fieldname, long_fieldname):
+    config_dict = get_custom_sat_data_config()
+    if config_dict:
+        config = SatConfig(config_dict)
+        merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname, config)
+    else:
+        raise ValueError("ERROR: Missing custom data satellite data config file.")
+
+
+def get_custom_sat_data_config():
+    if CUSTOM_DATA_PATH:
+        with open(CUSTOM_DATA_PATH, 'r') as infile:
+            return json.load(infile)
+    return None
 
 
 @lru_cache(maxsize=32)

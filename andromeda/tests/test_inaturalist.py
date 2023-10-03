@@ -39,7 +39,7 @@ class TestINaturalist(unittest.TestCase):
         mock_get_observations.return_value = ([item], 1)
 
         observations = get_inaturalist_observations(user_id="user-1",
-                                                    add_sat_rgb_data=False,
+                                                    add_custom_sat_data=False,
                                                     add_landcover_data=False,
                                                     limit=None)
         self.assertEqual(len(observations.data), 1)
@@ -58,37 +58,37 @@ class TestINaturalist(unittest.TestCase):
     def test_get_inaturalist_observations_with_limit(self, mock_get_observations):
         mock_get_observations.return_value = ([], 1)
         get_inaturalist_observations(user_id="user-1",
-                                     add_sat_rgb_data=False,
+                                     add_custom_sat_data=False,
                                      add_landcover_data=False,
                                      limit=10)
         mock_get_observations.assert_called_with(user_id='user-1', limit=10)
 
     @patch("inaturalist.get_observations")
-    @patch("inaturalist.add_satellite_rgb_data")
+    @patch("inaturalist.add_custom_satellite_data")
     @patch("inaturalist.add_satellite_landcover_data")
-    def test_get_inaturalist_observations_rgb(self, mock_add_satellite_landcover_data,
-                                              mock_add_satellite_rgb_data,
-                                              mock_get_observations):
+    def test_get_inaturalist_observations_custom(self, mock_add_satellite_landcover_data,
+                                                 mock_add_custom_satellite_data,
+                                                 mock_get_observations):
         mock_get_observations.return_value = ([], 0)
         observations = get_inaturalist_observations(user_id="user-1",
-                                                    add_sat_rgb_data=True,
+                                                    add_custom_sat_data=True,
                                                     add_landcover_data=False,
                                                     limit=None)
-        mock_add_satellite_rgb_data.assert_called_with(observations, 'Lat', 'Long')
+        mock_add_custom_satellite_data.assert_called_with(observations, 'Lat', 'Long')
         mock_add_satellite_landcover_data.assert_not_called()
 
     @patch("inaturalist.get_observations")
-    @patch("inaturalist.add_satellite_rgb_data")
+    @patch("inaturalist.add_custom_satellite_data")
     @patch("inaturalist.add_satellite_landcover_data")
     def test_get_inaturalist_observations_landcover(self, mock_add_satellite_landcover_data,
-                                                    mock_add_satellite_rgb_data,
+                                                    mock_add_custom_satellite_data,
                                                     mock_get_observations):
         mock_get_observations.return_value = ([], 0)
         observations = get_inaturalist_observations(user_id="user-1",
-                                                    add_sat_rgb_data=False,
+                                                    add_custom_sat_data=False,
                                                     add_landcover_data=True,
                                                     limit=None)
-        mock_add_satellite_rgb_data.assert_not_called()
+        mock_add_custom_satellite_data.assert_not_called()
         mock_add_satellite_landcover_data.assert_called_with(observations, 'Lat', 'Long')
 
     @patch("inaturalist.get_observations")
@@ -105,7 +105,7 @@ class TestINaturalist(unittest.TestCase):
         mock_get_observations.return_value = ([item], 1)
 
         observations = get_inaturalist_observations(user_id="user-1",
-                                                    add_sat_rgb_data=False,
+                                                    add_custom_sat_data=False,
                                                     add_landcover_data=False,
                                                     limit=None)
         self.assertEqual(len(observations.data), 1)
@@ -137,7 +137,7 @@ class TestINaturalist(unittest.TestCase):
         with self.assertRaises(BadObservationException) as raised_exception:
             get_inaturalist_observations(
                 user_id="user-1",
-                add_sat_rgb_data=False,
+                add_custom_sat_data=False,
                 add_landcover_data=False,
                 limit=None)
         self.assertEqual(str(raised_exception.exception), OBSERVED_ON_MISSING_MSG)

@@ -6,9 +6,11 @@ from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
 from inaturalist import get_inaturalist_observations, create_csv_str, BadObservationException
+from satellitedata import get_custom_sat_data_config
 
 UPLOAD_FOLDER = os.environ.get('ANDROMEDA_UPLOAD_DIR', '/tmp/andromeda_uploads')
 COLUMN_CONFIG = os.environ.get('ANDROMEDA_COLUMN_CONFIG', 'columnConfig.json')
+
 
 app = Flask(__name__)
 if os.environ.get('ANDROMEDA_DEV_MODE'):
@@ -117,12 +119,12 @@ def inverse_dimensional_reduction(dataset_id):
 @app.route('/api/inaturalist/<user_id>', methods=['GET'])
 def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
-    add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
+    add_custom_sat_data = get_boolean_param(request, "add_custom_sat_data")
     add_landcover_data = get_boolean_param(request, "add_landcover_data")
     limit = get_int_param(request, "limit")
     try:
         observations = get_inaturalist_observations(user_id=user_id,
-                                                    add_sat_rgb_data=add_sat_rgb_data,
+                                                    add_custom_sat_data=add_custom_sat_data,
                                                     add_landcover_data=add_landcover_data,
                                                     limit=limit)
         if format == "json":
@@ -158,3 +160,8 @@ def get_column_config():
     with open(COLUMN_CONFIG, 'r') as infile:
         payload = json.load(infile)
     return jsonify(payload)
+
+
+@app.route('/api/custom-data-config', methods=['GET'])
+def get_custom_data_config():
+    return jsonify(get_custom_sat_data_config())
