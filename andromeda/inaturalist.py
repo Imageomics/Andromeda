@@ -64,7 +64,7 @@ def get_observations(user_id, limit=None):
         # when using per_page the observations are sorted with the most recent first
         observations_dict = pyinaturalist.get_observations(user_id=user_id, per_page=limit)
     else:
-        # when using per_page the observations are sorted descending
+        # when using page="all" the observations are sorted descending
         observations_dict = pyinaturalist.get_observations(user_id=user_id, page="all")
     return observations_dict["results"], total_observations
 
