@@ -6,7 +6,7 @@ import FetchDataForm from "../../components/FetchDataForm";
 import WarningNotice from "../../components/WarningNotice";
 import Main from "../../components/Main";
 import { fetchObservations, makeObservationURL, downloadSecondsEstimate,
-    getCustomDataConfig } from "../../backend/observations";
+    getCustomDataConfig, createObservationDataset } from "../../backend/observations";
 import { useState, useEffect, use } from 'react';
 import { showError } from "../../util/toast";
 
@@ -39,6 +39,9 @@ export default function GeneratePage() {
     const [totalObservations, setTotalObservations] = useState<number>(0);
     const [loaded, setLoaded] = useState<boolean>(false);
     const [customSatDataConfig, setCustomSatDataConfig] = useState<any>();
+    const [generateObservationDataset, setGenerateObservationDataset] = useState<boolean>(false);
+    const [observationsURL, setObservationsURL] = useState<string>();
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +51,17 @@ export default function GeneratePage() {
         };
         fetchData().catch(console.error);
       }, []);
+
+    useEffect(() => {
+        const createDataset = async () => {
+            if (generateObservationDataset) {
+                const result = await createObservationDataset(iNatUser, addCustomSatData, addLandCover)
+                setObservationsURL(result.url);
+                setGenerateObservationDataset(false);
+            }
+        };
+        createDataset().catch(console.error);
+    }, [generateObservationDataset]);
 
     async function onClickFetch() {
         if (iNatUser) {
@@ -66,6 +80,7 @@ export default function GeneratePage() {
                         setShowObservations(false);
                     } else {
                         setShowObservations(true);
+                        setGenerateObservationDataset(true);
                     }
                 }
             } catch (error: any) {
@@ -93,7 +108,7 @@ export default function GeneratePage() {
     if (addLandCover) {
         const estimatedTimeMsg = downloadSecondsEstimate(totalObservations);
         downloadingNote = <span className="py-2 ml-2 text-sm italic align-text-bottom">
-            NOTE: Downloading will take ~ {estimatedTimeMsg} for this dataset due to fetching landcover data.
+            NOTE: Generating the CSV for all observations will take ~ {estimatedTimeMsg} due to fetching landcover data.
         </span>;
     }
     if (showObservations) {
@@ -107,7 +122,7 @@ export default function GeneratePage() {
             {warningNotice}
             <div className="flex gap-2 my-2">
                 <ColoredButton label="Back" color="white" onClick={onClickBack} />
-                <DownloadFileButton url={csvURL}  />
+                <DownloadFileButton url={observationsURL}  />
                 {downloadingNote}
             </div>
         </div>;
@@ -133,6 +148,7 @@ export default function GeneratePage() {
         <TitleBar selected="/fetch-data" />
         <Main>
             {content}
+
         </Main>
     </>;
 }

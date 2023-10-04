@@ -1,11 +1,16 @@
 import {buttonColorClassName} from "./ButtonColors";
+import Spinner from "./Spinner";
 
 interface DownloadFileButtonProps {
-    url: string;
+    url: string | undefined;
 }
 
 export default function DownloadFileButton(props: DownloadFileButtonProps) {
     const { url } = props;
     const className = buttonColorClassName("blue");
-    return <a className={className} download href={url}>Download CSV</a>;
+    if (url) {
+        return <a className={className} download href={url}>Download CSV</a>;
+    } else {
+        return <button className={className} disabled><Spinner /> Download CSV</button>;
+    }
 }

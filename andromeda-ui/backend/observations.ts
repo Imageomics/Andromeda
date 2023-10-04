@@ -42,3 +42,21 @@ export async function getCustomDataConfig() {
     },
   });
 }
+
+export function makeObservationDatasetURL(iNatUser: string, addCustomSatData: boolean, addLandCover: boolean) {
+  let url = `/inaturalist/${iNatUser}/dataset?` + 
+            `add_custom_sat_data=${addCustomSatData}&add_landcover_data=${addLandCover}`;
+  return apiURL(url);
+}
+
+export async function createObservationDataset(iNatUser: string, addCustomSatData: boolean,
+      addLandCover: boolean) {
+      const url = makeObservationDatasetURL(iNatUser, addCustomSatData, addLandCover);
+      console.log(url);
+      return await fetch_json(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+}

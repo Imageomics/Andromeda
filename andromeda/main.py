@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-from flask import Flask, Response, request, jsonify, abort, json
+from flask import Flask, Response, request, jsonify, abort, json, send_file
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
@@ -83,6 +83,14 @@ def upload_dataset():
     )
 
 
+@app.route('/api/dataset/<uuid:dataset_id>', methods=['GET'])
+def download_dataset(dataset_id):
+    filename = request.args.get("filename", "json")
+    dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
+    path = dataset_store.get_dataset_path(dataset_id)
+    return send_file(path, as_attachment=True, download_name=filename)
+
+
 @app.route('/api/dataset/<uuid:dataset_id>/dimensional-reduction', methods=['POST'])
 def dimensional_reduction(dataset_id):
     json_payload = request.get_json()
@@ -145,14 +153,40 @@ def get_inaturalist(user_id):
     except BadObservationException as ex:
         abort(400, str(ex))
 
+def get_csv_filename(user_id):
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    return f"andromeda_inaturalist_{user_id}_{now_str}.csv"
 
 def csv_reponse_for_observations(fieldnames, observations, user_id):
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    filename = get_csv_filename(user_id)
     return Response(
         create_csv_str(fieldnames=fieldnames, observations=observations),
         mimetype="text/csv",
-        headers={"Content-disposition":
-                f"attachment; filename=andromeda_inaturalist_{user_id}_{now_str}.csv"})        
+        headers={"Content-disposition": f"attachment; filename={filename}"})
+
+
+@app.route('/api/inaturalist/<user_id>/dataset', methods=['POST'])
+def create_inaturalist_dataset(user_id):
+    format = request.args.get("format", "json").lower()
+    add_custom_sat_data = get_boolean_param(request, "add_custom_sat_data")
+    add_landcover_data = get_boolean_param(request, "add_landcover_data")
+    try:
+        observations = get_inaturalist_observations(user_id=user_id,
+                                                    add_custom_sat_data=add_custom_sat_data,
+                                                    add_landcover_data=add_landcover_data,
+                                                    limit=None)
+        csv_content = create_csv_str(fieldnames=observations.fieldnames,
+                                     observations=observations.data)
+        dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
+        dataset = dataset_store.create_dataset_with_content(csv_content)
+        filename = get_csv_filename(user_id=user_id)
+        download_url = f"{request.host_url}/api/dataset/{dataset.id}?filename={filename}"
+        return jsonify({
+            "id": dataset.id,
+            "url": download_url
+        })
+    except BadObservationException as ex:
+        abort(400, str(ex))
 
 
 @app.route('/api/column-config', methods=['GET'])

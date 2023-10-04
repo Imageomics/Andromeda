@@ -9,10 +9,20 @@ class DatasetStore(object):
     def __init__(self, base_directory):
         self.base_directory = base_directory
 
-    def create_dataset(self, csv_file):
+    def _create_new_Dataset(self):
         dataset_id = str(uuid.uuid4())
         dataset = Dataset(dataset_id, self.base_directory)
+        return dataset
+
+    def create_dataset(self, csv_file):
+        dataset = self._create_new_Dataset()
         csv_file.save(dataset.get_path())
+        return dataset
+
+    def create_dataset_with_content(self, csv_content):
+        dataset = self._create_new_Dataset()
+        with open(dataset.get_path(), 'w') as outfile:
+            outfile.write(csv_content)
         return dataset
 
     def get_dataset(self, dataset_id, column_settings):
@@ -26,6 +36,10 @@ class DatasetStore(object):
         if not dataset.exists():
             abort(404, f"No dataset found for id {dataset_id}.")
         return dataset
+    
+    def get_dataset_path(self, dataset_id):
+        dataset = Dataset(dataset_id, self.base_directory)
+        return dataset.get_path()
 
 
 class Dataset(object):
