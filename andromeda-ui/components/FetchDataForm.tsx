@@ -9,7 +9,7 @@ interface FetchDataFormProps {
     onClickFetch: () => void;
     addLandCover: boolean;
     setAddLandCover: (add: boolean) => void;
-    customSataDataConfig: any | null;
+    customSatDataConfig: any | null;
     addCustomSatData: boolean;
     setAddCustomSatData: (add: boolean) => void;
 }
@@ -18,7 +18,7 @@ const LAND_COVER_TOOLTIP = "Add small and big landcoverage classification column
 
 export default function FetchDataForm(props: FetchDataFormProps) {
     const {iNatUser, setINatUser, disableFetchButton, onClickFetch, addLandCover, setAddLandCover,
-        customSataDataConfig, addCustomSatData, setAddCustomSatData} = props;
+        customSatDataConfig, addCustomSatData, setAddCustomSatData} = props;
     function onChangeLand(event: any){
         setAddLandCover(event.target.checked)
     }
@@ -27,10 +27,10 @@ export default function FetchDataForm(props: FetchDataFormProps) {
     }
     let customSatDataDiv = null;
     let customSatDataNote = null;
-    if (customSataDataConfig) {
+    if (customSatDataConfig) {
         customSatDataDiv = <div className="py-1">
             <label className="mr-2 text-md font-medium" htmlFor="AddCustomSatData">
-                    {customSataDataConfig.label}:
+                    {customSatDataConfig.label}:
                 </label>
                 <input
                     type="checkbox" id="AddCustomSatData"
@@ -38,9 +38,9 @@ export default function FetchDataForm(props: FetchDataFormProps) {
                     onChange={onChangeAddCustomSatData}>
                 </input>
         </div>
-        if (customSataDataConfig.note) {
+        if (customSatDataConfig.note) {
             customSatDataNote = <p className="text-sm mt-4 max-w-prose" >
-                {customSataDataConfig.note}
+                {customSatDataConfig.note}
             </p>
         }
     }

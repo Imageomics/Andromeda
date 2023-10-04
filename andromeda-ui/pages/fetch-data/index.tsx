@@ -38,12 +38,12 @@ export default function GeneratePage() {
     const [observations, setObservations] = useState<any[]>([]);
     const [totalObservations, setTotalObservations] = useState<number>(0);
     const [loaded, setLoaded] = useState<boolean>(false);
-    const [customSataDataConfig, setCustomSataDataConfig] = useState<any>();
+    const [customSatDataConfig, setCustomSatDataConfig] = useState<any>();
 
     useEffect(() => {
         const fetchData = async () => {
           const result = await getCustomDataConfig()
-          setCustomSataDataConfig(result);
+          setCustomSatDataConfig(result);
           setLoaded(true);
         };
         fetchData().catch(console.error);
@@ -119,7 +119,7 @@ export default function GeneratePage() {
                     setINatUser={setINatUser}
                     addLandCover={addLandCover}
                     setAddLandCover={setAddLandCover}
-                    customSataDataConfig={customSataDataConfig}
+                    customSatDataConfig={customSatDataConfig}
                     addCustomSatData={addCustomSatData}
                     setAddCustomSatData={setAddCustomSatData}
                     disableFetchButton={fetching}
