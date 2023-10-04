@@ -68,6 +68,15 @@ Upload a CSV file and return an id for use with `dimensional-reduction` and `inv
     { "id": "<dataset_id>" }
     ```
 
+### Download a dataset
+- GET __/api/dataset/<dataset_id>?filename=<filename>__
+  - Input
+    - dataset_id: id of the dataset to download
+    - filename: optional filename to use for Content-Disposition
+  - Output
+    - dataset CSV content
+
+
 ### Perform dimensional reduction
 Calculate image coordinates for the given weights.
 - POST __/api/dataset/<dataset_id>/dimensional-reduction__
@@ -138,6 +147,22 @@ Read all observations for iNaturalist user and return as a CSV file.
     ...
     ```
 NOTE: Since the result is a CSV file no warnings will be returned.
+
+### Create a dataset for some iNaturalist observations
+Creates a dataset for iNaturalist observations returns JSON withthe dataset id and a URL for downloading
+- POST __/api/inaturalist/<inat_user>/dataset?add_sat_rgb_data=<add_sat_rgb_data>&add_landcover_data=<add_landcover_data>
+  - Input
+    - inat_user: iNaturalist username to create a CSV for
+    - add_sat_rgb_data: Pass 'true' to include RGB data in resulting CSV
+    - add_landcover_data:  Pass 'true' to include landcover data in resulting CSV
+  - Example Output
+    ```
+{
+  "id": "...",
+  "url": ".../api/dataset/...",
+  "warnings": [...]
+}
+    ```
 
 ### Get column configuration settings
 Retrieve configuration about ancillary column names
