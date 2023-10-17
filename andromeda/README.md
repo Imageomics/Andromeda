@@ -149,7 +149,7 @@ Read all observations for iNaturalist user and return as a CSV file.
 NOTE: Since the result is a CSV file no warnings will be returned.
 
 ### Create a dataset for some iNaturalist observations
-Creates a dataset for iNaturalist observations returns JSON withthe dataset id and a URL for downloading
+Creates a dataset for iNaturalist observations returns JSON with the dataset id and a URL for downloading
 - POST __/api/inaturalist/<inat_user>/dataset?add_sat_rgb_data=<add_sat_rgb_data>&add_landcover_data=<add_landcover_data>
   - Input
     - inat_user: iNaturalist username to create a CSV for
