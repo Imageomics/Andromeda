@@ -5,8 +5,7 @@ from unittest.mock import Mock, patch
 from satellitedata import (
     add_satellite_rgb_data,
     add_satellite_landcover_data,
-    RGB_SAT_CONFIG,
-    LANDCOVER_SAT_CONFIG
+    RGB_SAT_CONFIG
 )
 
 def sample_rgb_dataframe():
@@ -165,10 +164,14 @@ class TestSatelliteData(unittest.TestCase):
         self.assertEqual(observations.data[0].get("Number"), 444)
         self.assertEqual(observations.add_warning.called, False)
 
-    @patch("satellitedata.pd")
-    def test_add_satellite_landcover_data(self, mock_pd):
-        sat_df = sample_landcover_dataframe()
-        mock_pd.read_csv.return_value = sat_df
+    @patch("satellitedata.time")
+    @patch("satellitedata.get_landcoverage_classification")
+    def test_add_satellite_landcover_data(self, mock_get_lc_classification, mock_time):
+        mock_get_lc_classification.side_effect = [
+            {'A_small': 0.426},
+            {'A_small': 0.326},
+            {'A_small': 0.226},
+        ]
         observations = Mock(data=sample_observation_data())
         add_satellite_landcover_data(
             observations=observations,
@@ -176,10 +179,9 @@ class TestSatelliteData(unittest.TestCase):
             long_fieldname='Long')
         self.assertEqual(len(observations.data), 3)
         self.assertEqual(observations.data[0]["id"], "p1")
-        self.assertEqual(observations.data[0]["Number"], 111)
+        self.assertEqual(observations.data[0]["A_small"], 0.426)
         self.assertEqual(observations.data[1]["id"], "p2")
-        self.assertEqual(observations.data[1]["Number"], 222)
+        self.assertEqual(observations.data[1]["A_small"], 0.326)
         self.assertEqual(observations.data[2]["id"], "p3")
-        self.assertEqual(observations.data[2].get("Number"), 111)
+        self.assertEqual(observations.data[2]["A_small"], 0.226)
         self.assertEqual(observations.add_warning.called, False)
-        mock_pd.read_csv.assert_called_with(LANDCOVER_SAT_CONFIG.url)
