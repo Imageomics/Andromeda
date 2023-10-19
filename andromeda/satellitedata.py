@@ -2,6 +2,13 @@ import os
 import pandas as pd
 import shapely
 import geopandas
+import latloncover
+import time
+from functools import lru_cache
+
+LATLONCOVER_REQUESTS_SLEEP_SEC = 0.1
+LATLONCOVER_RETRIES = 2
+LATLONCOVER_RETRY_SLEEP_SEC = 0.5
 
 
 class SatConfig(object):
@@ -21,18 +28,6 @@ RGB_SAT_CONFIG = SatConfig(
     },
     url_env_variable="ANDROMEDA_RGB_SATELLITE_URL",
     url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/satRgbFinal4.csv"
-)
-
-LANDCOVER_SAT_CONFIG = SatConfig(
-    column_prefix="land",
-    fields={ # fieldnames in the CSV representing bounds of the satellite data
-        "LAT_NW": "land_Lat-NW",
-        "LON_NW": "land_Lon-NW",
-        "LAT_SE": "land_Lat-SE",
-        "LON_SE": "land_Lon-SE"
-    },
-    url_env_variable="ANDROMEDA_LANDCOVER_URL",
-    url_default="https://raw.githubusercontent.com/Imageomics/Andromeda/main/datasets/satelliteData/landcover-nj-2023.csv"
 )
 
 
@@ -96,6 +91,26 @@ def add_satellite_rgb_data(observations, lat_fieldname, long_fieldname):
                            RGB_SAT_CONFIG)
 
 
+@lru_cache(maxsize=32)
+def get_landcoverage_classification(lat, lon):
+    retries = LATLONCOVER_RETRIES
+    while True:
+        try:
+            return latloncover.get_classification(lat, lon)
+        except:
+            if retries:
+                time.sleep(LATLONCOVER_RETRY_SLEEP_SEC)
+            else:
+                raise
+
+
 def add_satellite_landcover_data(observations, lat_fieldname, long_fieldname):
-    merge_lat_long_csv_url(observations, lat_fieldname, long_fieldname,
-                            LANDCOVER_SAT_CONFIG)
+    added_new_field_names = False
+    for obs in observations.data:
+        result = get_landcoverage_classification(lat=obs[lat_fieldname], lon=obs[long_fieldname])
+        # Pause between requests to avoid overwhelming the CropScape server used by LatLonCover
+        time.sleep(LATLONCOVER_REQUESTS_SLEEP_SEC)
+        if not added_new_field_names:
+            observations.add_fieldnames(result.keys())
+            added_new_field_names = True
+        obs.update(result)

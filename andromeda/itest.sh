@@ -31,5 +31,10 @@ curl http://127.0.0.1:5000/api/inaturalist/lhouse
 echo "Fetching inaturalist observations as CSV"
 curl http://127.0.0.1:5000/api/inaturalist/lhouse?format=csv
 
+echo "Save a dataset from iNaturalist observations"
+URL=$(curl -X POST http://127.0.0.1:5000/api/inaturalist/lhouse/dataset | jq -r .url)
+echo "Downloading the saved dataset"
+curl $URL
+
 echo ""
 echo "Done"

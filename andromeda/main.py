@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-from flask import Flask, Response, request, jsonify, abort, json
+from flask import Flask, Response, request, jsonify, abort, json, send_file
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 from dataset import DatasetStore
@@ -56,6 +56,14 @@ def get_boolean_param(request, param_name):
     return str_value.lower() == "true"
 
 
+def get_int_param(request, param_name):
+    # Return integer value in query parameters, defaults to None
+    str_value = request.args.get(param_name)
+    if str_value:
+        return int(str_value)
+    return None
+
+
 @app.route('/api/dataset/', methods=['POST'])
 def upload_dataset():
     # check if the post request has the file part
@@ -71,6 +79,14 @@ def upload_dataset():
             "id": dataset.id
         }
     )
+
+
+@app.route('/api/dataset/<uuid:dataset_id>', methods=['GET'])
+def download_dataset(dataset_id):
+    filename = request.args.get("filename", "json")
+    dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
+    path = dataset_store.get_dataset_path(dataset_id)
+    return send_file(path, as_attachment=True, download_name=filename)
 
 
 @app.route('/api/dataset/<uuid:dataset_id>/dimensional-reduction', methods=['POST'])
@@ -112,13 +128,16 @@ def get_inaturalist(user_id):
     format = request.args.get("format", "json").lower()
     add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
     add_landcover_data = get_boolean_param(request, "add_landcover_data")
+    limit = get_int_param(request, "limit")
     try:
         observations = get_inaturalist_observations(user_id=user_id,
                                                     add_sat_rgb_data=add_sat_rgb_data,
-                                                    add_landcover_data=add_landcover_data)
+                                                    add_landcover_data=add_landcover_data,
+                                                    limit=limit)
         if format == "json":
             return jsonify({
                 "user_id": user_id,
+                "total": observations.total,
                 "data": observations.data,
                 "warnings": list(observations.warnings)
             })
@@ -134,13 +153,41 @@ def get_inaturalist(user_id):
         abort(400, str(ex))
 
 
-def csv_reponse_for_observations(fieldnames, observations, user_id):
+def get_csv_filename(user_id):
     now_str = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    return f"andromeda_inaturalist_{user_id}_{now_str}.csv"
+
+
+def csv_reponse_for_observations(fieldnames, observations, user_id):
+    filename = get_csv_filename(user_id)
     return Response(
         create_csv_str(fieldnames=fieldnames, observations=observations),
         mimetype="text/csv",
-        headers={"Content-disposition":
-                f"attachment; filename=andromeda_inaturalist_{user_id}_{now_str}.csv"})        
+        headers={"Content-disposition": f"attachment; filename={filename}"})
+
+
+@app.route('/api/inaturalist/<user_id>/dataset', methods=['POST'])
+def create_inaturalist_dataset(user_id):
+    add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
+    add_landcover_data = get_boolean_param(request, "add_landcover_data")
+    try:
+        observations = get_inaturalist_observations(user_id=user_id,
+                                                    add_sat_rgb_data=add_sat_rgb_data,
+                                                    add_landcover_data=add_landcover_data,
+                                                    limit=None)
+        csv_content = create_csv_str(fieldnames=observations.fieldnames,
+                                     observations=observations.data)
+        dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
+        dataset = dataset_store.create_dataset_with_content(csv_content)
+        filename = get_csv_filename(user_id=user_id)
+        download_url = f"{request.host_url}/api/dataset/{dataset.id}?filename={filename}"
+        return jsonify({
+            "id": dataset.id,
+            "url": download_url,
+            "warnings": list(observations.warnings)
+        })
+    except BadObservationException as ex:
+        abort(400, str(ex))
 
 
 @app.route('/api/column-config', methods=['GET'])
