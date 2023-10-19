@@ -2,23 +2,41 @@
 Andromeda is a website that allows a user to perform dimensional reduction on an uploaded CSV file.
 
 ## Requirements
-Deployment requires [docker-compose](https://www.docker.com/).
+Deployment requires [Docker](https://www.docker.com/).
 
 Development requires [python3](https://www.python.org/) and [nodejs](https://nodejs.org/).
 
 ## Deployment
-To deploy the website on a machine running docker run the following commands:
+Our primary deployment environment is [Hugging Face Spaces](https://huggingface.co/spaces/imageomics/Andromeda).
+To deploy the website on a machine running Docker run the following commands:
+1. Clone our Hugging Face Andromeda repository, which uses this GitHub repository as a submodule.
 ```bash
-git clone https://github.com/Imageomics/Andromeda.git
-cd Andromeda/
-cp example.env .env
-docker-compose up -d
+git clone --recurse-submodules git@hf.co/spaces/imageomics/Andromeda # or use https://huggingface.co/spaces/imageomics/Andromeda
 ```
-The `-d` flag runs the website in the background. For troubleshooting remove this flag to more easily monitor the deployment.
+(optional) If you want to use or test a different branch of the Andromeda repository, checkout the desired branch.
+```bash
+cd Andromeda/Andromeda
+git checkout <branch>
+cd ..
+```
+2. Build the Docker image.
+```bash
+docker image build -t andromeda .
+```
+3. Run the Docker image.
+```bash
+docker container run -p 7860:7860 andromeda
+```
 
-Once the website finishes launching the website will be available on port 80: [http://localhost](http://localhost).
-Part of the deployment builds the docker containers used by the website, so it may take a few minutes to finish deployment.
-To stop the app run `docker-compose down`.
+While Hugging Face handles SSL encryption automatically, other deployment environments require SSL to be set up manually. One common approach is using a reverse proxy like Nginx. Below are some resources and tutorials that provide guidance on setting up SSL with Nginx in a Docker environment:
+
+- [Configure HTTPS for an Nginx Docker Container (Stackify)](https://stackify.com/configure-nginx-docker-container-https)​
+- [Setup SSL with Docker, NGINX and Lets Encrypt (Programonaut)​](https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt)
+- [Set up SSL on Docker, Nginx Container and Let's Encrypt (SSLWiki)]​(https://sslwiki.org/docker-nginx-letsencrypt)
+- [Install TLS/SSL on Docker Nginx Container With Let’s Encrypt (Dev.to)](https://dev.to/techworldzone/how-to-install-tls-ssl-on-docker-nginx-container-with-let-s-encrypt-5a3n)
+- [NGINX Docker with SSL Encryption (Self-signed) by Mike Polinowski​](https://mpolinowski.github.io/nginx-docker-ssl)
+
+These tutorials cover a range of setups including self-signed certificates, Let's Encrypt, and Certbot. Choose the one (or more) that aligns well with your deployment scenario.
 
 Settings for the app can be changed in `.env`.
 Options for `.env`:
@@ -26,37 +44,10 @@ Options for `.env`:
 - ANDROMEDA_RGB_SATELLITE_URL - URL pointing to a CSV file for joining RGB data
 - ANDROMEDA_LANDCOVER_URL - Optional URL pointing to a CSV file for joining Landcover data
 
-
-### Certbot Setup on AWS
-Certificates can be installed to the EC2 VM using Certbot with Nginx on pip following [EFF instructions](https://certbot.eff.org/instructions?ws=nginx&os=pip).
-```bash
-sudo python3 -m venv /opt/certbot/
-sudo /opt/certbot/bin/pip install --upgrade pip
-sudo /opt/certbot/bin/pip install certbot certbot-nginx
-sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
-```
-And to install Nginx on the Amazon Linux 2023 (following [instructions](https://awswithatiq.com/how-to-install-nginx-in-amazon-linux-2023/)) and run Certbot:
-```bash
-docker-compose down
-sudo dnf update -y
-sudo dnf install nginx -y
-sudo systemctl start nginx
-sudo certbot certonly --nginx
-```
-Following prompted agreements, registration, and specifying andromeda.imageomics.org, the certificates are installed to:
-
-Certificate: `/etc/letsencrypt/live/andromeda.imageomics.org/fullchain.pem`
-
-Key: `/etc/letsencrypt/live/andromeda.imageomics.org/privkey.pem`
-
-Finally, shut down Nginx on the system to avoid interference with the container:
-```bash
-sudo systemctl stop nginx
-docker-compose up -d
-```
-
 ## Development
-To run the website locally without using docker requires two terminal sessions.
+You may use the Docker image for development as described above, but it is not required.
+
+To run the website locally without using Docker requires two terminal sessions.
 1. Python Flask Backend API Server 
 2. Frontend nodejs/react development server
 
