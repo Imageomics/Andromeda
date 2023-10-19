@@ -7,10 +7,10 @@ export default function LatLonCoverNote() {
         from 2022 and is generated using&nbsp;
         <Anchor href="https://github.com/Imageomics/LatLonCover" target="_blank">LatLonCover</Anchor>.
         Columns will be added for landcover data at two scales centered on each observation geocoordinate:
-        &nbsp;
-        <span className="italic font-bold" title="1/2 x 1/2 mile">small</span>
-        &nbsp;and&nbsp;
-        <span className="italic font-bold" title="2 x 2 mile">big</span>.
+        small&nbsp;
+        <span className="whitespace-nowrap">(1/2 x 1/2 mile)</span>
+        &nbsp;and big&nbsp;
+        <span className="whitespace-nowrap">(2 x 2 mile)</span>.
         See&nbsp;
         <Anchor href="https://github.com/Imageomics/LatLonCover/blob/main/cropScapeDocumentation/CDL_subcategories_legendCrse.csv" target="_blank">
         LatLonCover subcategories
