@@ -30,11 +30,11 @@ docker container run -p 7860:7860 andromeda
 
 While Hugging Face handles SSL encryption automatically, other deployment environments require SSL to be set up manually. One common approach is using a reverse proxy like Nginx. Below are some resources and tutorials that provide guidance on setting up SSL with Nginx in a Docker environment:
 
-- [Configure HTTPS for an Nginx Docker Container (Stackify)](https://stackify.com/configure-nginx-docker-container-https)​
-- [Setup SSL with Docker, NGINX and Lets Encrypt (Programonaut)​](https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt)
-- [Set up SSL on Docker, Nginx Container and Let's Encrypt (SSLWiki)]​(https://sslwiki.org/docker-nginx-letsencrypt)
-- [Install TLS/SSL on Docker Nginx Container With Let’s Encrypt (Dev.to)](https://dev.to/techworldzone/how-to-install-tls-ssl-on-docker-nginx-container-with-let-s-encrypt-5a3n)
-- [NGINX Docker with SSL Encryption (Self-signed) by Mike Polinowski​](https://mpolinowski.github.io/nginx-docker-ssl)
+- [Configure HTTPS for an Nginx Docker Container (Stackify)](https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/)​
+- [Setup SSL with Docker, NGINX and Lets Encrypt (Programonaut)​](https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt/)
+- [Set up SSL on Docker, Nginx Container and Let's Encrypt (SSLWiki)](https://sslwiki.org/set-up-ssl-on-docker-nginx-and-lets-encrypt/)
+- [Install TLS/SSL on Docker Nginx Container With Let’s Encrypt (Dev.to)](https://dev.to/macelux/how-to-install-tlsssl-on-docker-nginx-container-with-lets-encrypt-34c5)
+- [NGINX Docker with SSL Encryption (Self-signed) by Mike Polinowski​](https://mpolinowski.github.io/docs/DevOps/NGINX/2020-08-27--nginx-docker-ssl-certs-self-signed/2020-08-27/)
 
 These tutorials cover a range of setups including self-signed certificates, Let's Encrypt, and Certbot. Choose the one (or more) that aligns well with your deployment scenario.
 
