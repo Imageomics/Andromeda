@@ -36,6 +36,7 @@ export default function GeneratePage() {
     const [fetching, setFetching] = useState<boolean>(false);
     const [showObservations, setShowObservations] = useState<boolean>(false);
     const [observations, setObservations] = useState<any[]>([]);
+    const [observationFieldnames, setObservationFieldnames] = useState<string[]>([]);
     const [totalObservations, setTotalObservations] = useState<number>(0);
     const [generateObservationDataset, setGenerateObservationDataset] = useState<boolean>(false);
     const [observationsURL, setObservationsURL] = useState<string>();
@@ -58,6 +59,7 @@ export default function GeneratePage() {
             try {
                 const result = await fetchObservations(iNatUser, addSatRGBData, addLandCover, SHOW_OBS_MAX);
                 setObservations(result.data);
+                setObservationFieldnames(result.fieldnames);
                 setTotalObservations(result.total);
                 setObservationsURL(undefined);
                 if (result.warnings.length) {
@@ -106,6 +108,7 @@ export default function GeneratePage() {
             <ObservationTable
                 iNatUser={iNatUser}
                 observations={observations}
+                observationFieldnames={observationFieldnames}
                 totalObservations={totalObservations}
                 maxObs={SHOW_OBS_MAX} />
             {warningNotice}
