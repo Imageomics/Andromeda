@@ -139,6 +139,7 @@ def get_inaturalist(user_id):
                 "user_id": user_id,
                 "total": observations.total,
                 "data": observations.data,
+                "fieldnames": observations.fieldnames,
                 "warnings": list(observations.warnings)
             })
         elif format == "csv":

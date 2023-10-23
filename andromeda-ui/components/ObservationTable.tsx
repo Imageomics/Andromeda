@@ -3,6 +3,7 @@ import Image from 'next/image'
 interface ObservationTableProps {
     iNatUser: string | undefined;
     observations: any[];
+    observationFieldnames: string[];
     totalObservations: number;
     maxObs: number;
 }
@@ -23,11 +24,11 @@ const KNOWN_COLUMNS = new Set([
 ]);
 
 export default function ObservationTable(props: ObservationTableProps) {
-    const { observations, maxObs, iNatUser, totalObservations} = props;
+    const { observations, observationFieldnames, maxObs, iNatUser, totalObservations} = props;
     const showing = Math.min(observations.length, maxObs);
     let extraColumns: string[] = [];
     if (observations.length > 0) {
-        extraColumns = Object.keys(observations[0]).filter((x) => !KNOWN_COLUMNS.has(x))
+        extraColumns = observationFieldnames.filter((x) => !KNOWN_COLUMNS.has(x))
     }
     const exampleObservations = observations.slice().slice(0, maxObs);
     const rows = exampleObservations.map((x) => {

@@ -80,9 +80,9 @@ def get_label(idx, total_observations, reversed):
 def get_inaturalist_observations(user_id, add_sat_rgb_data, add_landcover_data, limit):
     idx = 0
     missing_lat_long = False
-    obeservation_ary, total_observations = get_observations(user_id=user_id, limit=limit)
+    observation_ary, total_observations = get_observations(user_id=user_id, limit=limit)
     observations = Observations(fieldnames=CSV_FIELDS[:], total=total_observations)
-    for obs in obeservation_ary:
+    for obs in observation_ary:
         observed_on = obs.get("observed_on")
         if not observed_on:
             raise BadObservationException(OBSERVED_ON_MISSING_MSG)
