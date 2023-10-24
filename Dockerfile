@@ -12,7 +12,6 @@ WORKDIR /tmp
 RUN pip3 install gunicorn && pip3 install -r requirements.txt
 
 COPY ./andromeda/. /api
-COPY ./app.py /api/app.py
 COPY --from=builder /src/out /api/static
 WORKDIR /api
 
