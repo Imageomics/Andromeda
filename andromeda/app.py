@@ -7,8 +7,8 @@ def page_not_found(e):
     path = request.path.lstrip('/')
     if path == '':
        path = 'index.html'
-    print(path)
     return send_from_directory('static', path)
 
 if __name__ == '__main__':
    app.run(host="0.0.0.0", port=7860)
+   
