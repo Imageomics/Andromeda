@@ -21,4 +21,4 @@ RUN mkdir /tmp/home
 RUN chmod a+w /tmp/home
 ENV XDG_DATA_HOME=/tmp/home
 
-CMD python app.py
+CMD /api/run.sh
