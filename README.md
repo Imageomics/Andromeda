@@ -8,43 +8,41 @@ Development requires [python3](https://www.python.org/) and [nodejs](https://nod
 
 ## Deployment
 Our primary deployment environment is [Hugging Face Spaces](https://huggingface.co/spaces/imageomics/Andromeda).
-To deploy the website on a machine running Docker run the following commands:
-1. Clone our Hugging Face Andromeda repository, which uses this GitHub repository as a submodule.
-```bash
-git clone --recurse-submodules git@hf.co/spaces/imageomics/Andromeda # or use https://huggingface.co/spaces/imageomics/Andromeda
-```
-(optional) If you want to use or test a different branch of the Andromeda repository, checkout the desired branch.
-```bash
-cd Andromeda/Andromeda
-git checkout <branch>
-cd ..
-```
+
+To build a Docker image from the source code and deploy the container:
+
+1. Clone this repository and navigate into it.
+
 2. Build the Docker image.
 ```bash
 docker image build -t andromeda .
 ```
-3. Run the Docker image.
+
+3. Optionally, set your environment variables in `.env`. See the section below for more information.
 ```bash
-docker container run -p 7860:7860 andromeda
+cp example.env .env # uses the provided example environment variables
 ```
 
-While Hugging Face handles SSL encryption automatically, other deployment environments require SSL to be set up manually. One common approach is using a reverse proxy like Nginx. Below are some resources and tutorials that provide guidance on setting up SSL with Nginx in a Docker environment:
+4. Run the Docker container.
+```bash
+docker container run --env-file .env -p 7860:7860 andromeda
+```
 
-- [Configure HTTPS for an Nginx Docker Container (Stackify)](https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/)​
-- [Setup SSL with Docker, NGINX and Lets Encrypt (Programonaut)​](https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt/)
-- [Set up SSL on Docker, Nginx Container and Let's Encrypt (SSLWiki)](https://sslwiki.org/set-up-ssl-on-docker-nginx-and-lets-encrypt/)
-- [Install TLS/SSL on Docker Nginx Container With Let’s Encrypt (Dev.to)](https://dev.to/macelux/how-to-install-tlsssl-on-docker-nginx-container-with-lets-encrypt-34c5)
-- [NGINX Docker with SSL Encryption (Self-signed) by Mike Polinowski​](https://mpolinowski.github.io/docs/DevOps/NGINX/2020-08-27--nginx-docker-ssl-certs-self-signed/2020-08-27/)
+5. Prepare a simple Dockerfile in a Hugging Face Space. For example:
+```Dockerfile
+FROM ghcr.io/Imageomics/Andromeda:latest
+```
 
-These tutorials cover a range of setups including self-signed certificates, Let's Encrypt, and Certbot. Choose the one (or more) that aligns well with your deployment scenario.
+Hugging Face handles SSL encryption automatically. Deploying in another environment may require additional configuration; previous configurations are discussed in [Prior Configurations](https://github.com/Imageomics/Andromeda/wiki/Prior-Configurations).
 
+If you are interested in running your own QUEST-like class with your own satellite data CSV, you could create a few line Dockerfile, add their CSV, and host their own version Andromeda on their HF account.
 Settings for the app can be changed in `.env`.
 Options for `.env`:
 - BACKEND_WORKERS - number of [workers used by gunicorn](https://docs.gunicorn.org/en/latest/run.html#commonly-used-arguments)
 - ANDROMEDA_RGB_SATELLITE_URL - URL pointing to a CSV file for joining RGB data
 
 ## Development
-You may use the Docker image for development as described above, but it is not required.
+You may use the Docker image for testing during development as described above, but it is not required.
 
 To run the website locally without using Docker requires two terminal sessions.
 1. Python Flask Backend API Server 
