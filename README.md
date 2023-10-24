@@ -35,7 +35,7 @@ FROM ghcr.io/Imageomics/Andromeda:latest
 
 Hugging Face handles SSL encryption automatically. Deploying in another environment may require additional configuration; previous configurations are discussed in [Prior Configurations](https://github.com/Imageomics/Andromeda/wiki/Prior-Configurations).
 
-If you are interested in running your own QUEST-like class with your own satellite data CSV, you could create a few line Dockerfile, add their CSV, and host their own version Andromeda on their HF account.
+If you are interested in running your own QUEST-like class with your own satellite data CSV, you could create a few line Dockerfile, add your CSV, and host your own version Andromeda on your HF account.
 Settings for the app can be changed in `.env`.
 Options for `.env`:
 - BACKEND_WORKERS - number of [workers used by gunicorn](https://docs.gunicorn.org/en/latest/run.html#commonly-used-arguments)
