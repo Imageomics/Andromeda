@@ -16,7 +16,6 @@ Hugging Face handles SSL encryption automatically.
 Deploying in another environment may require additional configuration; previous configurations are discussed in [Prior Configurations](https://github.com/Imageomics/Andromeda/wiki/Prior-Configurations).
 
 ## Development
-You may use the Docker image for testing during development as described above, but it is not required.
 
 To run the website locally without using Docker requires two terminal sessions.
 1. Python Flask Backend API Server: navigate to the `andromeda` folder and run
