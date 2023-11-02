@@ -150,6 +150,24 @@ class TestDataset(unittest.TestCase):
         result = client.post(f"/api/inaturalist/bob/dataset")
         self.assertEqual(result.status_code, 200)
         self.assertEqual(list(result.json.keys()), ["id", "url", "warnings"])
+        self.assertIn("http://localhost", result.json["url"])
+
+    @patch("main.get_inaturalist_observations")
+    @patch.dict('main.os.environ', {"SPACE_HOST": "example.org"})
+    def test_create_inaturalist_dataset_hugging_face(self, mock_get_inaturalist_observations):
+        observations = [{"Image_Label": "p1"}]
+        warnings = ["missing_lat_long"]
+        fieldnames = ["Image_Label", "Image_Link", "Species", "User", "Date", "Time",
+                      "Seconds", "Place", "Lat", "Long"]
+        mock_get_inaturalist_observations.return_value = Mock(
+            data=observations,
+            fieldnames=fieldnames,
+            warnings=warnings)
+        client = app.test_client()
+        result = client.post(f"/api/inaturalist/bob/dataset")
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(list(result.json.keys()), ["id", "url", "warnings"])
+        self.assertIn("https://example.org", result.json["url"])
 
     @patch("main.get_inaturalist_observations")
     def test_get_inaturalist_csv(self, mock_get_inaturalist_observations):

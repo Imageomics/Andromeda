@@ -167,6 +167,15 @@ def csv_reponse_for_observations(fieldnames, observations, user_id):
         headers={"Content-disposition": f"attachment; filename={filename}"})
 
 
+def get_host_url(request):
+    # HuggingFace Space HOST
+    space_host = os.environ.get('SPACE_HOST')
+    if space_host:
+        return f"https://{space_host}"
+    else:
+        return request.host_url
+
+
 @app.route('/api/inaturalist/<user_id>/dataset', methods=['POST'])
 def create_inaturalist_dataset(user_id):
     add_sat_rgb_data = get_boolean_param(request, "add_sat_rgb_data")
@@ -181,7 +190,8 @@ def create_inaturalist_dataset(user_id):
         dataset_store = DatasetStore(base_directory=UPLOAD_FOLDER)
         dataset = dataset_store.create_dataset_with_content(csv_content)
         filename = get_csv_filename(user_id=user_id)
-        download_url = f"{request.host_url}/api/dataset/{dataset.id}?filename={filename}"
+        host_url = get_host_url(request=request)
+        download_url = f"{host_url}/api/dataset/{dataset.id}?filename={filename}"
         return jsonify({
             "id": dataset.id,
             "url": download_url,
