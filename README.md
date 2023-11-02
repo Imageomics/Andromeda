@@ -19,9 +19,18 @@ Deploying in another environment may require additional configuration; previous 
 You may use the Docker image for testing during development as described above, but it is not required.
 
 To run the website locally without using Docker requires two terminal sessions.
-1. Python Flask Backend API Server
+1. Python Flask Backend API Server: navigate to the `andromeda` folder and run
+```bash
+export ANDROMEDA_DEV_MODE=Y
+flask --app main run --debug
+```
+For more information, see the [Andromeda Backend README](https://github.com/Imageomics/Andromeda/blob/main/andromeda/README.md).
 
-2. Frontend nodejs/react development server
+2. Frontend nodejs/react development server: navigate to the `andromeda-ui` folder and run
+```bash
+npm run dev
+```
+For requirements and test information, see the [Andromeda UI README](https://github.com/Imageomics/Andromeda/blob/main/andromeda-ui/README.md).
 
 For instructions on building and running the Docker container see [Developing with Docker](https://github.com/Imageomics/Andromeda/wiki/Developing-with-Docker).
 
