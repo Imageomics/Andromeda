@@ -1,5 +1,8 @@
 # Andromeda
-Andromeda is a website that allows a user to perform dimensional reduction on an uploaded CSV file.
+This Andromeda package combines the data visualization tool (andromeda) with an option to fetch data from iNaturalist observations and pair them with satellite RGB and landcover data for analysis with andromeda. Andromeda uses a multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. It is interactive, allowing the user to choose image representations as their points and rearrange the clusters in a manner they find appropriate. This new grouping can be fed back into the algorithm to determine the weighting on provided features that most accurately describe it. Alternatively, the user can decide to increase the weight applied to a particular feature and see how that alters the clustering (they are defaulted to equal weight).
+
+An Andromeda instance allowing users to perform dimensional reduction on an uploaded CSV file can be found on the [Imageomics Hugging Face](https://huggingface.co/spaces/imageomics/Andromeda).
+
 
 ## Requirements
 Deployment requires [Docker](https://www.docker.com/).
@@ -16,10 +19,11 @@ Deploying in another environment may require additional configuration; previous 
 You may use the Docker image for testing during development as described above, but it is not required.
 
 To run the website locally without using Docker requires two terminal sessions.
-1. Python Flask Backend API Server 
+1. Python Flask Backend API Server
+
 2. Frontend nodejs/react development server
 
-For instructions on buliding and running the Docker container see [Developing with Docker](https://github.com/Imageomics/Andromeda/wiki/Developing-with-Docker).
+For instructions on building and running the Docker container see [Developing with Docker](https://github.com/Imageomics/Andromeda/wiki/Developing-with-Docker).
 
 ## Python Backend
 The python backend consists of a [Flask](https://flask.palletsprojects.com/en/2.3.x/quickstart/#a-minimal-application) REST API server.
