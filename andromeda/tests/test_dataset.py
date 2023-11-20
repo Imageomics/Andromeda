@@ -53,9 +53,11 @@ class TestDataset(unittest.TestCase):
 
         self.assertEqual(weights.keys(), set(["R1", "B1", "G1"]))
         self.assertEqual(len(image_coordinates), 3)
-        self.assertEqual(image_coordinates[0].keys(), set(["x", "y", "label", "url"]))
+        self.assertEqual(image_coordinates[0].keys(), set(["x", "y", "label", "url", "values"]))
         self.assertEqual(image_coordinates[0]["label"], "p1")
         self.assertEqual(image_coordinates[0]["url"], "https://example.com/p1.jpg")
+        self.assertEqual(image_coordinates[0]["values"].keys(), set(["R1", "B1", "G1"]))
+        self.assertEqual(image_coordinates[0]["values"]["B1"], 0.2)
         self.assertEqual(image_coordinates[1]["url"], "")
 
     @patch('dataset.os')

@@ -3,6 +3,7 @@ import uuid
 import pandas as pd
 from flask import abort
 import andromeda
+from sklearn.preprocessing import MinMaxScaler
 
 
 class DatasetStore(object):
@@ -75,6 +76,14 @@ class Dataset(object):
 
         return df[self.selected_columns]
 
+    def get_min_max_scaled_dataframe(self):
+        df = self.read_dataframe()
+        df.set_index(self.label_column_name, inplace=True)
+        df = df.select_dtypes('number')
+        scaler = MinMaxScaler()
+        df[df.columns] = scaler.fit_transform(df[df.columns])
+        return df
+
     def get_label_to_url(self):
         df = self.read_dataframe()
         return dict(zip(df[self.label_column_name], df[self.url_column_name]))
@@ -92,9 +101,13 @@ class Dataset(object):
         image_coordinate_df = andromeda.dimension_reduction(
             normalized_df, weight_series
         )
-
         self.add_label_and_url_columns(image_coordinate_df)
-        return weight_series.to_dict(), image_coordinate_df.to_dict("records")
+        min_max_dataframe = self.get_min_max_scaled_dataframe()
+        coordinate_dict_ary = image_coordinate_df.to_dict("records")
+        for item in coordinate_dict_ary:
+            series = min_max_dataframe.loc[item['label']]
+            item['values'] = series.to_dict()
+        return weight_series.to_dict(), coordinate_dict_ary
 
     @staticmethod
     def create_weight_series(weights, columns):

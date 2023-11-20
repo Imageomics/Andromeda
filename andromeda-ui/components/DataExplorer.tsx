@@ -19,6 +19,7 @@ interface DataExplorerProps {
     weights: any | undefined;
     datasetID: string | undefined;
     columnSettings: any;
+    columnDetails: any;
     drFunc: any;
     rdrFunc: any;
     onClickBack: any;
@@ -27,7 +28,7 @@ interface DataExplorerProps {
 
 export default function DataExplorer(props: DataExplorerProps) {
     const { images, setImageData, pointScaling, setPointScaling,
-        weights, datasetID, columnSettings,
+        weights, datasetID, columnSettings, columnDetails,
         drFunc, rdrFunc, onClickBack } = props;
     const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
     const [showLabel, setShowLabel] = useState<boolean>(true);
@@ -35,6 +36,7 @@ export default function DataExplorer(props: DataExplorerProps) {
     const [sliderWeights, setSliderWeights] = useState<any>(weights);
     const [working, setWorking] = useState<boolean>(false);
     const stageRef = useRef<any>(null);
+    const [highlightImageKey, setHighlightImageKey] = useState<string>();
 
     function onImageMoved(x: number, y: number, label: string) {
         if (images) {
@@ -55,9 +57,15 @@ export default function DataExplorer(props: DataExplorerProps) {
     }
 
     if (weights) {
+        let highlightValues: {[key:string]: number} = {}
+        if (highlightImageKey) {
+            highlightValues = images.find((x) => x.label == highlightImageKey).values;
+        }
+
         weightControls = Object.keys(weights).map(key => <WeightSlider
             key={key}
             id={key}
+            highlight={highlightValues[key]}
             weights={sliderWeights}
             onChange={(evt: any) => onChangeWeight(key, parseFloat(evt.target.value))} />);
     }
@@ -128,6 +136,7 @@ export default function DataExplorer(props: DataExplorerProps) {
                     showImage={showImage}
                     onImageMoved={onImageMoved}
                     images={images}
+                    setHighlightImageKey={setHighlightImageKey}
                 />
                 <div className="flex gap-2 my-2 mr-2">
                     <ColoredButton
