@@ -1,0 +1,108 @@
+# following https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
+
+abstract: "Andromeda uses a multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. This visualization is interactive, allowing the user to choose image representations as their points and rearrange the clusters in a manner they find appropriate. This package has an additional 'fetch data' option which pulls from iNaturalist, and can be merged with additional satellite data."
+authors:
+- family-names: "Bradley"
+  given-names: "John"
+  orcid: "https://orcid.org/0000-0003-3858-848X"
+- family-names: "Campolongo"
+  given-names: "Elizabeth G."
+  orcid: "https://orcid.org/0000-0003-0846-2413"
+- family-names: "Thompson"
+  given-names: "Matthew J."
+  orcid: "https://orcid.org/0000-0003-0583-8585"
+- family-names: "Rubenstein"
+  given-names: "Dan"
+  orcid: "https://orcid.org/0000-0001-9049-5219"
+- family-names: "Lapp"
+  given-names: "Hilmar"
+  orcid: "https://orcid.org/0000-0001-9107-0714"
+- family-names: "House"
+  given-names: "Leanna"
+  orcid: "https://orcid.org/0009-0003-2848-4131"
+cff-version: 1.2.0
+date-released: "2023-11-02"
+identifiers:
+  - description: "The GitHub release URL of tag 1.1.1."
+    type: url
+    value: "https://github.com/Imageomics/Andromeda/releases/tag/1.1.1"
+  - description: "The GitHub URL of the commit tagged with 1.1.1."
+    type: url
+    value: "https://github.com/Imageomics/Andromeda/tree/fb887fa48943dfa396845cbeee0da42456d55616"
+keywords:
+  - "multi-dimensional scaling"
+  - "MDS"
+  - "dimension reduction"
+  - "clustering"
+  - "explainable AI"
+  - "interactive evaluation"
+  - "image data"
+  - "visual analytics"
+  - "EDA"
+  - "data exploration"
+  - "data analysis"
+  - "visualization"
+license: MIT
+message: "If you use this software, please cite it using these metadata."
+repository-code: "https://github.com/Imageomics/Andromeda"
+title: "Andromeda"
+version: 1.1.1
+references:
+  # Papers covering the algorithm and conecpt of Andromeda (original introduction, followed by newer work)
+  - authors:
+      - family-names: Self
+        given-names: "Jessica Zeitz"
+      - family-names: Dowling
+        given-names: Michelle
+      - family-names: Wenskovitch
+        given-names: John
+      - family-names: Crandell
+        given-names: Ian
+      - family-names: Wang
+        given-names: Ming
+      - family-names: House
+        given-names: Leanna
+      - family-names: Leman
+        given-names: Scotland
+      - family-names: North
+        given-names: Chris
+    title: "Observation-Level and Parametric Interaction for High-Dimensional Data Analysis"
+    type: article
+    year: 2018
+    journal: "ACM Transactions on Interactive Intelligent Systems"
+    volume: 8
+    issue: 2
+  - authors:
+      - family-names: Han
+        given-names: Huimin
+      - family-names: Faust
+        given-names: Rebecca
+      - family-names: Norambuena
+        given-names: "Brian Felipe Keith"
+      - family-names: Prabhu
+        given-names: Ritvik
+      - family-names: Smith
+        given-names: Timothy
+      - family-names: Li
+        given-names: Song
+      - family-names: North
+        given-names: Chris
+    title: "Explainable Interactive Projections For Image Data"
+    type: article
+    year: 2022
+    journal: "Advances in Visual Computing: 17th International Symposium"
+    doi: "https://doi.org/10.1007/978-3-031-20713-6_6"
+  # Initial source repository
+  - authors:
+      - family-names: Liu
+        given-names: Wei
+    title: "Quest2022_Andromeda"
+    repository-code: "https://github.com/infovis-vt/Quest2022_Andromeda/tree/7cb9fc17c7652dfb85ee7544603c8c5110edd9e7"
+    type: software
+  # Reference repository providing additional insight for reworking source repo
+  - authors:
+      - family-names: Han
+        given-names: "Huimin (Hannah)"
+    title: "Andromeda_IMG" 
+    repository-code: "https://github.com/infovis-vt/Andromeda_IMG/tree/5ed9d493d15d834d0a47c7ac543e565dd4d2c84e"
+    type: software
