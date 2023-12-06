@@ -1,5 +1,7 @@
 # Andromeda
-This Andromeda package combines the data visualization tool (andromeda) with an option to fetch data from iNaturalist observations and pair them with satellite RGB and landcover data for analysis with andromeda. Andromeda uses a multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. It is interactive, allowing the user to choose image representations as their points and rearrange the clusters in a manner they find appropriate. This new grouping can be fed back into the algorithm to determine the weighting on provided features that most accurately describe it. Alternatively, the user can decide to increase the weight applied to a particular feature and see how that alters the clustering (they are defaulted to equal weight).
+Andromeda allows users to visualize high dimensional data in a 2-dimensional plot using weighted multidimensional scaling. Through the interactive interface users can explore the relationships within their data by adjusting the column weights and viewing the resulting clusters. Alternatively users can arrange the items into clusters and Andromeda can determine column weights.
+
+This package also includes a page to fetch data from iNaturalist observations and pair them with satellite RGB and landcover data for analysis with Andromeda. 
 
 An Andromeda instance allowing users to perform dimensional reduction on an uploaded CSV file can be found on the [Imageomics Hugging Face](https://huggingface.co/spaces/imageomics/Andromeda). 
 
