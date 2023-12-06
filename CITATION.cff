@@ -1,6 +1,6 @@
 # following https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
 
-abstract: "Andromeda uses a multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. This visualization is interactive, allowing the user to choose image representations as their points and rearrange the clusters in a manner they find appropriate. This package has an additional 'fetch data' option which pulls from iNaturalist, and can be merged with additional satellite data."
+abstract: "Andromeda uses a weighted multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. This visualization is interactive, allowing the user to choose image representations as their points and rearrange the clusters, and dimensional weights, in a manner they find appropriate. This package has an additional 'fetch data' option which pulls from iNaturalist, and can be merged with additional satellite data."
 authors:
 - family-names: "Bradley"
   given-names: "John"
