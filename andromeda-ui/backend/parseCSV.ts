@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 
-export async function parseCSVFile(file: File) {
+export async function parseCSVFile(fileContent: string) {
   // Wrap Papa.parse in a promise to allow async/await usage
   const promise: any = new Promise((resolve, reject) => {
     var config = {
@@ -14,7 +14,7 @@ export async function parseCSVFile(file: File) {
         reject(error);
       },
     };
-    Papa.parse(file, config);
+    Papa.parse(fileContent, config);
   });
   return await promise;
 }

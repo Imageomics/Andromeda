@@ -4,6 +4,7 @@ import ColoredButton from './ColoredButton';
 import { groupColumnsByType } from "../backend/parseCSV";
 
 interface ConfigureDatasetProps {
+    datasetName: string
     columnDetails: any;
     columnSettings: any;
     setColumnSettings: any;
@@ -12,7 +13,7 @@ interface ConfigureDatasetProps {
 }
 
 export default function ConfigureDataset(props: ConfigureDatasetProps) {
-    const { columnDetails, columnSettings, setColumnSettings, visualizeData, onClickBack } = props;
+    const { datasetName, columnDetails, columnSettings, setColumnSettings, visualizeData, onClickBack } = props;
     function setLabelColumnName(value: string) {
         setColumnSettings({ ...columnSettings, label: value })
     }
@@ -57,6 +58,10 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
 
     return <div>
         <h2 className="text-xl mb-2 font-bold">Configure Visualization</h2>
+        <div>
+            <div className="text-md font-medium">CSV file</div>
+            <div className="ml-3">{datasetName}</div>
+        </div>
         <div>
             <SimpleSelect
                 label="Label"
