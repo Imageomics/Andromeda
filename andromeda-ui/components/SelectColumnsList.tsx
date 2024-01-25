@@ -19,7 +19,6 @@ export default function SelectColumnsList(props: SelectColumnsListrProps) {
     const { columns, selectedColumns, changeSelectedColumn } = props
     const groupedItems = groupItems(columns, CHECKBOXES_PER_ROW)
     const columnTableRows = groupedItems.map((columnNamesSubset: string[], idx: number) => {
-        console.log(idx, columnNamesSubset);
         const checkboxes: any = columnNamesSubset.map((x) => {
             const name = "select_column_" + x;
             return <td key={x} className="px-2 whitespace-nowrap">

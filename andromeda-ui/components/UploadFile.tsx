@@ -4,12 +4,10 @@ import ColoredButton from './ColoredButton';
 
 interface UploadFileProps {
     uploadFile: any;
-    showUploadButton: boolean;
-    selectedFileChanged: any;
 }
 
 export default function UploadFile(props: UploadFileProps) {
-    const { uploadFile, showUploadButton, selectedFileChanged } = props;
+    const { uploadFile } = props;
     const [selectedFile, setSelectedFile] = useState<File>();
 
     async function onChangeSelectedFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -17,7 +15,6 @@ export default function UploadFile(props: UploadFileProps) {
         const selectedFiles = files as FileList;
         if (selectedFiles && selectedFiles.length > 0) {
             setSelectedFile(selectedFiles[0]);
-            selectedFileChanged();
         } else {
             setSelectedFile(undefined);
         }
@@ -29,16 +26,6 @@ export default function UploadFile(props: UploadFileProps) {
         } else {
             showError("File must be selected first.");
         }
-    }
-
-    let uploadButton = null;
-    if (showUploadButton) {
-        uploadButton = <ColoredButton
-            label="Upload File"
-            onClick={onClickUploadFile}
-            disabled={selectedFile === undefined}
-            color="blue"
-        />
     }
 
     return <>
@@ -55,6 +42,11 @@ export default function UploadFile(props: UploadFileProps) {
                 accept=".csv"
                 id="formFile" />
         </div>
-        {uploadButton}
+        <ColoredButton
+            label="Upload File"
+            onClick={onClickUploadFile}
+            disabled={selectedFile === undefined}
+            color="blue"
+        />
     </>
 }

@@ -11,6 +11,13 @@ export async function uploadDataset(file: File) {
   });
 }
 
+export async function readDataset(datasetId: string) {
+  const url = apiURL("/dataset/" + datasetId);
+  const response = await fetch(url);
+  const text = await response.text()
+  return text;
+}
+
 export async function dimensionalReduction(
   dataset_id: string,
   weights: any,
