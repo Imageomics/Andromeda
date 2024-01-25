@@ -18,7 +18,7 @@ const DEFAULT_POINT_SCALING = 1.0;
 export default function Home() {
   const router = useRouter()
 
-  const [datasetID, setDatasetID] = useState<string>();
+  const [datasetID, setDatasetID] = useState<string>("");
   const [datasetName, setDatasetName] = useState<string>("");
   const [imageData, setImageData] = useState<any[]>();
   const [weightData, setWeightData] = useState<any[]>();
