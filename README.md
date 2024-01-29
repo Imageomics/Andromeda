@@ -1,5 +1,12 @@
 # Andromeda
-Andromeda is a website that allows a user to perform dimensional reduction on an uploaded CSV file.
+Andromeda allows users to visualize high dimensional data in a 2-dimensional plot using weighted multidimensional scaling. Through the interactive interface users can explore the relationships within their data by adjusting the variable weights and viewing an updated plot.  Alternatively users can arrange the items  in the plot so that Andromeda can determine new variable weights and create a new projection. 
+
+This package also includes a page to fetch data from iNaturalist observations and pair them with satellite RGB and landcover data for analysis with Andromeda. 
+
+An Andromeda instance allowing users to perform dimensional reduction on an uploaded CSV file can be found on the [Imageomics Hugging Face](https://huggingface.co/spaces/imageomics/Andromeda). 
+
+![sample data visualization in Andromeda](docs/images/sample-data-viz.png)
+<p align="center"><i>Sample data visualization with Andromeda.</i></p>
 
 ## Requirements
 Deployment requires [Docker](https://www.docker.com/).
@@ -13,13 +20,22 @@ Hugging Face handles SSL encryption automatically.
 Deploying in another environment may require additional configuration; previous configurations are discussed in [Prior Configurations](https://github.com/Imageomics/Andromeda/wiki/Prior-Configurations).
 
 ## Development
-You may use the Docker image for testing during development as described above, but it is not required.
 
 To run the website locally without using Docker requires two terminal sessions.
-1. Python Flask Backend API Server 
-2. Frontend nodejs/react development server
+1. Python Flask Backend API Server: navigate to the `andromeda` folder and run
+```bash
+export ANDROMEDA_DEV_MODE=Y
+flask --app main run --debug
+```
+For more information, see the [Andromeda Backend README](https://github.com/Imageomics/Andromeda/blob/main/andromeda/README.md).
 
-For instructions on buliding and running the Docker container see [Developing with Docker](https://github.com/Imageomics/Andromeda/wiki/Developing-with-Docker).
+2. Frontend nodejs/react development server: navigate to the `andromeda-ui` folder and run
+```bash
+npm run dev
+```
+For requirements and test information, see the [Andromeda UI README](https://github.com/Imageomics/Andromeda/blob/main/andromeda-ui/README.md).
+
+For instructions on building and running the Docker container see [Developing with Docker](https://github.com/Imageomics/Andromeda/wiki/Developing-with-Docker).
 
 ## Python Backend
 The python backend consists of a [Flask](https://flask.palletsprojects.com/en/2.3.x/quickstart/#a-minimal-application) REST API server.
