@@ -1,0 +1,14 @@
+﻿Animal,imageFile,imageLink,Active,Forager,Furry,Grazer,Hunter,Size,Smart,Speed,Spots,Strength,Stripes,Walks,Water
+Blue Whale,whale.jpg,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/whale.jpg,7.88,0,0,0,5.94,86.46,39.06,21.42,23.75,55.26,2.5,0,76.61
+Cow,cow-head.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/cow-head.png,20.93,5.24,32.05,60.89,0,68.31,13.97,10.89,31.35,47.02,4.09,58.21,0.55
+Deer,deer-head.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/deer-head.png,50,23.91,52.33,69.35,5.26,39.88,40.05,73.73,48.08,23.88,0,63.33,0
+Dolphin,dolphin.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/dolphin.png,53.15,8.86,0.62,0.75,20.01,47.82,60.38,59.09,0.8,41.88,0,0,71.4
+Elephant,elephant-tusk2.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/elephant-tusk2.png,6.48,8.06,1.14,43.83,3.75,85.48,22.81,3.75,1.25,67.45,0,66.19,1.25
+German Shepherd,German Shephed.jpg,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/German%20Shepherd.jpg,58.15,5.62,66.05,0.62,43.77,54.88,57.53,57.02,11.59,62.33,1.56,76.91,3.75
+Horse,horse.jpg,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/horse.jpg,55.95,2.34,40.58,72.19,4.09,71.5,37.28,81.68,15.8,69.13,0,55.58,2.22
+Otter,Otter.jpg,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/Otter.jpg,41.11,1.25,46.94,0,32.92,11.25,27.22,40.97,0,11.39,0,5,78.75
+Sheep,sheep.svg.hi.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/sheep.svg.hi.png,3.75,2.5,61.16,68.35,0,16.53,10.62,4.66,0,10,0,73.69,0
+Siamese Cat,siameseCat.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/siameseCat.png,37.63,19.05,72.76,0,34.6,2.22,52.9,43.24,6.94,8.96,0,67.39,2.22
+Squirrel,squirrel.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/squirrel.png,62.01,77.01,78.78,2.5,0,2.64,18.48,54.93,2.5,14.17,12.5,35.21,1.25
+Tiger,tiger.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/tiger.png,59.45,4.38,66.23,0,84.93,78.36,36.59,76.21,6.08,84.04,89.3,73.92,4.06
+Wolf,wolf.png,https://github.com/Imageomics/Andromeda/raw/main/datasets/cartoonAnimals/wolf.png,77.68,22.97,67.2,0,71.47,40.21,61.48,63.13,0,61.63,0,32.95,0
