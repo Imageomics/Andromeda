@@ -12,6 +12,7 @@ interface ImageGridProps {
     showLabel: boolean;
     showImage: boolean;
     onImageMoved: any;
+    setHighlightImageKey: any;
     images: any[];
 }
 
@@ -55,10 +56,13 @@ export default function ImageGrid(props: ImageGridProps) {
     const { stageRef, size, imageSize, pointScaling, showLabel, showImage, images } = props;
     function onMouseEnter(evt: any) {
         stageRef.current.container().style.cursor = 'move';
+        const dataLabel = evt.currentTarget.attrs["data-label"];
+        props.setHighlightImageKey(dataLabel);
     }
 
     function onMouseLeave(evt: any) {
         stageRef.current.container().style.cursor = 'grab';
+        props.setHighlightImageKey(undefined);
     }
 
     const imageControls = images.map(item => createImage(
