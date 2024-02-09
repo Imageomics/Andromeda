@@ -19,7 +19,6 @@ interface DataExplorerProps {
     weights: any | undefined;
     datasetID: string | undefined;
     columnSettings: any;
-    columnDetails: any;
     drFunc: any;
     rdrFunc: any;
     onClickBack: any;
@@ -28,7 +27,7 @@ interface DataExplorerProps {
 
 export default function DataExplorer(props: DataExplorerProps) {
     const { images, setImageData, pointScaling, setPointScaling,
-        weights, datasetID, columnSettings, columnDetails,
+        weights, datasetID, columnSettings,
         drFunc, rdrFunc, onClickBack } = props;
     const [imageSize, setImageSize] = useState<number>(DEFAULT_IMAGE_SIZE);
     const [showLabel, setShowLabel] = useState<boolean>(true);
