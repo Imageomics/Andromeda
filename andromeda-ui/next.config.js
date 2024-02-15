@@ -2,7 +2,7 @@
 const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
 
 module.exports = (phase, { defaultConfig }) => {
-  let apiURL = "api";
+  let apiURL = "/api";
   if (phase === PHASE_DEVELOPMENT_SERVER) {
     apiURL = "http://127.0.0.1:5000/api";
   }
