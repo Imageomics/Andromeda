@@ -1,5 +1,4 @@
 import { makeObservationURL, fetchObservations } from "../../backend/observations";
-import fetchMock from 'fetch-mock';
 
 jest.mock('next/config', () => () => ({
     publicRuntimeConfig: {
@@ -33,8 +32,11 @@ test("fetchObservations returns JSON result of observations", async () => {
         "data": [{"label": "p1"}],
         "warnings": ["some_warning"]        
     }
-    fetchMock.get('https://example.com/api/inaturalist/bob?format=json&add_sat_rgb_data=false&add_landcover_data=false', payload);
-    const results = await fetchObservations("bob", false, false);
+    jest.spyOn(global, "fetch").mockImplementation(
+        jest.fn(
+          () => Promise.resolve({ ok: true, json: () => Promise.resolve(payload),
+        }),
+      ) as jest.Mock );
+    const results = await fetchObservations("bob", false, false, 10);
     expect(results).toStrictEqual(payload);
-    fetchMock.restore();
 });
