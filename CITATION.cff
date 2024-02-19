@@ -21,14 +21,14 @@ authors:
   given-names: "Leanna"
   orcid: "https://orcid.org/0009-0003-2848-4131"
 cff-version: 1.2.0
-date-released: "2023-11-02"
+date-released: "2024-02-15"
 identifiers:
-  - description: "The GitHub release URL of tag 1.1.1."
+  - description: "The GitHub release URL of tag 1.2.2."
     type: url
-    value: "https://github.com/Imageomics/Andromeda/releases/tag/1.1.1"
-  - description: "The GitHub URL of the commit tagged with 1.1.1."
+    value: "https://github.com/Imageomics/Andromeda/releases/tag/1.2.2"
+  - description: "The GitHub URL of the commit tagged with 1.2.2."
     type: url
-    value: "https://github.com/Imageomics/Andromeda/tree/fb887fa48943dfa396845cbeee0da42456d55616"
+    value: "https://github.com/Imageomics/Andromeda/tree/2fb1598ced144c298f829e1173f1ca9467845a5f"
 keywords:
   - "multi-dimensional scaling"
   - "MDS"
@@ -46,7 +46,7 @@ license: MIT
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/Imageomics/Andromeda"
 title: "Andromeda"
-version: 1.1.1
+version: 1.2.2
 references:
   # Papers covering the algorithm and conecpt of Andromeda (original introduction, followed by newer work)
   - authors:
