@@ -21,7 +21,7 @@ authors:
   given-names: "Leanna"
   orcid: "https://orcid.org/0009-0003-2848-4131"
 cff-version: 1.2.0
-date-released: "2024-02-15"
+date-released: "2024-02-16"
 identifiers:
   - description: "The GitHub release URL of tag 1.2.2."
     type: url
