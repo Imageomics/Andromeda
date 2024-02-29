@@ -1,6 +1,7 @@
 import SimpleSelect from "../components/SimpleSelect";
 import SelectColumnsList from "../components/SelectColumnsList";
 import ColoredButton from './ColoredButton';
+import IgnoredColumnsNote from '@/components/IgnoredColumnsNote';
 import { groupColumnsByType } from "../backend/parseCSV";
 
 interface ConfigureDatasetProps {
@@ -81,6 +82,7 @@ export default function ConfigureDataset(props: ConfigureDatasetProps) {
                 changeSelectedColumn={changeSelectedColumn} />
             {selectAncillaryColumns}
         </div>
+        <IgnoredColumnsNote />
         <div className="mt-4 flex gap-2">
             <ColoredButton
                 label="Back"
