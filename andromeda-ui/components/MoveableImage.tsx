@@ -21,49 +21,40 @@ export default function MoveableImage(props: MoveableImageProps) {
         onImageMoved, onMouseEnter, onMouseLeave } = props;
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [image] = useImage(url);
-    let imageControl = null;
+    const halfImageSize = imageSize / 2;
+    const circleRadius = halfImageSize + 6;
+    let imageOrDot = <Circle radius={4} fill="black"/>;
     if (showImage) {
         if (url) {
-            imageControl = <Image
+            imageOrDot = <Image
+                x={-halfImageSize}
+                y={-halfImageSize}
                 image={image}
                 width={imageSize}
                 height={imageSize}
                 strokeWidth={2}
                 alt={label}
             />            
-        } else {
-            imageControl = <Circle radius={4} fill="black"/>
         }
     }
-    let labelControl = null;
-    let labelX = 0;
-    let labelY = 0;
+    let imageLabel = null;
+    let labelX = 6;
+    let labelY = -6;
     if (showLabel) {
         if (showImage) {
             if (url) {
-                labelX = imageSize + 2;
-                labelY = imageSize / 3;    
-            } else {
-                labelX = 6;
-                labelY = -6;
+                labelX = halfImageSize + 2;
             }
         }
-        labelControl = <Text text={label}
+        imageLabel = <Text text={label}
             x={labelX} y={labelY}
             fontSize={14}
             shadowOffsetX={1}
             shadowColor="white" />
     }
-    let circleControl = null;
+    let selectionShape = null
     if (showSelected || isDragging) {
-        const halfImageSize = imageSize / 2;
-        const circleRadius = halfImageSize + 6;
-        if (url) {
-            circleControl = <Circle x={halfImageSize} y={halfImageSize} radius={circleRadius} fill="green" opacity={0.5} />
-        } else {
-            circleControl = <Circle  radius={10} fill="green" opacity={0.5} />
-        }
-        
+        selectionShape = <Circle  radius={circleRadius} fill="green" opacity={0.5} />
     }
 
     function onDragEnd(evt: any) {
@@ -80,8 +71,8 @@ export default function MoveableImage(props: MoveableImageProps) {
         onDragEnd={onDragEnd}
         x={x}
         y={y}>
-        {circleControl}
-        {imageControl}
-        {labelControl}
+        {selectionShape}
+        {imageOrDot}
+        {imageLabel}
     </Group>;
 }
