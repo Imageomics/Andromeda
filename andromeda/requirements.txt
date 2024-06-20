@@ -2,7 +2,7 @@ pandas==2.0.3
 numpy==1.26.0
 scikit-learn==1.5.0
 Flask==2.3.2
-Flask-Cors==3.0.10
+Flask-Cors==4.0.1
 pyinaturalist==0.18.0
 geopandas==0.13.2
 latloncover==0.1.0
