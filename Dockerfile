@@ -1,4 +1,4 @@
-FROM node:18.20.0 as builder
+FROM node:18.20.3 as builder
 WORKDIR /src
 COPY ./andromeda-ui/package.json ./
 RUN npm install
