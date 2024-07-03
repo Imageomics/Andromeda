@@ -1,4 +1,4 @@
-# Andromeda
+# Andromeda  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12107162.svg)](https://zenodo.org/doi/10.5281/zenodo.12107162)
 Andromeda allows users to visualize high dimensional data in a 2-dimensional plot using weighted multidimensional scaling. Through the interactive interface users can explore the relationships within their data by adjusting the variable weights and viewing an updated plot.  Alternatively users can arrange the items  in the plot so that Andromeda can determine new variable weights and create a new projection. 
 
 This package also includes a page to fetch data from iNaturalist observations and pair them with satellite RGB and landcover data for analysis with Andromeda. 
