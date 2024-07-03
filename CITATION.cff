@@ -27,9 +27,9 @@ identifiers:
   - description: "The GitHub release URL of tag 1.3.0."
     type: url
     value: "https://github.com/Imageomics/Andromeda/releases/tag/1.3.0"
-  - description: "The GitHub URL of the commit tagged with 1.2.2."
+  - description: "The GitHub URL of the commit tagged with 1.3.0."
     type: url
-    value: "https://github.com/Imageomics/Andromeda/tree/2fb1598ced144c298f829e1173f1ca9467845a5f" #Update on release
+    value: "https://github.com/Imageomics/Andromeda/tree/b1f28e74c83d636443f60fa6a4ad27d4e81f31cd"
 keywords:
   - "multi-dimensional scaling"
   - "MDS"
