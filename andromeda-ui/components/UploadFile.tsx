@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { showError } from "../util/toast";
 import ColoredButton from './ColoredButton';
+import SourceNote from './SourceNote';
 
 interface UploadFileProps {
     uploadFile: any;
@@ -48,5 +49,8 @@ export default function UploadFile(props: UploadFileProps) {
             disabled={selectedFile === undefined}
             color="blue"
         />
-    </>
+        <div>
+            <SourceNote />
+        </div>
+    </>;
 }
