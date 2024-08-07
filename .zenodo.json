@@ -1,0 +1,103 @@
+{
+  "creators": [
+    {
+      "name": "Bradley, John",
+      "orcid": "0000-0003-3858-848X"
+    },
+    {
+      "name": "Campolongo, Elizabeth G.",
+      "orcid": "0000-0003-0846-2413"
+    },
+    {
+      "name": "Thompson, Matthew J.",
+      "orcid": "0000-0003-0583-8585"
+    },
+    {
+      "name": "Rubenstein, Dan",
+      "orcid": "0000-0001-9049-5219"
+    },
+    {
+      "name": "Lapp, Hilmar",
+      "orcid": "0000-0001-9107-0714"
+    },
+    {
+      "name": "House, Leanna",
+      "orcid": "0009-0003-2848-4131"
+    }
+  ],
+  "description": "Andromeda uses a weighted multi-dimensional scaling algorithm to display data in clusters on a 2-dimensional plot. This visualization is interactive, allowing the user to choose image representations as their points and rearrange the clusters, and dimensional weights, in a manner they find appropriate. This package has an additional 'fetch data' option which pulls from iNaturalist and can be merged with additional satellite data. <a href=\"https://github.com/Imageomics/LatLonCover\" target=\"_blank\" rel=\"noopener\">LatLonCover</a> integration is available to add land coverage type percentages to data fetched through the \"fetch data\" tab; it is available for the contiguous US. Data fetched from iNaturalist could also be merged with pre-set satellite data including RGB summaries, though these are limited to areas covered by the&nbsp;<a href=\"https://github.com/Imageomics/Andromeda/wiki/Prior-Configurations#prior-versions\" target=\"_blank\" rel=\"noopener\">QUEST 2023</a> version. <a href=\"https://huggingface.co/spaces/imageomics/Andromeda\" target=\"_blank\" rel=\"noopener\">Hugging Face Instance of Andromeda</a>",
+  "keywords": [
+    "multi-dimensional scaling",
+    "MDS",
+    "dimension reduction",
+    "clustering",
+    "explainable AI",
+    "interactive evaluation",
+    "image data",
+    "visual analytics",
+    "EDA",
+    "data exploration",
+    "data analysis",
+    "visualization"
+  ],
+  "license": {
+    "id": "MIT"
+  },
+  "publication_date": "2024-07-19",
+  "title": "Andromeda",
+  "version": "1.3.1",
+  "funding": [
+      {
+        "award": {
+          "id": "021nxhr62::2118240",
+          "number": "2118240",
+          "program": "CISE/OAD",
+          "title": {
+            "en": "HDR Institute: Imageomics: A New Frontier of Biological Information Powered by Knowledge-Guided Machine Learning"
+          }
+        },
+        "funder": {
+          "id": "021nxhr62",
+          "name": "National Science Foundation"
+        }
+      }
+    ],
+    "references": [
+      {
+        "reference": "Han, H. et al. (2022). Explainable Interactive Projections for Image Data. In: Bebis, G., et al. Advances in Visual Computing. ISVC 2022. Lecture Notes in Computer Science, vol 13598. Springer, Cham. https://doi.org/10.1007/978-3-031-20713-6_6"
+      },
+      {
+        "reference": "Liu, W. (2022). Quest2022_Andromeda [Computer Software]. https://github.com/infovis-vt/Quest2022_Andromeda/tree/7cb9fc17c7652dfb85ee7544603c8c5110edd9e7"
+      },
+      {
+        "reference": "Han, H. (2023) Andromeda_IMG [Computer Software]. https://github.com/infovis-vt/Andromeda_IMG/tree/5ed9d493d15d834d0a47c7ac543e565dd4d2c84e"
+      }
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://github.com/Imageomics/Andromeda/",
+        "relation_type": {
+          "id": "isversionof",
+          "title": {
+            "de": "Ist eine Version von",
+            "en": "Is version of"
+          }
+        },
+        "resource_type": {
+          "id": "software",
+          "title": {
+            "de": "Software",
+            "en": "Software"
+          }
+        },
+        "scheme": "url"
+      }
+    ],
+    "resource_type": {
+      "id": "software",
+      "title": {
+        "de": "Software",
+        "en": "Software"
+      }
+    }
+}
