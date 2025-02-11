@@ -46,58 +46,14 @@
   "publication_date": "2024-07-19",
   "title": "Andromeda",
   "version": "1.3.1",
-  "funding": [
+  "grants": [
       {
-        "award": {
-          "id": "021nxhr62::2118240",
-          "number": "2118240",
-          "program": "CISE/OAD",
-          "title": {
-            "en": "HDR Institute: Imageomics: A New Frontier of Biological Information Powered by Knowledge-Guided Machine Learning"
-          }
-        },
-        "funder": {
-          "id": "021nxhr62",
-          "name": "National Science Foundation"
+          "id": "021nxhr62::2118240"
         }
-      }
     ],
     "references": [
-      {
-        "reference": "Han, H. et al. (2022). Explainable Interactive Projections for Image Data. In: Bebis, G., et al. Advances in Visual Computing. ISVC 2022. Lecture Notes in Computer Science, vol 13598. Springer, Cham. https://doi.org/10.1007/978-3-031-20713-6_6"
-      },
-      {
-        "reference": "Liu, W. (2022). Quest2022_Andromeda [Computer Software]. https://github.com/infovis-vt/Quest2022_Andromeda/tree/7cb9fc17c7652dfb85ee7544603c8c5110edd9e7"
-      },
-      {
-        "reference": "Han, H. (2023) Andromeda_IMG [Computer Software]. https://github.com/infovis-vt/Andromeda_IMG/tree/5ed9d493d15d834d0a47c7ac543e565dd4d2c84e"
-      }
-    ],
-    "related_identifiers": [
-      {
-        "identifier": "https://github.com/Imageomics/Andromeda/",
-        "relation_type": {
-          "id": "isversionof",
-          "title": {
-            "de": "Ist eine Version von",
-            "en": "Is version of"
-          }
-        },
-        "resource_type": {
-          "id": "software",
-          "title": {
-            "de": "Software",
-            "en": "Software"
-          }
-        },
-        "scheme": "url"
-      }
-    ],
-    "resource_type": {
-      "id": "software",
-      "title": {
-        "de": "Software",
-        "en": "Software"
-      }
-    }
+        "Han, H. et al. (2022). Explainable Interactive Projections for Image Data. In: Bebis, G., et al. Advances in Visual Computing. ISVC 2022. Lecture Notes in Computer Science, vol 13598. Springer, Cham. https://doi.org/10.1007/978-3-031-20713-6_6",
+        "Liu, W. (2022). Quest2022_Andromeda [Computer Software]. https://github.com/infovis-vt/Quest2022_Andromeda/tree/7cb9fc17c7652dfb85ee7544603c8c5110edd9e7",
+        "Han, H. (2023) Andromeda_IMG [Computer Software]. https://github.com/infovis-vt/Andromeda_IMG/tree/5ed9d493d15d834d0a47c7ac543e565dd4d2c84e"
+    ]
 }
